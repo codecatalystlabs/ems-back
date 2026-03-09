@@ -82,10 +82,6 @@ test-redis:
 run-app:
 	go run ./cmd/server/main.go
 
-.PHONY: run-events
-run-events:
-	go run ./cmd/worker/main.go
-
 .PHONY: run-seed
 run-seed:
 	go run ./cmd/seed/main.go

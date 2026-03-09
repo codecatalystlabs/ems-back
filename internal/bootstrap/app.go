@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
 	"dispatch/internal/platform/config"
@@ -47,13 +46,6 @@ func NewApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	producer, err := NewKafkaSyncProducer(cfg.Kafka)
-	if err != nil {
-		return nil, err
-	}
-
-	bus := events.NewKafkaBus(producer, log)
-
 	r := NewRouter()
 	api := r.Group("/api/v1")
 	RegisterModules(types.ModuleDeps{
@@ -61,7 +53,6 @@ func NewApp(ctx context.Context) (*App, error) {
 		DB:     db,
 		Redis:  redisClient,
 		Logger: log,
-		Bus:    bus,
 		Config: cfg,
 	})
 
@@ -72,7 +63,7 @@ func NewApp(ctx context.Context) (*App, error) {
 		WriteTimeout: cfg.App.WriteTimeout,
 	}
 
-	return &App{cfg: cfg, log: log, http: srv, kafka: bus}, nil
+	return &App{cfg: cfg, log: log, http: srv}, nil
 }
 
 func (a *App) Run(ctx context.Context) error {
@@ -95,28 +86,3 @@ func (a *App) Run(ctx context.Context) error {
 		return err
 	}
 }
-
-func NewWorker(ctx context.Context) (*Worker, error) {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		return nil, err
-	}
-	log, err := NewLogger(cfg.Log)
-	if err != nil {
-		return nil, err
-	}
-	producer, err := NewKafkaSyncProducer(cfg.Kafka)
-	if err != nil {
-		return nil, err
-	}
-	bus := events.NewKafkaBus(producer, log)
-	return &Worker{cfg: cfg, log: log, kafka: bus}, nil
-}
-
-func (w *Worker) Run(ctx context.Context) error {
-	w.log.Info("worker started")
-	<-ctx.Done()
-	return w.kafka.Close()
-}
-
-var _ = gin.H{}
