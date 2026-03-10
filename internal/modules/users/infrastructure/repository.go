@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -9,6 +10,10 @@ import (
 	"dispatch/internal/modules/users/domain"
 	"dispatch/internal/platform/db"
 
+	userapp "dispatch/internal/modules/users/application"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -94,4 +99,98 @@ func (r *Repository) List(ctx context.Context, params dto.ListUsersParams) ([]do
 		users = append(users, u)
 	}
 	return users, total, rows.Err()
+}
+
+func (r *Repository) GetByID(ctx context.Context, id string) (domain.User, error) {
+	var u domain.User
+	err := r.db.QueryRow(ctx, `
+		SELECT id, username, first_name, last_name, COALESCE(phone,''), COALESCE(email,''), status, created_at
+		FROM users
+		WHERE id = $1 AND deleted_at IS NULL
+	`, id).Scan(&u.ID, &u.Username, &u.FirstName, &u.LastName, &u.Phone, &u.Email, &u.Status, &u.CreatedAt)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.User{}, userapp.ErrUserNotFound
+	}
+	return u, err
+}
+
+func (r *Repository) Update(ctx context.Context, id string, req dto.UpdateUserRequest) (domain.User, error) {
+	sets := make([]string, 0)
+	args := make([]any, 0)
+	pos := 1
+
+	if req.FirstName != nil {
+		sets = append(sets, fmt.Sprintf("first_name = $%d", pos))
+		args = append(args, *req.FirstName)
+		pos++
+	}
+	if req.LastName != nil {
+		sets = append(sets, fmt.Sprintf("last_name = $%d", pos))
+		args = append(args, *req.LastName)
+		pos++
+	}
+	if req.Phone != nil {
+		sets = append(sets, fmt.Sprintf("phone = $%d", pos))
+		args = append(args, *req.Phone)
+		pos++
+	}
+	if req.Email != nil {
+		sets = append(sets, fmt.Sprintf("email = $%d", pos))
+		args = append(args, *req.Email)
+		pos++
+	}
+	if req.Status != nil {
+		sets = append(sets, fmt.Sprintf("status = $%d", pos))
+		args = append(args, strings.ToUpper(*req.Status))
+		pos++
+	}
+	if req.IsActive != nil {
+		sets = append(sets, fmt.Sprintf("is_active = $%d", pos))
+		args = append(args, *req.IsActive)
+		pos++
+	}
+
+	if len(sets) == 0 {
+		return r.GetByID(ctx, id)
+	}
+
+	sets = append(sets, "updated_at = now()")
+	args = append(args, id)
+
+	query := fmt.Sprintf(`
+		UPDATE users
+		SET %s
+		WHERE id = $%d AND deleted_at IS NULL
+	`, strings.Join(sets, ", "), pos)
+
+	ct, err := r.db.Exec(ctx, query, args...)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return domain.User{}, err
+		}
+		return domain.User{}, err
+	}
+	if ct.RowsAffected() == 0 {
+		return domain.User{}, userapp.ErrUserNotFound
+	}
+
+	return r.GetByID(ctx, id)
+}
+
+func (r *Repository) Delete(ctx context.Context, id string) error {
+	ct, err := r.db.Exec(ctx, `
+		UPDATE users
+		SET deleted_at = now(),
+		    is_active = FALSE,
+		    updated_at = now()
+		WHERE id = $1 AND deleted_at IS NULL
+	`, id)
+	if err != nil {
+		return err
+	}
+	if ct.RowsAffected() == 0 {
+		return userapp.ErrUserNotFound
+	}
+	return nil
 }

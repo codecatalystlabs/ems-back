@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"dispatch/internal/platform/auth"
@@ -15,9 +16,14 @@ import (
 	"go.uber.org/zap"
 )
 
+var ErrUserNotFound = errors.New("user not found")
+
 type ServiceRepository interface {
 	Create(ctx context.Context, user domain.User, passwordHash string) error
 	List(ctx context.Context, params dto.ListUsersParams) ([]domain.User, int64, error)
+	GetByID(ctx context.Context, id string) (domain.User, error)
+	Update(ctx context.Context, id string, req dto.UpdateUserRequest) (domain.User, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type Service struct {
@@ -76,4 +82,16 @@ func (s *Service) List(ctx context.Context, params dto.ListUsersParams) (db.Page
 		Items: items,
 		Meta:  db.NewPageMeta(params.Pagination, total),
 	}, nil
+}
+
+func (s *Service) GetByID(ctx context.Context, id string) (domain.User, error) {
+	return s.repo.GetByID(ctx, id)
+}
+
+func (s *Service) Update(ctx context.Context, id string, req dto.UpdateUserRequest) (domain.User, error) {
+	return s.repo.Update(ctx, id, req)
+}
+
+func (s *Service) Delete(ctx context.Context, id string) error {
+	return s.repo.Delete(ctx, id)
 }

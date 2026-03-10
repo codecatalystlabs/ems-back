@@ -14,3 +14,12 @@ type CreateUserRequest struct {
 type ListUsersParams struct {
 	Pagination db.Pagination `json:"pagination"`
 }
+
+type UpdateUserRequest struct {
+	FirstName *string `json:"first_name"`
+	LastName  *string `json:"last_name"`
+	Phone     *string `json:"phone"`
+	Email     *string `json:"email"`
+	Status    *string `json:"status"`
+	IsActive  *bool   `json:"is_active"`
+}

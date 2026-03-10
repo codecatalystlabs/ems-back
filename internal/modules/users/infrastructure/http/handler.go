@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -86,4 +87,48 @@ func (h *Handler) List(c *gin.Context) {
 		return
 	}
 	httpx.OK(c, result)
+}
+
+func (h *Handler) GetByID(c *gin.Context) {
+	user, err := h.service.GetByID(c.Request.Context(), c.Param("id"))
+	if err != nil {
+		if errors.Is(err, userSv.ErrUserNotFound) {
+			httpx.Error(c, http.StatusNotFound, err.Error())
+			return
+		}
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, user)
+}
+
+func (h *Handler) Update(c *gin.Context) {
+	var req dto.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	user, err := h.service.Update(c.Request.Context(), c.Param("id"), req)
+	if err != nil {
+		if errors.Is(err, userSv.ErrUserNotFound) {
+			httpx.Error(c, http.StatusNotFound, err.Error())
+			return
+		}
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, user)
+}
+
+func (h *Handler) Delete(c *gin.Context) {
+	err := h.service.Delete(c.Request.Context(), c.Param("id"))
+	if err != nil {
+		if errors.Is(err, userSv.ErrUserNotFound) {
+			httpx.Error(c, http.StatusNotFound, err.Error())
+			return
+		}
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "user deleted"})
 }

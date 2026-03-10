@@ -1,15 +1,19 @@
 package http
 
-import "github.com/gin-gonic/gin"
+import (
+	rbacmiddleware "dispatch/internal/modules/rbac/middleware"
+
+	"github.com/gin-gonic/gin"
+)
 
 func RegisterRoutes(rg *gin.RouterGroup, h *Handler) {
-	rg.POST("/requisitions", h.RaiseRequisition)
-	rg.GET("/requisitions", h.ListRequisitions)
-	rg.POST("/requisitions/:id/broadcast", h.Broadcast)
-	rg.GET("/requisitions/:id/offers", h.ListOffers)
-	rg.POST("/offers", h.CreateOffer)
-	rg.POST("/requisitions/:id/offers/:offerId/accept", h.AcceptOffer)
-	rg.POST("/pickup-assignments", h.AssignPickup)
-	rg.POST("/pickup-assignments/:assignmentId/collect", h.MarkCollected)
-	rg.POST("/pickup-assignments/:assignmentId/deliver", h.MarkDelivered)
+	rg.POST("/requisitions", rbacmiddleware.RequirePermission(nil, "incidents.create"), h.RaiseRequisition)
+	rg.GET("/requisitions", rbacmiddleware.RequirePermission(nil, "incidents.read"), h.ListRequisitions)
+	rg.POST("/requisitions/:id/broadcast", rbacmiddleware.RequirePermission(nil, "dispatch.assign"), h.Broadcast)
+	rg.GET("/requisitions/:id/offers", rbacmiddleware.RequirePermission(nil, "incidents.read"), h.ListOffers)
+	rg.POST("/offers", rbacmiddleware.RequirePermission(nil, "incidents.create"), h.CreateOffer)
+	rg.POST("/requisitions/:id/offers/:offerId/accept", rbacmiddleware.RequirePermission(nil, "dispatch.assign"), h.AcceptOffer)
+	rg.POST("/pickup-assignments", rbacmiddleware.RequirePermission(nil, "dispatch.assign"), h.AssignPickup)
+	rg.POST("/pickup-assignments/:assignmentId/collect", rbacmiddleware.RequirePermission(nil, "dispatch.update_status"), h.MarkCollected)
+	rg.POST("/pickup-assignments/:assignmentId/deliver", rbacmiddleware.RequirePermission(nil, "dispatch.update_status"), h.MarkDelivered)
 }
