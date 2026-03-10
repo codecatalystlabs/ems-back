@@ -23,6 +23,7 @@ func NewHandler(service *notifapp.Service) *Handler {
 //	@Summary		List my notifications
 //	@Tags			Notifications
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			page		query	int		false	"Page number"	default(1)
 //	@Param			page_size	query	int		false	"Page size"		default(20)
 //	@Param			filter[status]	query	string	false	"Filter by status"
@@ -55,6 +56,7 @@ func (h *Handler) ListMy(c *gin.Context) {
 //	@Summary		Get notification
 //	@Tags			Notifications
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Notification ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
@@ -75,6 +77,7 @@ func (h *Handler) Get(c *gin.Context) {
 //	@Tags			Notifications
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			payload	body		notifapp.CreateNotificationRequest	true	"Create notification payload"
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -99,6 +102,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Summary		Mark notification as read
 //	@Tags			Notifications
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Notification ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}

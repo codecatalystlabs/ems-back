@@ -24,6 +24,7 @@ func NewHandler(service *facapp.Service) *Handler {
 //	@Description	Returns paginated facilities with region/district/subcounty hierarchy
 //	@Tags			Facilities
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			page				query		int		false	"Page number"			default(1)
 //	@Param			page_size			query		int		false	"Page size"				default(20)
 //	@Param			search				query		string	false	"Search term (facility, district, subcounty, region)"
@@ -72,6 +73,7 @@ func (h *Handler) List(c *gin.Context) {
 //	@Description	Get a single facility by UID
 //	@Tags			Facilities
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			uid	path	string	true	"Facility UID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
@@ -93,6 +95,7 @@ func (h *Handler) Get(c *gin.Context) {
 //	@Tags			Facilities
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			payload	body		facapp.CreateFacilityRequest	true	"Create facility payload"
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -119,6 +122,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Tags			Facilities
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			uid		path	string							true	"Facility UID"
 //	@Param			payload	body		facapp.UpdateFacilityRequest	true	"Update facility payload"
 //	@Success		200		{object}	map[string]interface{}
@@ -146,6 +150,7 @@ func (h *Handler) Update(c *gin.Context) {
 //	@Description	Delete a facility by UID
 //	@Tags			Facilities
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			uid	path	string	true	"Facility UID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}

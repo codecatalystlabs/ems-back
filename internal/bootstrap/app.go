@@ -77,7 +77,9 @@ func (a *App) Run(ctx context.Context) error {
 	case <-ctx.Done():
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), a.cfg.App.ShutdownTimeout)
 		defer cancel()
-		_ = a.kafka.Close()
+		if a.kafka != nil {
+			_ = a.kafka.Close()
+		}
 		return a.http.Shutdown(shutdownCtx)
 	case err := <-errCh:
 		if err == http.ErrServerClosed {

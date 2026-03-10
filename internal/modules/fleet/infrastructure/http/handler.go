@@ -24,6 +24,7 @@ func NewHandler(service *fleetapp.Service) *Handler {
 //	@Description	Returns paginated ambulances with status and readiness
 //	@Tags			Fleet
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			page					query		int		false	"Page number"			default(1)
 //	@Param			page_size				query		int		false	"Page size"				default(20)
 //	@Param			search					query		string	false	"Search term (code, plate, VIN, make, model)"
@@ -40,16 +41,16 @@ func (h *Handler) List(c *gin.Context) {
 	p := platformdb.ParsePagination(
 		c.Request.URL.Query(),
 		map[string]string{
-			"created_at":        "a.created_at",
-			"plate_number":      "a.plate_number",
-			"status":            "a.status",
+			"created_at":         "a.created_at",
+			"plate_number":       "a.plate_number",
+			"status":             "a.status",
 			"dispatch_readiness": "a.dispatch_readiness",
 		},
 		map[string]struct{}{
-			"status":            {},
+			"status":             {},
 			"dispatch_readiness": {},
-			"district_id":       {},
-			"category_id":       {},
+			"district_id":        {},
+			"category_id":        {},
 		},
 	)
 	out, err := h.service.ListAmbulances(c.Request.Context(), p)
@@ -66,6 +67,7 @@ func (h *Handler) List(c *gin.Context) {
 //	@Description	Get a single ambulance by ID
 //	@Tags			Fleet
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Ambulance ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
@@ -87,6 +89,7 @@ func (h *Handler) Get(c *gin.Context) {
 //	@Tags			Fleet
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			payload	body		fleetapp.CreateAmbulanceRequest	true	"Create ambulance payload"
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -113,6 +116,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Tags			Fleet
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id		path	string							true	"Ambulance ID"
 //	@Param			payload	body		fleetapp.UpdateAmbulanceRequest	true	"Update ambulance payload"
 //	@Success		200		{object}	map[string]interface{}
@@ -140,6 +144,7 @@ func (h *Handler) Update(c *gin.Context) {
 //	@Description	Delete an ambulance by ID
 //	@Tags			Fleet
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Ambulance ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
@@ -152,5 +157,3 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 	httpx.OK(c, gin.H{"message": "ambulance deleted"})
 }
-
-

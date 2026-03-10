@@ -10,6 +10,11 @@
     "paths": {
         "/ambulances": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns paginated ambulances with status and readiness",
                 "produces": [
                     "application/json"
@@ -104,6 +109,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new ambulance record",
                 "consumes": [
                     "application/json"
@@ -153,6 +163,11 @@
         },
         "/ambulances/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single ambulance by ID",
                 "produces": [
                     "application/json"
@@ -188,6 +203,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing ambulance",
                 "consumes": [
                     "application/json"
@@ -242,6 +262,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an ambulance by ID",
                 "produces": [
                     "application/json"
@@ -917,6 +942,11 @@
         },
         "/facilities": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns paginated facilities with region/district/subcounty hierarchy",
                 "produces": [
                     "application/json"
@@ -1021,6 +1051,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new facility record",
                 "consumes": [
                     "application/json"
@@ -1070,6 +1105,11 @@
         },
         "/facilities/{uid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single facility by UID",
                 "produces": [
                     "application/json"
@@ -1105,6 +1145,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing facility",
                 "consumes": [
                     "application/json"
@@ -1159,6 +1204,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a facility by UID",
                 "produces": [
                     "application/json"
@@ -1196,6 +1246,11 @@
         },
         "/incidents": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns paginated incidents with filters for status and type",
                 "produces": [
                     "application/json"
@@ -1294,6 +1349,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new incident record from an emergency alert",
                 "consumes": [
                     "application/json"
@@ -1343,6 +1403,11 @@
         },
         "/incidents/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single incident by ID",
                 "produces": [
                     "application/json"
@@ -1378,6 +1443,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing incident",
                 "consumes": [
                     "application/json"
@@ -1432,6 +1502,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an incident by ID",
                 "produces": [
                     "application/json"
@@ -1469,6 +1544,11 @@
         },
         "/notifications": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1522,6 +1602,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -1570,6 +1655,11 @@
         },
         "/notifications/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1606,6 +1696,11 @@
         },
         "/notifications/{id}/read": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1675,6 +1770,11 @@
         },
         "/trips": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1748,6 +1848,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -1796,6 +1901,11 @@
         },
         "/trips/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1830,6 +1940,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -1883,6 +1998,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1919,6 +2039,11 @@
         },
         "/trips/{id}/events": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1967,6 +2092,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],

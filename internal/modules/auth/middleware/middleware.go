@@ -18,12 +18,18 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 
 	jwtMgr := platformauth.NewJWTManager(secret, cfg.JWT.Issuer, cfg.JWT.AccessTTL, cfg.JWT.RefreshTTL)
 	return func(c *gin.Context) {
-		auth := c.GetHeader("Authorization")
-		if auth == "" || !strings.HasPrefix(auth, "Bearer ") {
+		auth := strings.TrimSpace(c.GetHeader("Authorization"))
+		if auth == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "missing bearer token"})
 			return
 		}
-		tokenStr := strings.TrimPrefix(auth, "Bearer ")
+
+		parts := strings.SplitN(auth, " ", 2)
+		if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") || strings.TrimSpace(parts[1]) == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "missing bearer token"})
+			return
+		}
+		tokenStr := strings.TrimSpace(parts[1])
 		claims, err := jwtMgr.ParseAccessToken(tokenStr)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "invalid token"})

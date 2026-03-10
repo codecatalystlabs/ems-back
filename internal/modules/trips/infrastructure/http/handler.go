@@ -23,6 +23,7 @@ func NewHandler(service *tripsapp.Service) *Handler {
 //	@Summary		List trips
 //	@Tags			Trips
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			page				query		int		false	"Page number"		default(1)
 //	@Param			page_size			query		int		false	"Page size"		default(20)
 //	@Param			sort_by				query		string	false	"Sort field"	Enums(started_at,created_at)
@@ -57,6 +58,7 @@ func (h *Handler) List(c *gin.Context) {
 //	@Summary		Get trip
 //	@Tags			Trips
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Trip ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
@@ -77,6 +79,7 @@ func (h *Handler) Get(c *gin.Context) {
 //	@Tags			Trips
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			payload	body		tripsapp.CreateTripRequest	true	"Create trip payload"
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -102,6 +105,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Tags			Trips
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id		path	string						true	"Trip ID"
 //	@Param			payload	body		tripsapp.UpdateTripRequest	true	"Update trip payload"
 //	@Success		200		{object}	map[string]interface{}
@@ -128,6 +132,7 @@ func (h *Handler) Update(c *gin.Context) {
 //	@Summary		Delete trip
 //	@Tags			Trips
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Trip ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
@@ -146,6 +151,7 @@ func (h *Handler) Delete(c *gin.Context) {
 //	@Summary		List trip events
 //	@Tags			Trips
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id		path	string	true	"Trip ID"
 //	@Param			page	query	int		false	"Page number"	default(1)
 //	@Param			page_size query	int	false	"Page size"		default(20)
@@ -175,6 +181,7 @@ func (h *Handler) ListEvents(c *gin.Context) {
 //	@Tags			Trips
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id		path	string							true	"Trip ID"
 //	@Param			payload	body		tripsapp.CreateTripEventRequest	true	"Create trip event payload"
 //	@Success		201		{object}	map[string]interface{}

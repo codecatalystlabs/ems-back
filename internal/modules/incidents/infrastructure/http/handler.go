@@ -24,6 +24,7 @@ func NewHandler(service *incapp.Service) *Handler {
 //	@Description	Returns paginated incidents with filters for status and type
 //	@Tags			Incidents
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			page					query		int		false	"Page number"				default(1)
 //	@Param			page_size				query		int		false	"Page size"					default(20)
 //	@Param			search					query		string	false	"Search term (number, caller, patient, summary)"
@@ -67,6 +68,7 @@ func (h *Handler) List(c *gin.Context) {
 //	@Tags			Incidents
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			payload	body		incapp.CreateIncidentRequest	true	"Create incident payload"
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -97,6 +99,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Description	Get a single incident by ID
 //	@Tags			Incidents
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Incident ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
@@ -118,6 +121,7 @@ func (h *Handler) Get(c *gin.Context) {
 //	@Tags			Incidents
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id		path	string							true	"Incident ID"
 //	@Param			payload	body		incapp.UpdateIncidentRequest	true	"Update incident payload"
 //	@Success		200		{object}	map[string]interface{}
@@ -145,6 +149,7 @@ func (h *Handler) Update(c *gin.Context) {
 //	@Description	Delete an incident by ID
 //	@Tags			Incidents
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			id	path	string	true	"Incident ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}

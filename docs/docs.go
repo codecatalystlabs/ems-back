@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/ambulances": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns paginated ambulances with status and readiness",
                 "produces": [
                     "application/json"
@@ -111,6 +116,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new ambulance record",
                 "consumes": [
                     "application/json"
@@ -160,6 +170,11 @@ const docTemplate = `{
         },
         "/ambulances/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single ambulance by ID",
                 "produces": [
                     "application/json"
@@ -195,6 +210,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing ambulance",
                 "consumes": [
                     "application/json"
@@ -249,6 +269,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an ambulance by ID",
                 "produces": [
                     "application/json"
@@ -924,6 +949,11 @@ const docTemplate = `{
         },
         "/facilities": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns paginated facilities with region/district/subcounty hierarchy",
                 "produces": [
                     "application/json"
@@ -1028,6 +1058,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new facility record",
                 "consumes": [
                     "application/json"
@@ -1077,6 +1112,11 @@ const docTemplate = `{
         },
         "/facilities/{uid}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single facility by UID",
                 "produces": [
                     "application/json"
@@ -1112,6 +1152,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing facility",
                 "consumes": [
                     "application/json"
@@ -1166,6 +1211,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a facility by UID",
                 "produces": [
                     "application/json"
@@ -1203,6 +1253,11 @@ const docTemplate = `{
         },
         "/incidents": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Returns paginated incidents with filters for status and type",
                 "produces": [
                     "application/json"
@@ -1301,6 +1356,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new incident record from an emergency alert",
                 "consumes": [
                     "application/json"
@@ -1350,6 +1410,11 @@ const docTemplate = `{
         },
         "/incidents/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single incident by ID",
                 "produces": [
                     "application/json"
@@ -1385,6 +1450,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing incident",
                 "consumes": [
                     "application/json"
@@ -1439,6 +1509,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an incident by ID",
                 "produces": [
                     "application/json"
@@ -1476,6 +1551,11 @@ const docTemplate = `{
         },
         "/notifications": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1529,6 +1609,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -1577,6 +1662,11 @@ const docTemplate = `{
         },
         "/notifications/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1613,6 +1703,11 @@ const docTemplate = `{
         },
         "/notifications/{id}/read": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1682,6 +1777,11 @@ const docTemplate = `{
         },
         "/trips": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1755,6 +1855,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -1803,6 +1908,11 @@ const docTemplate = `{
         },
         "/trips/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1837,6 +1947,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -1890,6 +2005,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1926,6 +2046,11 @@ const docTemplate = `{
         },
         "/trips/{id}/events": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1974,6 +2099,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
