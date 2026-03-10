@@ -15,6 +15,19 @@ type Handler struct{ service *bloodapp.Service }
 
 func NewHandler(service *bloodapp.Service) *Handler { return &Handler{service: service} }
 
+// RaiseRequisition godoc
+//
+//	@Summary		Raise blood requisition
+//	@Description	Creates a new blood requisition request
+//	@Tags			Blood
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			payload	body		dto.CreateBloodRequisitionRequest	true	"Requisition details"
+//	@Success		201		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/blood/requisitions [post]
 func (h *Handler) RaiseRequisition(c *gin.Context) {
 	var req dto.CreateBloodRequisitionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -44,6 +57,24 @@ func (h *Handler) Broadcast(c *gin.Context) {
 	httpx.OK(c, out)
 }
 
+// ListRequisitions godoc
+//
+//	@Summary		List blood requisitions
+//	@Description	Returns paginated blood requisitions with search, sorting, and filters
+//	@Tags			Blood
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			page			query		int		false	"Page number"	default(1)
+//	@Param			page_size		query		int		false	"Page size"		default(20)
+//	@Param			search			query		string	false	"Search term"
+//	@Param			status			query		string	false	"Filter by status"
+//	@Param			blood_type		query		string	false	"Filter by blood type"
+//	@Param			urgency_level	query		string	false	"Filter by urgency level"
+//	@Param			sort_by			query		string	false	"Sort by field: created_at, status, urgency_level"
+//	@Param			sort_order		query		string	false	"Sort order: asc or desc"
+//	@Success		200				{object}	map[string]interface{}
+//	@Failure		500				{object}	map[string]interface{}
+//	@Router			/blood/requisitions [get]
 func (h *Handler) ListRequisitions(c *gin.Context) {
 	p := platformdb.ParsePagination(c.Request.URL.Query(), map[string]string{
 		"created_at":      "br.created_at",
@@ -62,6 +93,19 @@ func (h *Handler) ListRequisitions(c *gin.Context) {
 	httpx.OK(c, out)
 }
 
+// CreateOffer godoc
+//
+//	@Summary		Create blood offer
+//	@Description	Creates a new blood offer for a requisition
+//	@Tags			Blood
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			payload	body		dto.CreateBloodOfferRequest	true	"Offer details"
+//	@Success		201		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/blood/offers [post]
 func (h *Handler) CreateOffer(c *gin.Context) {
 	var req dto.CreateBloodOfferRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -76,6 +120,17 @@ func (h *Handler) CreateOffer(c *gin.Context) {
 	httpx.Created(c, out)
 }
 
+// ListOffers godoc
+//
+//	@Summary		List offers for requisition
+//	@Description	Returns the list of blood offers for a given requisition
+//	@Tags			Blood
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		string	true	"Blood Requisition ID"
+//	@Success		200	{object}	map[string]interface{}
+//	@Failure		500	{object}	map[string]interface{}
+//	@Router			/blood/requisitions/{id}/offers [get]
 func (h *Handler) ListOffers(c *gin.Context) {
 	requisitionID := c.Param("id")
 	p := platformdb.ParsePagination(c.Request.URL.Query(), map[string]string{
@@ -93,12 +148,25 @@ func (h *Handler) ListOffers(c *gin.Context) {
 	httpx.OK(c, out)
 }
 
+// AcceptOffer godoc
+//
+//	@Summary		Accept blood offer
+//	@Description	Accepts a blood offer for a requisition and marks it as accepted
+//	@Tags			Blood
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string					true	"Blood Requisition ID"
+//	@Param			offerId	path		string					true	"Blood Offer ID"
+//	@Param			payload	body		dto.AcceptOfferRequest	false	"Optional audit actor"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/blood/requisitions/{id}/offers/{offerId}/accept [post]
 func (h *Handler) AcceptOffer(c *gin.Context) {
 	requisitionID := c.Param("id")
 	offerID := c.Param("offerId")
-	var body struct {
-		ActorUserID *string `json:"actor_user_id"`
-	}
+	var body dto.AcceptOfferRequest
 	_ = c.ShouldBindJSON(&body)
 	if err := h.service.AcceptOffer(c.Request.Context(), requisitionID, offerID, body.ActorUserID); err != nil {
 		httpx.Error(c, http.StatusInternalServerError, err.Error())
@@ -107,6 +175,19 @@ func (h *Handler) AcceptOffer(c *gin.Context) {
 	httpx.OK(c, gin.H{"message": "offer accepted"})
 }
 
+// AssignPickup godoc
+//
+//	@Summary		Assign blood pickup
+//	@Description	Assigns a pickup for an accepted blood offer, creating a new assignment record
+//	@Tags			Blood
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			payload	body		dto.AssignBloodPickupRequest	true	"Pickup assignment details"
+//	@Success		201		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/blood/pickups/assign [post]
 func (h *Handler) AssignPickup(c *gin.Context) {
 	var req dto.AssignBloodPickupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -121,12 +202,23 @@ func (h *Handler) AssignPickup(c *gin.Context) {
 	httpx.Created(c, out)
 }
 
+// MarkCollected godoc
+//
+//	@Summary		Mark blood as collected
+//	@Description	Marks a blood pickup assignment as collected by the assigned user
+//	@Tags			Blood
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			assignmentId	path		string						true	"Pickup Assignment ID"
+//	@Param			payload			body		dto.MarkCollectedRequest	true	"Payload with requisition ID and optional actor user ID"
+//	@Success		200				{object}	map[string]interface{}
+//	@Failure		400				{object}	map[string]interface{}
+//	@Failure		500				{object}	map[string]interface{}
+//	@Router			/blood/pickups/{assignmentId}/collect [post]
 func (h *Handler) MarkCollected(c *gin.Context) {
 	assignmentID := c.Param("assignmentId")
-	var body struct {
-		BloodRequisitionID string  `json:"blood_requisition_id" binding:"required"`
-		ActorUserID        *string `json:"actor_user_id"`
-	}
+	var body dto.MarkCollectedRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		httpx.Error(c, http.StatusBadRequest, err.Error())
 		return
@@ -138,12 +230,23 @@ func (h *Handler) MarkCollected(c *gin.Context) {
 	httpx.OK(c, gin.H{"message": "blood marked collected"})
 }
 
+// MarkDelivered godoc
+//
+//	@Summary		Mark blood as delivered
+//	@Description	Marks a blood pickup assignment as delivered, completing the pickup process
+//	@Tags			Blood
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			assignmentId	path		string						true	"Pickup Assignment ID"
+//	@Param			payload			body		dto.MarkDeliveredRequest	true	"Payload with requisition ID and optional actor user ID"
+//	@Success		200				{object}	map[string]interface{}
+//	@Failure		400				{object}	map[string]interface{}
+//	@Failure		500				{object}	map[string]interface{}
+//	@Router			/blood/pickups/{assignmentId}/deliver [post]
 func (h *Handler) MarkDelivered(c *gin.Context) {
 	assignmentID := c.Param("assignmentId")
-	var body struct {
-		BloodRequisitionID string  `json:"blood_requisition_id" binding:"required"`
-		ActorUserID        *string `json:"actor_user_id"`
-	}
+	var body dto.MarkDeliveredRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
 		httpx.Error(c, http.StatusBadRequest, err.Error())
 		return

@@ -73,6 +73,130 @@ definitions:
       user_agent:
         type: string
     type: object
+  dispatch_internal_modules_blood_application_dto.AcceptOfferRequest:
+    properties:
+      actor_user_id:
+        type: string
+    type: object
+  dispatch_internal_modules_blood_application_dto.AssignBloodPickupRequest:
+    properties:
+      ambulance_id:
+        type: string
+      assigned_by_user_id:
+        type: string
+      assigned_driver_user_id:
+        type: string
+      blood_requisition_id:
+        type: string
+      blood_requisition_offer_id:
+        type: string
+      destination_facility_id:
+        type: string
+      dispatch_assignment_id:
+        type: string
+      notes:
+        type: string
+      pickup_site_id:
+        type: string
+      vehicle_type:
+        type: string
+    required:
+    - blood_requisition_id
+    - vehicle_type
+    type: object
+  dispatch_internal_modules_blood_application_dto.CreateBloodOfferRequest:
+    properties:
+      blood_group_code:
+        type: string
+      blood_product_code:
+        type: string
+      blood_requisition_id:
+        type: string
+      contact_person_name:
+        type: string
+      contact_phone:
+        type: string
+      inventory_site_id:
+        type: string
+      notes:
+        type: string
+      offered_by_user_id:
+        type: string
+      reserved_until:
+        type: string
+      units_offered:
+        minimum: 1
+        type: integer
+    required:
+    - blood_group_code
+    - blood_product_code
+    - blood_requisition_id
+    - inventory_site_id
+    - units_offered
+    type: object
+  dispatch_internal_modules_blood_application_dto.CreateBloodRequisitionRequest:
+    properties:
+      blood_group_code:
+        type: string
+      blood_product_code:
+        type: string
+      clinical_summary:
+        type: string
+      destination_facility_id:
+        type: string
+      destination_lat:
+        type: number
+      destination_lon:
+        type: number
+      diagnosis:
+        type: string
+      expires_at:
+        type: string
+      incident_id:
+        type: string
+      indication:
+        type: string
+      parity_summary:
+        type: string
+      patient_identifier:
+        type: string
+      patient_name:
+        type: string
+      reporter_phone:
+        type: string
+      requested_by_user_id:
+        type: string
+      requesting_facility_id:
+        type: string
+      units_requested:
+        minimum: 1
+        type: integer
+      urgency_level:
+        type: string
+    required:
+    - blood_group_code
+    - blood_product_code
+    - clinical_summary
+    - units_requested
+    type: object
+  dispatch_internal_modules_blood_application_dto.MarkCollectedRequest:
+    properties:
+      actor_user_id:
+        type: string
+      blood_requisition_id:
+        type: string
+    required:
+    - blood_requisition_id
+    type: object
+  dispatch_internal_modules_blood_application_dto.MarkDeliveredRequest:
+    properties:
+      actor_user_id:
+        type: string
+      blood_requisition_id:
+        type: string
+    required:
+    - blood_requisition_id
+    type: object
   dispatch_internal_modules_users_application_dto.CreateUserRequest:
     properties:
       email:
@@ -93,6 +217,21 @@ definitions:
     - last_name
     - password
     - username
+    type: object
+  dispatch_internal_modules_users_application_dto.UpdateUserRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      is_active:
+        type: boolean
+      last_name:
+        type: string
+      phone:
+        type: string
+      status:
+        type: string
     type: object
 info:
   contact: {}
@@ -206,6 +345,341 @@ paths:
       summary: List sessions
       tags:
       - Auth
+  /blood/offers:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new blood offer for a requisition
+      parameters:
+      - description: Offer details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.CreateBloodOfferRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create blood offer
+      tags:
+      - Blood
+  /blood/pickups/{assignmentId}/collect:
+    post:
+      consumes:
+      - application/json
+      description: Marks a blood pickup assignment as collected by the assigned user
+      parameters:
+      - description: Pickup Assignment ID
+        in: path
+        name: assignmentId
+        required: true
+        type: string
+      - description: Payload with requisition ID and optional actor user ID
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.MarkCollectedRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark blood as collected
+      tags:
+      - Blood
+  /blood/pickups/{assignmentId}/deliver:
+    post:
+      consumes:
+      - application/json
+      description: Marks a blood pickup assignment as delivered, completing the pickup
+        process
+      parameters:
+      - description: Pickup Assignment ID
+        in: path
+        name: assignmentId
+        required: true
+        type: string
+      - description: Payload with requisition ID and optional actor user ID
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.MarkDeliveredRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark blood as delivered
+      tags:
+      - Blood
+  /blood/pickups/assign:
+    post:
+      consumes:
+      - application/json
+      description: Assigns a pickup for an accepted blood offer, creating a new assignment
+        record
+      parameters:
+      - description: Pickup assignment details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.AssignBloodPickupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign blood pickup
+      tags:
+      - Blood
+  /blood/requisitions:
+    get:
+      description: Returns paginated blood requisitions with search, sorting, and
+        filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by blood type
+        in: query
+        name: blood_type
+        type: string
+      - description: Filter by urgency level
+        in: query
+        name: urgency_level
+        type: string
+      - description: 'Sort by field: created_at, status, urgency_level'
+        in: query
+        name: sort_by
+        type: string
+      - description: 'Sort order: asc or desc'
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List blood requisitions
+      tags:
+      - Blood
+    post:
+      consumes:
+      - application/json
+      description: Creates a new blood requisition request
+      parameters:
+      - description: Requisition details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.CreateBloodRequisitionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Raise blood requisition
+      tags:
+      - Blood
+  /blood/requisitions/{id}/offers:
+    get:
+      description: Returns the list of blood offers for a given requisition
+      parameters:
+      - description: Blood Requisition ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List offers for requisition
+      tags:
+      - Blood
+  /blood/requisitions/{id}/offers/{offerId}/accept:
+    post:
+      consumes:
+      - application/json
+      description: Accepts a blood offer for a requisition and marks it as accepted
+      parameters:
+      - description: Blood Requisition ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Blood Offer ID
+        in: path
+        name: offerId
+        required: true
+        type: string
+      - description: Optional audit actor
+        in: body
+        name: payload
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.AcceptOfferRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Accept blood offer
+      tags:
+      - Blood
+  /rbac/me/permissions:
+    get:
+      description: Returns the list of permissions granted to the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my permissions
+      tags:
+      - RBAC
   /users:
     get:
       description: Returns paginated users with search, sorting, and filters
@@ -262,6 +736,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: List users
       tags:
       - Users
@@ -294,7 +770,116 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - BearerAuth: []
       summary: Create user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      description: Soft deletes a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - Users
+    get:
+      description: Returns a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Updates user details. All fields are optional.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update user payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
       tags:
       - Users
 securityDefinitions:

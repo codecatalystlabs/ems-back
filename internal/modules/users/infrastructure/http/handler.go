@@ -28,6 +28,7 @@ func NewHandler(service *userSv.Service) *Handler {
 //	@Tags			Users
 //	@Accept			json
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			payload	body		userdto.CreateUserRequest	true	"Create user payload"
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -53,6 +54,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Description	Returns paginated users with search, sorting, and filters
 //	@Tags			Users
 //	@Produce		json
+//	@Security		BearerAuth
 //	@Param			page				query		int		false	"Page number"	default(1)
 //	@Param			page_size			query		int		false	"Page size"		default(20)
 //	@Param			search				query		string	false	"Search term"
@@ -89,6 +91,18 @@ func (h *Handler) List(c *gin.Context) {
 	httpx.OK(c, result)
 }
 
+// GetByID godoc
+//
+//	@Summary		Get user by ID
+//	@Description	Returns a user by their ID
+//	@Tags			Users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200	{object}	map[string]interface{}
+//	@Failure		404	{object}	map[string]interface{}
+//	@Failure		500	{object}	map[string]interface{}
+//	@Router			/users/{id} [get]
 func (h *Handler) GetByID(c *gin.Context) {
 	user, err := h.service.GetByID(c.Request.Context(), c.Param("id"))
 	if err != nil {
@@ -102,6 +116,21 @@ func (h *Handler) GetByID(c *gin.Context) {
 	httpx.OK(c, user)
 }
 
+// Update godoc
+//
+//	@Summary		Update user
+//	@Description	Updates user details. All fields are optional.
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string						true	"User ID"
+//	@Param			payload	body		userdto.UpdateUserRequest	true	"Update user payload"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		404		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/users/{id} [put]
 func (h *Handler) Update(c *gin.Context) {
 	var req dto.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -120,6 +149,18 @@ func (h *Handler) Update(c *gin.Context) {
 	httpx.OK(c, user)
 }
 
+// Delete godoc
+//
+//	@Summary		Delete user
+//	@Description	Soft deletes a user by their ID
+//	@Tags			Users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200	{object}	map[string]interface{}
+//	@Failure		404	{object}	map[string]interface{}
+//	@Failure		500	{object}	map[string]interface{}
+//	@Router			/users/{id} [delete]
 func (h *Handler) Delete(c *gin.Context) {
 	err := h.service.Delete(c.Request.Context(), c.Param("id"))
 	if err != nil {

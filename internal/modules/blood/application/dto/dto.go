@@ -48,3 +48,17 @@ type AssignBloodPickupRequest struct {
 	DestinationFacilityID   *string `json:"destination_facility_id"`
 	Notes                   string  `json:"notes"`
 }
+
+type AcceptOfferRequest struct {
+	ActorUserID *string `json:"actor_user_id"`
+}
+
+type MarkCollectedRequest struct {
+	BloodRequisitionID string  `json:"blood_requisition_id" binding:"required"`
+	ActorUserID        *string `json:"actor_user_id"`
+}
+
+type MarkDeliveredRequest struct {
+	BloodRequisitionID string  `json:"blood_requisition_id" binding:"required"`
+	ActorUserID        *string `json:"actor_user_id"`
+}
