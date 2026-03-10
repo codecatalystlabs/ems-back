@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/redis/go-redis/v9"
@@ -16,19 +17,29 @@ type Service struct {
 	log   *zap.Logger
 }
 
+var ErrRBACNotInitialized = errors.New("rbac service not initialized")
+
 func NewService(repo Repository, redis *redis.Client, log *zap.Logger) *Service {
 	return &Service{repo: repo, redis: redis, log: log}
 }
 
 func (s *Service) ListPermissionGrants(ctx context.Context, userID string) ([]rbacdomain.PermissionGrant, error) {
+	if s == nil || s.repo == nil {
+		return nil, ErrRBACNotInitialized
+	}
 	return s.repo.ListPermissionGrants(ctx, userID)
 }
 
-func (s *Service) HasPermission(ctx context.Context, userID, permission string, scopeType string, scopeID *string) (bool, error) {
+func (s *Service) HasPermission(ctx context.Context, userID, permission, scopeType string, scopeID *string) (bool, error) {
+	if s == nil || s.repo == nil {
+		return false, ErrRBACNotInitialized
+	}
+
 	grants, err := s.repo.ListPermissionGrants(ctx, userID)
 	if err != nil {
 		return false, err
 	}
+
 	permission = normalize(permission)
 	scopeType = normalize(scopeType)
 
@@ -40,6 +51,7 @@ func (s *Service) HasPermission(ctx context.Context, userID, permission string, 
 			return true, nil
 		}
 	}
+
 	return false, nil
 }
 

@@ -34,7 +34,7 @@ CREATE TABLE user_roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role_id UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-    scope_type TEXT NOT NULL DEFAULT 'GLOBAL' CHECK (scope_type IN ('GLOBAL', 'DISTRICT', 'FACILITY', 'OWN')),
+    scope_type TEXT NOT NULL DEFAULT 'GLOBAL' CHECK (scope_type IN ('GLOBAL', 'DISTRICT', 'SUBCOUNTY', 'FACILITY', 'OWN')),
     scope_id UUID,
     active BOOLEAN NOT NULL DEFAULT TRUE,
     assigned_at TIMESTAMPTZ NOT NULL DEFAULT now(),
