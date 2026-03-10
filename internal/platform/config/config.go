@@ -81,9 +81,9 @@ func LoadConfig() (Config, error) {
 		},
 		DB: DBConfig{
 			Host:            getenv("DB_HOST", "localhost"),
-			Port:            getenv("DB_PORT", "5431"),
+			Port:            getenv("DB_PORT", "5432"),
 			User:            getenv("DB_USER", "postgres"),
-			Password:        getenv("DB_PASSWORD", "postgres"),
+			Password:        getenv("DB_PASSWORD", "pwaiswa"),
 			Name:            getenv("DB_NAME", "dispatch_db"),
 			SSLMode:         getenv("DB_SSLMODE", "disable"),
 			MaxOpenConns:    mustInt("DB_MAX_OPEN_CONNS", 25),

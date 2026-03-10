@@ -8,6 +8,275 @@
     },
     "basePath": "/api/v1",
     "paths": {
+        "/ambulances": {
+            "get": {
+                "description": "Returns paginated ambulances with status and readiness",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fleet"
+                ],
+                "summary": "List ambulances",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search term (code, plate, VIN, make, model)",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "created_at",
+                            "plate_number",
+                            "status",
+                            "dispatch_readiness"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "filter[status]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by dispatch readiness",
+                        "name": "filter[dispatch_readiness]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by district id",
+                        "name": "filter[district_id]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by ambulance category id",
+                        "name": "filter[category_id]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new ambulance record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fleet"
+                ],
+                "summary": "Create ambulance",
+                "parameters": [
+                    {
+                        "description": "Create ambulance payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_fleet_application.CreateAmbulanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/ambulances/{id}": {
+            "get": {
+                "description": "Get a single ambulance by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fleet"
+                ],
+                "summary": "Get ambulance",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ambulance ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing ambulance",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fleet"
+                ],
+                "summary": "Update ambulance",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ambulance ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update ambulance payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_fleet_application.UpdateAmbulanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an ambulance by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fleet"
+                ],
+                "summary": "Delete ambulance",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ambulance ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "Authenticates a user and returns access and refresh tokens",
@@ -646,6 +915,731 @@
                 }
             }
         },
+        "/facilities": {
+            "get": {
+                "description": "Returns paginated facilities with region/district/subcounty hierarchy",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Facilities"
+                ],
+                "summary": "List facilities",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search term (facility, district, subcounty, region)",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "facility",
+                            "level",
+                            "ownership",
+                            "region",
+                            "district",
+                            "subcounty",
+                            "facility_uid",
+                            "subcounty_uid"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by region UID",
+                        "name": "filter[region_uid]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by district UID",
+                        "name": "filter[district_uid]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by subcounty UID",
+                        "name": "filter[subcounty_uid]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by facility level",
+                        "name": "filter[level]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by ownership",
+                        "name": "filter[ownership]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new facility record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Facilities"
+                ],
+                "summary": "Create facility",
+                "parameters": [
+                    {
+                        "description": "Create facility payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_facilities_application.CreateFacilityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/facilities/{uid}": {
+            "get": {
+                "description": "Get a single facility by UID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Facilities"
+                ],
+                "summary": "Get facility",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Facility UID",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing facility",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Facilities"
+                ],
+                "summary": "Update facility",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Facility UID",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update facility payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_facilities_application.UpdateFacilityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a facility by UID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Facilities"
+                ],
+                "summary": "Delete facility",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Facility UID",
+                        "name": "uid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/incidents": {
+            "get": {
+                "description": "Returns paginated incidents with filters for status and type",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incidents"
+                ],
+                "summary": "List incidents",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search term (number, caller, patient, summary)",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "reported_at",
+                            "status"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "filter[status]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by verification status",
+                        "name": "filter[verification_status]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by incident type id",
+                        "name": "filter[incident_type_id]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by district id",
+                        "name": "filter[district_id]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by facility id",
+                        "name": "filter[facility_id]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new incident record from an emergency alert",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incidents"
+                ],
+                "summary": "Create incident",
+                "parameters": [
+                    {
+                        "description": "Create incident payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_incidents_application.CreateIncidentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/incidents/{id}": {
+            "get": {
+                "description": "Get a single incident by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incidents"
+                ],
+                "summary": "Get incident",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing incident",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incidents"
+                ],
+                "summary": "Update incident",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update incident payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_incidents_application.UpdateIncidentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an incident by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incidents"
+                ],
+                "summary": "Delete incident",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "List my notifications",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "filter[status]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by channel",
+                        "name": "filter[channel]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Create notification",
+                "parameters": [
+                    {
+                        "description": "Create notification payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_notifications_application.CreateNotificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get notification",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Notification ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/{id}/read": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark notification as read",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Notification ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/rbac/me/permissions": {
             "get": {
                 "security": [
@@ -664,6 +1658,353 @@
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/trips": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "List trips",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "started_at",
+                            "created_at"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by incident id",
+                        "name": "filter[incident_id]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by ambulance id",
+                        "name": "filter[ambulance_id]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Create trip",
+                "parameters": [
+                    {
+                        "description": "Create trip payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_trips_application.CreateTripRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/trips/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Get trip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Update trip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update trip payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_trips_application.UpdateTripRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Delete trip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/trips/{id}/events": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "List trip events",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trips"
+                ],
+                "summary": "Create trip event",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trip ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Create trip event payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_trips_application.CreateTripEventRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1277,6 +2618,417 @@
                     "type": "string"
                 },
                 "blood_requisition_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_facilities_application.CreateFacilityRequest": {
+            "type": "object",
+            "required": [
+                "facility",
+                "facility_uid",
+                "subcounty_uid"
+            ],
+            "properties": {
+                "facility": {
+                    "type": "string"
+                },
+                "facility_uid": {
+                    "type": "string"
+                },
+                "level": {
+                    "type": "string"
+                },
+                "ownership": {
+                    "type": "string"
+                },
+                "subcounty_uid": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_facilities_application.UpdateFacilityRequest": {
+            "type": "object",
+            "properties": {
+                "facility": {
+                    "type": "string"
+                },
+                "level": {
+                    "type": "string"
+                },
+                "ownership": {
+                    "type": "string"
+                },
+                "subcounty_uid": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_fleet_application.CreateAmbulanceRequest": {
+            "type": "object",
+            "required": [
+                "category_id",
+                "plate_number"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "dispatch_readiness": {
+                    "type": "string"
+                },
+                "district_id": {
+                    "type": "string"
+                },
+                "make": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "ownership_type": {
+                    "type": "string"
+                },
+                "plate_number": {
+                    "type": "string"
+                },
+                "station_facility_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "vin": {
+                    "type": "string"
+                },
+                "year_of_manufacture": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dispatch_internal_modules_fleet_application.UpdateAmbulanceRequest": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "dispatch_readiness": {
+                    "type": "string"
+                },
+                "district_id": {
+                    "type": "string"
+                },
+                "make": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "ownership_type": {
+                    "type": "string"
+                },
+                "station_facility_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "vin": {
+                    "type": "string"
+                },
+                "year_of_manufacture": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dispatch_internal_modules_incidents_application.CreateIncidentRequest": {
+            "type": "object",
+            "required": [
+                "incident_type_id",
+                "source_channel"
+            ],
+            "properties": {
+                "caller_name": {
+                    "type": "string"
+                },
+                "caller_phone": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "district_id": {
+                    "type": "string"
+                },
+                "facility_id": {
+                    "type": "string"
+                },
+                "incident_type_id": {
+                    "type": "string"
+                },
+                "landmark": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "parish": {
+                    "type": "string"
+                },
+                "patient_age_group": {
+                    "type": "string"
+                },
+                "patient_name": {
+                    "type": "string"
+                },
+                "patient_phone": {
+                    "type": "string"
+                },
+                "patient_sex": {
+                    "type": "string"
+                },
+                "source_channel": {
+                    "type": "string"
+                },
+                "subcounty": {
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "village": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_incidents_application.UpdateIncidentRequest": {
+            "type": "object",
+            "properties": {
+                "caller_name": {
+                    "type": "string"
+                },
+                "caller_phone": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "district_id": {
+                    "type": "string"
+                },
+                "facility_id": {
+                    "type": "string"
+                },
+                "incident_type_id": {
+                    "type": "string"
+                },
+                "landmark": {
+                    "type": "string"
+                },
+                "parish": {
+                    "type": "string"
+                },
+                "patient_age_group": {
+                    "type": "string"
+                },
+                "patient_name": {
+                    "type": "string"
+                },
+                "patient_phone": {
+                    "type": "string"
+                },
+                "patient_sex": {
+                    "type": "string"
+                },
+                "priority_level_id": {
+                    "type": "string"
+                },
+                "severity_level_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subcounty": {
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "verification_status": {
+                    "type": "string"
+                },
+                "village": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_notifications_application.CreateNotificationRequest": {
+            "type": "object",
+            "required": [
+                "body",
+                "channel",
+                "type"
+            ],
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "channel": {
+                    "type": "string"
+                },
+                "linked_entity_id": {
+                    "type": "string"
+                },
+                "linked_entity_type": {
+                    "type": "string"
+                },
+                "recipient_email": {
+                    "type": "string"
+                },
+                "recipient_phone": {
+                    "type": "string"
+                },
+                "recipient_user_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_trips_application.CreateTripEventRequest": {
+            "type": "object",
+            "required": [
+                "event_type"
+            ],
+            "properties": {
+                "actor_user_id": {
+                    "type": "string"
+                },
+                "event_time": {
+                    "type": "string"
+                },
+                "event_type": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "notes": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_trips_application.CreateTripRequest": {
+            "type": "object",
+            "required": [
+                "dispatch_assignment_id",
+                "incident_id"
+            ],
+            "properties": {
+                "ambulance_id": {
+                    "type": "string"
+                },
+                "destination_facility_id": {
+                    "type": "string"
+                },
+                "destination_lat": {
+                    "type": "number"
+                },
+                "destination_lon": {
+                    "type": "number"
+                },
+                "dispatch_assignment_id": {
+                    "type": "string"
+                },
+                "incident_id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "odometer_end": {
+                    "type": "number"
+                },
+                "odometer_start": {
+                    "type": "number"
+                },
+                "origin_lat": {
+                    "type": "number"
+                },
+                "origin_lon": {
+                    "type": "number"
+                },
+                "outcome": {
+                    "type": "string"
+                },
+                "scene_lat": {
+                    "type": "number"
+                },
+                "scene_lon": {
+                    "type": "number"
+                }
+            }
+        },
+        "dispatch_internal_modules_trips_application.UpdateTripRequest": {
+            "type": "object",
+            "properties": {
+                "ambulance_id": {
+                    "type": "string"
+                },
+                "destination_facility_id": {
+                    "type": "string"
+                },
+                "destination_lat": {
+                    "type": "number"
+                },
+                "destination_lon": {
+                    "type": "number"
+                },
+                "ended_at": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "odometer_end": {
+                    "type": "number"
+                },
+                "odometer_start": {
+                    "type": "number"
+                },
+                "origin_lat": {
+                    "type": "number"
+                },
+                "origin_lon": {
+                    "type": "number"
+                },
+                "outcome": {
+                    "type": "string"
+                },
+                "scene_lat": {
+                    "type": "number"
+                },
+                "scene_lon": {
+                    "type": "number"
+                },
+                "started_at": {
                     "type": "string"
                 }
             }

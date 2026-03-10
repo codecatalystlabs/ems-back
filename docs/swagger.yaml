@@ -197,6 +197,279 @@ definitions:
     required:
     - blood_requisition_id
     type: object
+  dispatch_internal_modules_facilities_application.CreateFacilityRequest:
+    properties:
+      facility:
+        type: string
+      facility_uid:
+        type: string
+      level:
+        type: string
+      ownership:
+        type: string
+      subcounty_uid:
+        type: string
+    required:
+    - facility
+    - facility_uid
+    - subcounty_uid
+    type: object
+  dispatch_internal_modules_facilities_application.UpdateFacilityRequest:
+    properties:
+      facility:
+        type: string
+      level:
+        type: string
+      ownership:
+        type: string
+      subcounty_uid:
+        type: string
+    type: object
+  dispatch_internal_modules_fleet_application.CreateAmbulanceRequest:
+    properties:
+      category_id:
+        type: string
+      code:
+        type: string
+      dispatch_readiness:
+        type: string
+      district_id:
+        type: string
+      make:
+        type: string
+      model:
+        type: string
+      ownership_type:
+        type: string
+      plate_number:
+        type: string
+      station_facility_id:
+        type: string
+      status:
+        type: string
+      vin:
+        type: string
+      year_of_manufacture:
+        type: integer
+    required:
+    - category_id
+    - plate_number
+    type: object
+  dispatch_internal_modules_fleet_application.UpdateAmbulanceRequest:
+    properties:
+      category_id:
+        type: string
+      code:
+        type: string
+      dispatch_readiness:
+        type: string
+      district_id:
+        type: string
+      make:
+        type: string
+      model:
+        type: string
+      ownership_type:
+        type: string
+      station_facility_id:
+        type: string
+      status:
+        type: string
+      vin:
+        type: string
+      year_of_manufacture:
+        type: integer
+    type: object
+  dispatch_internal_modules_incidents_application.CreateIncidentRequest:
+    properties:
+      caller_name:
+        type: string
+      caller_phone:
+        type: string
+      description:
+        type: string
+      district_id:
+        type: string
+      facility_id:
+        type: string
+      incident_type_id:
+        type: string
+      landmark:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      parish:
+        type: string
+      patient_age_group:
+        type: string
+      patient_name:
+        type: string
+      patient_phone:
+        type: string
+      patient_sex:
+        type: string
+      source_channel:
+        type: string
+      subcounty:
+        type: string
+      summary:
+        type: string
+      village:
+        type: string
+    required:
+    - incident_type_id
+    - source_channel
+    type: object
+  dispatch_internal_modules_incidents_application.UpdateIncidentRequest:
+    properties:
+      caller_name:
+        type: string
+      caller_phone:
+        type: string
+      description:
+        type: string
+      district_id:
+        type: string
+      facility_id:
+        type: string
+      incident_type_id:
+        type: string
+      landmark:
+        type: string
+      parish:
+        type: string
+      patient_age_group:
+        type: string
+      patient_name:
+        type: string
+      patient_phone:
+        type: string
+      patient_sex:
+        type: string
+      priority_level_id:
+        type: string
+      severity_level_id:
+        type: string
+      status:
+        type: string
+      subcounty:
+        type: string
+      summary:
+        type: string
+      verification_status:
+        type: string
+      village:
+        type: string
+    type: object
+  dispatch_internal_modules_notifications_application.CreateNotificationRequest:
+    properties:
+      body:
+        type: string
+      channel:
+        type: string
+      linked_entity_id:
+        type: string
+      linked_entity_type:
+        type: string
+      recipient_email:
+        type: string
+      recipient_phone:
+        type: string
+      recipient_user_id:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - body
+    - channel
+    - type
+    type: object
+  dispatch_internal_modules_trips_application.CreateTripEventRequest:
+    properties:
+      actor_user_id:
+        type: string
+      event_time:
+        type: string
+      event_type:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      notes:
+        type: string
+    required:
+    - event_type
+    type: object
+  dispatch_internal_modules_trips_application.CreateTripRequest:
+    properties:
+      ambulance_id:
+        type: string
+      destination_facility_id:
+        type: string
+      destination_lat:
+        type: number
+      destination_lon:
+        type: number
+      dispatch_assignment_id:
+        type: string
+      incident_id:
+        type: string
+      notes:
+        type: string
+      odometer_end:
+        type: number
+      odometer_start:
+        type: number
+      origin_lat:
+        type: number
+      origin_lon:
+        type: number
+      outcome:
+        type: string
+      scene_lat:
+        type: number
+      scene_lon:
+        type: number
+    required:
+    - dispatch_assignment_id
+    - incident_id
+    type: object
+  dispatch_internal_modules_trips_application.UpdateTripRequest:
+    properties:
+      ambulance_id:
+        type: string
+      destination_facility_id:
+        type: string
+      destination_lat:
+        type: number
+      destination_lon:
+        type: number
+      ended_at:
+        type: string
+      notes:
+        type: string
+      odometer_end:
+        type: number
+      odometer_start:
+        type: number
+      origin_lat:
+        type: number
+      origin_lon:
+        type: number
+      outcome:
+        type: string
+      scene_lat:
+        type: number
+      scene_lon:
+        type: number
+      started_at:
+        type: string
+    type: object
   dispatch_internal_modules_users_application_dto.CreateUserRequest:
     properties:
       email:
@@ -240,6 +513,190 @@ info:
   title: Dispatch Backend API
   version: "1.0"
 paths:
+  /ambulances:
+    get:
+      description: Returns paginated ambulances with status and readiness
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term (code, plate, VIN, make, model)
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - created_at
+        - plate_number
+        - status
+        - dispatch_readiness
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by status
+        in: query
+        name: filter[status]
+        type: string
+      - description: Filter by dispatch readiness
+        in: query
+        name: filter[dispatch_readiness]
+        type: string
+      - description: Filter by district id
+        in: query
+        name: filter[district_id]
+        type: string
+      - description: Filter by ambulance category id
+        in: query
+        name: filter[category_id]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List ambulances
+      tags:
+      - Fleet
+    post:
+      consumes:
+      - application/json
+      description: Create a new ambulance record
+      parameters:
+      - description: Create ambulance payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_fleet_application.CreateAmbulanceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create ambulance
+      tags:
+      - Fleet
+  /ambulances/{id}:
+    delete:
+      description: Delete an ambulance by ID
+      parameters:
+      - description: Ambulance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete ambulance
+      tags:
+      - Fleet
+    get:
+      description: Get a single ambulance by ID
+      parameters:
+      - description: Ambulance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get ambulance
+      tags:
+      - Fleet
+    put:
+      consumes:
+      - application/json
+      description: Update an existing ambulance
+      parameters:
+      - description: Ambulance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update ambulance payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_fleet_application.UpdateAmbulanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update ambulance
+      tags:
+      - Fleet
   /auth/login:
     post:
       consumes:
@@ -659,6 +1116,500 @@ paths:
       summary: Accept blood offer
       tags:
       - Blood
+  /facilities:
+    get:
+      description: Returns paginated facilities with region/district/subcounty hierarchy
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term (facility, district, subcounty, region)
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - facility
+        - level
+        - ownership
+        - region
+        - district
+        - subcounty
+        - facility_uid
+        - subcounty_uid
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by region UID
+        in: query
+        name: filter[region_uid]
+        type: string
+      - description: Filter by district UID
+        in: query
+        name: filter[district_uid]
+        type: string
+      - description: Filter by subcounty UID
+        in: query
+        name: filter[subcounty_uid]
+        type: string
+      - description: Filter by facility level
+        in: query
+        name: filter[level]
+        type: string
+      - description: Filter by ownership
+        in: query
+        name: filter[ownership]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List facilities
+      tags:
+      - Facilities
+    post:
+      consumes:
+      - application/json
+      description: Create a new facility record
+      parameters:
+      - description: Create facility payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_facilities_application.CreateFacilityRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create facility
+      tags:
+      - Facilities
+  /facilities/{uid}:
+    delete:
+      description: Delete a facility by UID
+      parameters:
+      - description: Facility UID
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete facility
+      tags:
+      - Facilities
+    get:
+      description: Get a single facility by UID
+      parameters:
+      - description: Facility UID
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get facility
+      tags:
+      - Facilities
+    put:
+      consumes:
+      - application/json
+      description: Update an existing facility
+      parameters:
+      - description: Facility UID
+        in: path
+        name: uid
+        required: true
+        type: string
+      - description: Update facility payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_facilities_application.UpdateFacilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update facility
+      tags:
+      - Facilities
+  /incidents:
+    get:
+      description: Returns paginated incidents with filters for status and type
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search term (number, caller, patient, summary)
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - reported_at
+        - status
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by status
+        in: query
+        name: filter[status]
+        type: string
+      - description: Filter by verification status
+        in: query
+        name: filter[verification_status]
+        type: string
+      - description: Filter by incident type id
+        in: query
+        name: filter[incident_type_id]
+        type: string
+      - description: Filter by district id
+        in: query
+        name: filter[district_id]
+        type: string
+      - description: Filter by facility id
+        in: query
+        name: filter[facility_id]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List incidents
+      tags:
+      - Incidents
+    post:
+      consumes:
+      - application/json
+      description: Creates a new incident record from an emergency alert
+      parameters:
+      - description: Create incident payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_incidents_application.CreateIncidentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create incident
+      tags:
+      - Incidents
+  /incidents/{id}:
+    delete:
+      description: Delete an incident by ID
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete incident
+      tags:
+      - Incidents
+    get:
+      description: Get a single incident by ID
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get incident
+      tags:
+      - Incidents
+    put:
+      consumes:
+      - application/json
+      description: Update an existing incident
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update incident payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_incidents_application.UpdateIncidentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update incident
+      tags:
+      - Incidents
+  /notifications:
+    get:
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Filter by status
+        in: query
+        name: filter[status]
+        type: string
+      - description: Filter by channel
+        in: query
+        name: filter[channel]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List my notifications
+      tags:
+      - Notifications
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create notification payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_notifications_application.CreateNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create notification
+      tags:
+      - Notifications
+  /notifications/{id}:
+    get:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get notification
+      tags:
+      - Notifications
+  /notifications/{id}/read:
+    post:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Mark notification as read
+      tags:
+      - Notifications
   /rbac/me/permissions:
     get:
       description: Returns the list of permissions granted to the authenticated user
@@ -680,6 +1631,241 @@ paths:
       summary: Get my permissions
       tags:
       - RBAC
+  /trips:
+    get:
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Sort field
+        enum:
+        - started_at
+        - created_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by incident id
+        in: query
+        name: filter[incident_id]
+        type: string
+      - description: Filter by ambulance id
+        in: query
+        name: filter[ambulance_id]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List trips
+      tags:
+      - Trips
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create trip payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_trips_application.CreateTripRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create trip
+      tags:
+      - Trips
+  /trips/{id}:
+    delete:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete trip
+      tags:
+      - Trips
+    get:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get trip
+      tags:
+      - Trips
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update trip payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_trips_application.UpdateTripRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update trip
+      tags:
+      - Trips
+  /trips/{id}/events:
+    get:
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List trip events
+      tags:
+      - Trips
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Create trip event payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_trips_application.CreateTripEventRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create trip event
+      tags:
+      - Trips
   /users:
     get:
       description: Returns paginated users with search, sorting, and filters
