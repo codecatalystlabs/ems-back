@@ -1,0 +1,283 @@
+package application
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+
+	blooddomain "dispatch/internal/modules/blood/domain"
+	platformdb "dispatch/internal/platform/db"
+	"dispatch/internal/platform/events"
+)
+
+type CreateBloodRequisitionRequest struct {
+	IncidentID            *string    `json:"incident_id"`
+	RequestingFacilityID  *string    `json:"requesting_facility_id"`
+	PatientName           string     `json:"patient_name"`
+	PatientIdentifier     string     `json:"patient_identifier"`
+	ClinicalSummary       string     `json:"clinical_summary" binding:"required"`
+	Diagnosis             string     `json:"diagnosis"`
+	Indication            string     `json:"indication"`
+	ParitySummary         string     `json:"parity_summary"`
+	BloodGroupCode        string     `json:"blood_group_code" binding:"required"`
+	BloodProductCode      string     `json:"blood_product_code" binding:"required"`
+	UnitsRequested        int        `json:"units_requested" binding:"required,min=1"`
+	UrgencyLevel          string     `json:"urgency_level"`
+	ReporterPhone         string     `json:"reporter_phone"`
+	DestinationFacilityID *string    `json:"destination_facility_id"`
+	DestinationLat        *float64   `json:"destination_lat"`
+	DestinationLon        *float64   `json:"destination_lon"`
+	RequestedByUserID     *string    `json:"requested_by_user_id"`
+	ExpiresAt             *time.Time `json:"expires_at"`
+}
+
+type CreateBloodOfferRequest struct {
+	BloodRequisitionID string     `json:"blood_requisition_id" binding:"required"`
+	InventorySiteID    string     `json:"inventory_site_id" binding:"required"`
+	BloodGroupCode     string     `json:"blood_group_code" binding:"required"`
+	BloodProductCode   string     `json:"blood_product_code" binding:"required"`
+	UnitsOffered       int        `json:"units_offered" binding:"required,min=1"`
+	ReservedUntil      *time.Time `json:"reserved_until"`
+	ContactPersonName  string     `json:"contact_person_name"`
+	ContactPhone       string     `json:"contact_phone"`
+	Notes              string     `json:"notes"`
+	OfferedByUserID    *string    `json:"offered_by_user_id"`
+}
+
+type AssignBloodPickupRequest struct {
+	BloodRequisitionID      string  `json:"blood_requisition_id" binding:"required"`
+	BloodRequisitionOfferID *string `json:"blood_requisition_offer_id"`
+	VehicleType             string  `json:"vehicle_type" binding:"required"`
+	AmbulanceID             *string `json:"ambulance_id"`
+	DispatchAssignmentID    *string `json:"dispatch_assignment_id"`
+	AssignedDriverUserID    *string `json:"assigned_driver_user_id"`
+	AssignedByUserID        *string `json:"assigned_by_user_id"`
+	PickupSiteID            *string `json:"pickup_site_id"`
+	DestinationFacilityID   *string `json:"destination_facility_id"`
+	Notes                   string  `json:"notes"`
+}
+
+type Service struct {
+	repo Repository
+	bus  events.Publisher
+	log  *zap.Logger
+}
+
+func NewService(repo Repository, bus events.Publisher, log *zap.Logger) *Service {
+	return &Service{repo: repo, bus: bus, log: log}
+}
+
+func (s *Service) ListRequisitions(ctx context.Context, p platformdb.Pagination) (platformdb.PageResult[blooddomain.BloodRequisition], error) {
+	items, total, err := s.repo.ListRequisitions(ctx, p)
+	if err != nil {
+		return platformdb.PageResult[blooddomain.BloodRequisition]{}, err
+	}
+	return platformdb.PageResult[blooddomain.BloodRequisition]{Items: items, Meta: platformdb.NewPageMeta(p, total)}, nil
+}
+
+func (s *Service) RaiseRequisition(ctx context.Context, req CreateBloodRequisitionRequest) (blooddomain.BloodRequisition, error) {
+	bloodGroupID, err := s.repo.ResolveBloodGroupIDByCode(ctx, req.BloodGroupCode)
+	if err != nil {
+		return blooddomain.BloodRequisition{}, fmt.Errorf("resolve blood group: %w", err)
+	}
+	bloodProductID, err := s.repo.ResolveBloodProductIDByCode(ctx, req.BloodProductCode)
+	if err != nil {
+		return blooddomain.BloodRequisition{}, fmt.Errorf("resolve blood product: %w", err)
+	}
+
+	urgency := strings.ToUpper(strings.TrimSpace(req.UrgencyLevel))
+	if urgency == "" {
+		urgency = "EMERGENCY"
+	}
+
+	requisition := blooddomain.BloodRequisition{
+		ID:                    uuid.NewString(),
+		IncidentID:            req.IncidentID,
+		RequestingFacilityID:  req.RequestingFacilityID,
+		PatientName:           req.PatientName,
+		PatientIdentifier:     req.PatientIdentifier,
+		ClinicalSummary:       req.ClinicalSummary,
+		Diagnosis:             req.Diagnosis,
+		Indication:            req.Indication,
+		ParitySummary:         req.ParitySummary,
+		BloodGroupID:          bloodGroupID,
+		BloodProductID:        bloodProductID,
+		UnitsRequested:        req.UnitsRequested,
+		UrgencyLevel:          urgency,
+		Status:                "OPEN",
+		ReporterPhone:         req.ReporterPhone,
+		DestinationFacilityID: req.DestinationFacilityID,
+		RequestedByUserID:     req.RequestedByUserID,
+		ExpiresAt:             req.ExpiresAt,
+	}
+
+	created, err := s.repo.CreateRequisition(ctx, requisition)
+	if err != nil {
+		return blooddomain.BloodRequisition{}, err
+	}
+
+	_ = s.repo.CreateStatusLog(ctx, created.ID, "", created.Status, created.RequestedByUserID, "blood requisition raised")
+
+	_ = s.bus.Publish(ctx, "blood.requisition.raised", events.Event{
+		ID:          uuid.NewString(),
+		Topic:       "blood.requisition.raised",
+		AggregateID: created.ID,
+		Type:        "blood.requisition.raised",
+		OccurredAt:  time.Now().UTC(),
+		Payload: map[string]any{
+			"blood_requisition_id": created.ID,
+			"blood_group_code":     req.BloodGroupCode,
+			"blood_product_code":   req.BloodProductCode,
+			"units_requested":      created.UnitsRequested,
+			"urgency_level":        created.UrgencyLevel,
+			"status":               created.Status,
+		},
+	})
+
+	return created, nil
+}
+
+func (s *Service) BroadcastRequisition(ctx context.Context, requisitionID string, destLat, destLon *float64) ([]blooddomain.BloodBroadcastTarget, error) {
+	req, err := s.repo.GetRequisitionByID(ctx, requisitionID)
+	if err != nil {
+		return nil, err
+	}
+	targets, err := s.repo.FindBroadcastTargets(ctx, req.BloodGroupID, req.BloodProductID, req.UnitsRequested, destLat, destLon, 20)
+	if err != nil {
+		return nil, err
+	}
+	msg := fmt.Sprintf("Blood request: %d unit(s) of %s %s needed urgently. %s",
+		req.UnitsRequested, req.BloodProductCode, req.BloodGroupCode, req.ClinicalSummary)
+	if len(targets) > 0 {
+		if err := s.repo.CreateBroadcasts(ctx, requisitionID, msg, targets); err != nil {
+			return nil, err
+		}
+	}
+	prev := req.Status
+	_ = s.repo.UpdateRequisitionStatus(ctx, requisitionID, "BROADCASTING")
+	_ = s.repo.CreateStatusLog(ctx, requisitionID, prev, "BROADCASTING", req.RequestedByUserID, "broadcast sent to candidate sites")
+	return targets, nil
+}
+
+func (s *Service) ListOffers(ctx context.Context, requisitionID string, p platformdb.Pagination) (platformdb.PageResult[blooddomain.BloodRequisitionOffer], error) {
+	items, total, err := s.repo.ListOffers(ctx, requisitionID, p)
+	if err != nil {
+		return platformdb.PageResult[blooddomain.BloodRequisitionOffer]{}, err
+	}
+	return platformdb.PageResult[blooddomain.BloodRequisitionOffer]{Items: items, Meta: platformdb.NewPageMeta(p, total)}, nil
+}
+
+func (s *Service) AcceptOffer(ctx context.Context, requisitionID, offerID string, actorUserID *string) error {
+	req, err := s.repo.GetRequisitionByID(ctx, requisitionID)
+	if err != nil {
+		return err
+	}
+	if err := s.repo.AcceptOffer(ctx, requisitionID, offerID); err != nil {
+		return err
+	}
+	_ = s.repo.CreateStatusLog(ctx, requisitionID, req.Status, "MATCHED", actorUserID, "blood offer accepted")
+	return s.repo.UpdateRequisitionStatus(ctx, requisitionID, "MATCHED")
+}
+
+func (s *Service) CreateOffer(ctx context.Context, req CreateBloodOfferRequest) (blooddomain.BloodRequisitionOffer, error) {
+	bloodGroupID, err := s.repo.ResolveBloodGroupIDByCode(ctx, req.BloodGroupCode)
+	if err != nil {
+		return blooddomain.BloodRequisitionOffer{}, fmt.Errorf("resolve blood group: %w", err)
+	}
+	bloodProductID, err := s.repo.ResolveBloodProductIDByCode(ctx, req.BloodProductCode)
+	if err != nil {
+		return blooddomain.BloodRequisitionOffer{}, fmt.Errorf("resolve blood product: %w", err)
+	}
+
+	offer := blooddomain.BloodRequisitionOffer{
+		ID:                 uuid.NewString(),
+		BloodRequisitionID: req.BloodRequisitionID,
+		InventorySiteID:    req.InventorySiteID,
+		BloodProductID:     bloodProductID,
+		BloodGroupID:       bloodGroupID,
+		UnitsOffered:       req.UnitsOffered,
+		ReservedUntil:      req.ReservedUntil,
+		Notes:              req.Notes,
+		ContactPersonName:  req.ContactPersonName,
+		ContactPhone:       req.ContactPhone,
+		OfferedByUserID:    req.OfferedByUserID,
+		Status:             "OFFERED",
+	}
+	created, err := s.repo.CreateOffer(ctx, offer)
+	if err != nil {
+		return blooddomain.BloodRequisitionOffer{}, err
+	}
+	_ = s.bus.Publish(ctx, "blood.offer.created", events.Event{
+		ID:          uuid.NewString(),
+		Topic:       "blood.offer.created",
+		AggregateID: req.BloodRequisitionID,
+		Type:        "blood.offer.created",
+		OccurredAt:  time.Now().UTC(),
+		Payload: map[string]any{
+			"blood_requisition_id": req.BloodRequisitionID,
+			"offer_id":             created.ID,
+			"inventory_site_id":    created.InventorySiteID,
+			"units_offered":        created.UnitsOffered,
+		},
+	})
+	return created, nil
+}
+
+func (s *Service) AssignPickup(ctx context.Context, req AssignBloodPickupRequest) (blooddomain.BloodTransportAssignment, error) {
+	in := blooddomain.BloodTransportAssignment{
+		ID:                      uuid.NewString(),
+		BloodRequisitionID:      req.BloodRequisitionID,
+		BloodRequisitionOfferID: req.BloodRequisitionOfferID,
+		VehicleType:             strings.ToUpper(strings.TrimSpace(req.VehicleType)),
+		AmbulanceID:             req.AmbulanceID,
+		DispatchAssignmentID:    req.DispatchAssignmentID,
+		AssignedDriverUserID:    req.AssignedDriverUserID,
+		AssignedByUserID:        req.AssignedByUserID,
+		PickupSiteID:            req.PickupSiteID,
+		DestinationFacilityID:   req.DestinationFacilityID,
+		Status:                  "ASSIGNED",
+		Notes:                   req.Notes,
+	}
+	created, err := s.repo.CreateTransportAssignment(ctx, in)
+	if err != nil {
+		return blooddomain.BloodTransportAssignment{}, err
+	}
+	reqRow, _ := s.repo.GetRequisitionByID(ctx, req.BloodRequisitionID)
+	_ = s.repo.UpdateRequisitionStatus(ctx, req.BloodRequisitionID, "PICKUP_ASSIGNED")
+	_ = s.repo.CreateStatusLog(ctx, req.BloodRequisitionID, reqRow.Status, "PICKUP_ASSIGNED", req.AssignedByUserID, "transport assigned for blood pickup")
+	_ = s.bus.Publish(ctx, "blood.pickup.assigned", events.Event{
+		ID:          uuid.NewString(),
+		Topic:       "blood.pickup.assigned",
+		AggregateID: req.BloodRequisitionID,
+		Type:        "blood.pickup.assigned",
+		OccurredAt:  time.Now().UTC(),
+		Payload: map[string]any{
+			"blood_requisition_id":    req.BloodRequisitionID,
+			"transport_assignment_id": created.ID,
+			"vehicle_type":            req.VehicleType,
+		},
+	})
+	return created, nil
+}
+
+func (s *Service) MarkCollected(ctx context.Context, assignmentID, requisitionID string, actorUserID *string) error {
+	if err := s.repo.MarkTransportCollected(ctx, assignmentID); err != nil {
+		return err
+	}
+	req, _ := s.repo.GetRequisitionByID(ctx, requisitionID)
+	_ = s.repo.UpdateRequisitionStatus(ctx, requisitionID, "COLLECTED")
+	return s.repo.CreateStatusLog(ctx, requisitionID, req.Status, "COLLECTED", actorUserID, "blood collected from source site")
+}
+
+func (s *Service) MarkDelivered(ctx context.Context, assignmentID, requisitionID string, actorUserID *string) error {
+	if err := s.repo.MarkTransportDelivered(ctx, assignmentID); err != nil {
+		return err
+	}
+	req, _ := s.repo.GetRequisitionByID(ctx, requisitionID)
+	_ = s.repo.UpdateRequisitionStatus(ctx, requisitionID, "DELIVERED")
+	return s.repo.CreateStatusLog(ctx, requisitionID, req.Status, "DELIVERED", actorUserID, "blood delivered to destination")
+}

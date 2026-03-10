@@ -8,6 +8,7 @@ import (
 	// incidentmod "dispatch/internal/modules/incidents"
 	// rbacmod "dispatch/internal/modules/rbac"
 
+	bloodmod "dispatch/internal/modules/blood"
 	usermod "dispatch/internal/modules/users"
 	"dispatch/internal/shared/types"
 )
@@ -16,6 +17,7 @@ func RegisterModules(deps types.ModuleDeps) {
 	// auth.Register(deps)
 	usermod.Register(deps)
 	// rbacmod.Register(deps)
+	bloodmod.Register(deps)
 	// fleetmod.Register(deps)
 	// availabilitymod.Register(deps)
 	// incidentmod.Register(deps)

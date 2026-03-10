@@ -1,6 +1,3 @@
--- ============================================
--- File: 000002_reference.sql
--- ============================================
 -- +goose Up
 CREATE TABLE ref_districts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -59,8 +56,11 @@ CREATE TABLE ref_priority_levels (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL UNIQUE,
+    color_code TEXT NOT NULL CHECK (color_code IN ('RED', 'ORANGE', 'GREEN')),
     sort_order INT NOT NULL,
     target_response_minutes INT,
+    severity_weight INT NOT NULL DEFAULT 0,
+    escalation_note TEXT,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -119,11 +119,10 @@ INSERT INTO ref_incident_types (code, name, description, requires_transport) VAL
 ('MEDICINE_DELIVERY', 'Medicine Delivery', 'Medicine dispatch', FALSE)
 ON CONFLICT (code) DO NOTHING;
 
-INSERT INTO ref_priority_levels (code, name, sort_order, target_response_minutes) VALUES
-('P1', 'Critical', 1, 15),
-('P2', 'High', 2, 30),
-('P3', 'Moderate', 3, 60),
-('P4', 'Low', 4, 120)
+INSERT INTO ref_priority_levels (code, name, color_code, sort_order, target_response_minutes, severity_weight, escalation_note) VALUES
+('RED', 'Red Priority', 'RED', 1, 15, 100, 'Immediate life-threatening emergency. Dispatch immediately.'),
+('ORANGE', 'Orange Priority', 'ORANGE', 2, 30, 60, 'High-risk urgent case. Prioritize rapid dispatch.'),
+('GREEN', 'Green Priority', 'GREEN', 3, 60, 20, 'Stable case. Manage in normal queue unless condition changes.')
 ON CONFLICT (code) DO NOTHING;
 
 INSERT INTO ref_severity_levels (code, name, sort_order) VALUES
@@ -167,4 +166,3 @@ DROP TABLE IF EXISTS ref_incident_types;
 DROP TABLE IF EXISTS ref_facilities;
 DROP TABLE IF EXISTS ref_facility_levels;
 DROP TABLE IF EXISTS ref_districts;
-
