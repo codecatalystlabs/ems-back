@@ -7,11 +7,13 @@ import (
 	"dispatch/internal/shared/types"
 )
 
-func Register(deps types.ModuleDeps) *rbacapp.Service {
+func BuildService(deps types.ModuleDeps) *rbacapp.Service {
 	repo := infrastructure.NewRepository(deps.DB)
-	service := rbacapp.NewService(repo, deps.Redis, deps.Logger)
+	return rbacapp.NewService(repo, deps.Redis, deps.Logger)
+}
+
+func RegisterRoutes(deps types.ModuleDeps, service *rbacapp.Service) {
 	h := http.NewHandler(service)
 	group := deps.Router.Group("/rbac")
 	http.RegisterRoutes(group, h)
-	return service
 }

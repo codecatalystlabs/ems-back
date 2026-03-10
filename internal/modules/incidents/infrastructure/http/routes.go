@@ -4,13 +4,14 @@ import (
 	rbacmiddleware "dispatch/internal/modules/rbac/middleware"
 
 	"github.com/gin-gonic/gin"
+
+	rbacapp "dispatch/internal/modules/rbac/application"
 )
 
-func RegisterRoutes(rg *gin.RouterGroup, h *Handler) {
-	rg.GET("", rbacmiddleware.RequirePermission(nil, "incidents.read"), h.List)
-	rg.POST("", rbacmiddleware.RequirePermission(nil, "incidents.create"), h.Create)
-	rg.GET("/:id", rbacmiddleware.RequirePermission(nil, "incidents.read"), h.Get)
-	rg.PUT("/:id", rbacmiddleware.RequirePermission(nil, "incidents.triage"), h.Update)
-	rg.DELETE("/:id", rbacmiddleware.RequirePermission(nil, "incidents.triage"), h.Delete)
+func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service) {
+	rg.GET("", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.List)
+	rg.POST("", rbacmiddleware.RequirePermission(rbacSvc, "incidents.create"), h.Create)
+	rg.GET("/:id", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.Get)
+	rg.PUT("/:id", rbacmiddleware.RequirePermission(rbacSvc, "incidents.triage"), h.Update)
+	rg.DELETE("/:id", rbacmiddleware.RequirePermission(rbacSvc, "incidents.triage"), h.Delete)
 }
-

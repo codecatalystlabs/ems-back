@@ -18,7 +18,7 @@ func RequirePermission(rbacSvc *rbacapp.Service, permission string) gin.HandlerF
 	return func(c *gin.Context) {
 		if rbacSvc == nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": "rbac service is not initialized",
+				"message": "rbac service is not initialized!",
 			})
 			return
 		}

@@ -5,11 +5,9 @@ import (
 	// dispatchmod "dispatch/internal/modules/dispatch"
 	authmod "dispatch/internal/modules/auth"
 	bloodmod "dispatch/internal/modules/blood"
-	facilitiesmod "dispatch/internal/modules/facilities"
+
 	fleetmod "dispatch/internal/modules/fleet"
 	incidentmod "dispatch/internal/modules/incidents"
-	notifmod "dispatch/internal/modules/notifications"
-	tripsmod "dispatch/internal/modules/trips"
 	rbacmod "dispatch/internal/modules/rbac"
 	usermod "dispatch/internal/modules/users"
 	"dispatch/internal/shared/types"
@@ -20,25 +18,25 @@ import (
 
 func RegisterModules(deps types.ModuleDeps) {
 	authmod.Register(deps)
-	rbacSvc := rbacmod.Register(deps)
+	rbacSvc := rbacmod.BuildService(deps)
 
 	secured := deps.Router.Group("")
 	secured.Use(authmiddleware.AuthMiddleware(deps.Config.JWT.Secret), rbacmiddleware.ScopeContextMiddleware())
 
-	usersGroup := secured.Group("/users")
-	usersGroup.Use(rbacmiddleware.RequirePermission(rbacSvc, "users.read"))
-	_ = usersGroup
+	securedDeps := types.ModuleDeps{
+		Router: secured,
+		DB:     deps.DB,
+		Redis:  deps.Redis,
+		Logger: deps.Logger,
+		Bus:    deps.Bus,
+		Config: deps.Config,
+	}
 
-	fleetGroup := secured.Group("/ambulances")
-	fleetGroup.Use(rbacmiddleware.RequirePermission(rbacSvc, "fleet.read"))
-	_ = fleetGroup
-	usermod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	facilitiesmod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	incidentmod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	// availabilitymod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	// dispatchmod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	bloodmod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	fleetmod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	tripsmod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
-	notifmod.Register(types.ModuleDeps{Router: secured, DB: deps.DB, Redis: deps.Redis, Logger: deps.Logger, Bus: deps.Bus, Config: deps.Config})
+	rbacmod.RegisterRoutes(securedDeps, rbacSvc)
+	usermod.Register(securedDeps, rbacSvc)
+	fleetmod.Register(securedDeps, rbacSvc)
+	// availabilitymod.Register(securedDeps, rbacSvc)
+	incidentmod.Register(securedDeps, rbacSvc)
+	// dispatchmod.Register(securedDeps, rbacSvc)
+	bloodmod.Register(securedDeps, rbacSvc)
 }
