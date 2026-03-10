@@ -9,57 +9,11 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
+	"dispatch/internal/modules/blood/application/dto"
 	blooddomain "dispatch/internal/modules/blood/domain"
 	platformdb "dispatch/internal/platform/db"
 	"dispatch/internal/platform/events"
 )
-
-type CreateBloodRequisitionRequest struct {
-	IncidentID            *string    `json:"incident_id"`
-	RequestingFacilityID  *string    `json:"requesting_facility_id"`
-	PatientName           string     `json:"patient_name"`
-	PatientIdentifier     string     `json:"patient_identifier"`
-	ClinicalSummary       string     `json:"clinical_summary" binding:"required"`
-	Diagnosis             string     `json:"diagnosis"`
-	Indication            string     `json:"indication"`
-	ParitySummary         string     `json:"parity_summary"`
-	BloodGroupCode        string     `json:"blood_group_code" binding:"required"`
-	BloodProductCode      string     `json:"blood_product_code" binding:"required"`
-	UnitsRequested        int        `json:"units_requested" binding:"required,min=1"`
-	UrgencyLevel          string     `json:"urgency_level"`
-	ReporterPhone         string     `json:"reporter_phone"`
-	DestinationFacilityID *string    `json:"destination_facility_id"`
-	DestinationLat        *float64   `json:"destination_lat"`
-	DestinationLon        *float64   `json:"destination_lon"`
-	RequestedByUserID     *string    `json:"requested_by_user_id"`
-	ExpiresAt             *time.Time `json:"expires_at"`
-}
-
-type CreateBloodOfferRequest struct {
-	BloodRequisitionID string     `json:"blood_requisition_id" binding:"required"`
-	InventorySiteID    string     `json:"inventory_site_id" binding:"required"`
-	BloodGroupCode     string     `json:"blood_group_code" binding:"required"`
-	BloodProductCode   string     `json:"blood_product_code" binding:"required"`
-	UnitsOffered       int        `json:"units_offered" binding:"required,min=1"`
-	ReservedUntil      *time.Time `json:"reserved_until"`
-	ContactPersonName  string     `json:"contact_person_name"`
-	ContactPhone       string     `json:"contact_phone"`
-	Notes              string     `json:"notes"`
-	OfferedByUserID    *string    `json:"offered_by_user_id"`
-}
-
-type AssignBloodPickupRequest struct {
-	BloodRequisitionID      string  `json:"blood_requisition_id" binding:"required"`
-	BloodRequisitionOfferID *string `json:"blood_requisition_offer_id"`
-	VehicleType             string  `json:"vehicle_type" binding:"required"`
-	AmbulanceID             *string `json:"ambulance_id"`
-	DispatchAssignmentID    *string `json:"dispatch_assignment_id"`
-	AssignedDriverUserID    *string `json:"assigned_driver_user_id"`
-	AssignedByUserID        *string `json:"assigned_by_user_id"`
-	PickupSiteID            *string `json:"pickup_site_id"`
-	DestinationFacilityID   *string `json:"destination_facility_id"`
-	Notes                   string  `json:"notes"`
-}
 
 type Service struct {
 	repo Repository
@@ -79,7 +33,7 @@ func (s *Service) ListRequisitions(ctx context.Context, p platformdb.Pagination)
 	return platformdb.PageResult[blooddomain.BloodRequisition]{Items: items, Meta: platformdb.NewPageMeta(p, total)}, nil
 }
 
-func (s *Service) RaiseRequisition(ctx context.Context, req CreateBloodRequisitionRequest) (blooddomain.BloodRequisition, error) {
+func (s *Service) RaiseRequisition(ctx context.Context, req dto.CreateBloodRequisitionRequest) (blooddomain.BloodRequisition, error) {
 	bloodGroupID, err := s.repo.ResolveBloodGroupIDByCode(ctx, req.BloodGroupCode)
 	if err != nil {
 		return blooddomain.BloodRequisition{}, fmt.Errorf("resolve blood group: %w", err)
@@ -183,7 +137,7 @@ func (s *Service) AcceptOffer(ctx context.Context, requisitionID, offerID string
 	return s.repo.UpdateRequisitionStatus(ctx, requisitionID, "MATCHED")
 }
 
-func (s *Service) CreateOffer(ctx context.Context, req CreateBloodOfferRequest) (blooddomain.BloodRequisitionOffer, error) {
+func (s *Service) CreateOffer(ctx context.Context, req dto.CreateBloodOfferRequest) (blooddomain.BloodRequisitionOffer, error) {
 	bloodGroupID, err := s.repo.ResolveBloodGroupIDByCode(ctx, req.BloodGroupCode)
 	if err != nil {
 		return blooddomain.BloodRequisitionOffer{}, fmt.Errorf("resolve blood group: %w", err)
@@ -227,7 +181,7 @@ func (s *Service) CreateOffer(ctx context.Context, req CreateBloodOfferRequest) 
 	return created, nil
 }
 
-func (s *Service) AssignPickup(ctx context.Context, req AssignBloodPickupRequest) (blooddomain.BloodTransportAssignment, error) {
+func (s *Service) AssignPickup(ctx context.Context, req dto.AssignBloodPickupRequest) (blooddomain.BloodTransportAssignment, error) {
 	in := blooddomain.BloodTransportAssignment{
 		ID:                      uuid.NewString(),
 		BloodRequisitionID:      req.BloodRequisitionID,

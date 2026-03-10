@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	bloodapp "dispatch/internal/modules/blood/application"
+	"dispatch/internal/modules/blood/application/dto"
 	platformdb "dispatch/internal/platform/db"
 	"dispatch/internal/platform/httpx"
 )
@@ -15,7 +16,7 @@ type Handler struct{ service *bloodapp.Service }
 func NewHandler(service *bloodapp.Service) *Handler { return &Handler{service: service} }
 
 func (h *Handler) RaiseRequisition(c *gin.Context) {
-	var req bloodapp.CreateBloodRequisitionRequest
+	var req dto.CreateBloodRequisitionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		httpx.Error(c, http.StatusBadRequest, err.Error())
 		return
@@ -62,7 +63,7 @@ func (h *Handler) ListRequisitions(c *gin.Context) {
 }
 
 func (h *Handler) CreateOffer(c *gin.Context) {
-	var req bloodapp.CreateBloodOfferRequest
+	var req dto.CreateBloodOfferRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		httpx.Error(c, http.StatusBadRequest, err.Error())
 		return
@@ -107,7 +108,7 @@ func (h *Handler) AcceptOffer(c *gin.Context) {
 }
 
 func (h *Handler) AssignPickup(c *gin.Context) {
-	var req bloodapp.AssignBloodPickupRequest
+	var req dto.AssignBloodPickupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		httpx.Error(c, http.StatusBadRequest, err.Error())
 		return

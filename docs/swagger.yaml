@@ -1,5 +1,78 @@
 basePath: /api/v1
 definitions:
+  dispatch_internal_modules_auth_application_dto.AuthResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      refresh_token_expires_in:
+        type: integer
+      session:
+        $ref: '#/definitions/dispatch_internal_modules_auth_application_dto.SessionResponse'
+      user:
+        $ref: '#/definitions/dispatch_internal_modules_auth_application_dto.AuthUserResponse'
+    type: object
+  dispatch_internal_modules_auth_application_dto.AuthUserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+      username:
+        type: string
+    type: object
+  dispatch_internal_modules_auth_application_dto.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dispatch_internal_modules_auth_application_dto.LogoutRequest:
+    properties:
+      logout_all:
+        type: boolean
+      refresh_token:
+        type: string
+    type: object
+  dispatch_internal_modules_auth_application_dto.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dispatch_internal_modules_auth_application_dto.SessionResponse:
+    properties:
+      device_id:
+        type: string
+      device_name:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      ip_address:
+        type: string
+      last_activity_at:
+        type: string
+      user_agent:
+        type: string
+    type: object
   dispatch_internal_modules_users_application_dto.CreateUserRequest:
     properties:
       email:
@@ -28,6 +101,111 @@ info:
   title: Dispatch Backend API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns access and refresh tokens
+      parameters:
+      - description: Login payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_auth_application_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dispatch_internal_modules_auth_application_dto.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Revokes current session or all sessions
+      parameters:
+      - description: Logout payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_auth_application_dto.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access token using the refresh token
+      parameters:
+      - description: Refresh payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_auth_application_dto.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dispatch_internal_modules_auth_application_dto.AuthResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Refresh tokens
+      tags:
+      - Auth
+  /auth/sessions:
+    get:
+      description: Lists active user sessions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List sessions
+      tags:
+      - Auth
   /users:
     get:
       description: Returns paginated users with search, sorting, and filters
