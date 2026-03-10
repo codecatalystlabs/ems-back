@@ -9,6 +9,19 @@ CREATE TABLE ref_districts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE ref_subcounties (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    district_id UUID NOT NULL REFERENCES ref_districts(id) ON DELETE CASCADE,
+    code TEXT UNIQUE,
+    name TEXT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE(district_id, name)
+);
+
+CREATE INDEX idx_ref_subcounties_district_id ON ref_subcounties(district_id);
+
 CREATE TABLE ref_facility_levels (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code TEXT NOT NULL UNIQUE,

@@ -48,7 +48,11 @@ CREATE TABLE user_assignments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     district_id UUID REFERENCES ref_districts(id),
+    subcounty_id UUID REFERENCES ref_subcounties(id),
     facility_id UUID REFERENCES ref_facilities(id),
+    assignment_level TEXT NOT NULL CHECK (
+        assignment_level IN ('NATIONAL', 'DISTRICT', 'SUBCOUNTY', 'FACILITY')
+    ),
     team_name TEXT,
     is_primary BOOLEAN NOT NULL DEFAULT FALSE,
     active BOOLEAN NOT NULL DEFAULT TRUE,
