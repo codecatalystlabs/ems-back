@@ -113,6 +113,14 @@ func (r *Repository) ListRequisitions(ctx context.Context, p platformdb.Paginati
 			where = append(where, fmt.Sprintf(`br.urgency_level = $%d`, argPos))
 			args = append(args, strings.ToUpper(v))
 			argPos++
+		case "date_from":
+			where = append(where, fmt.Sprintf(`br.created_at >= $%d`, argPos))
+			args = append(args, v)
+			argPos++
+		case "date_to":
+			where = append(where, fmt.Sprintf(`br.created_at <= $%d`, argPos))
+			args = append(args, v)
+			argPos++
 		}
 	}
 	whereSQL := "WHERE " + strings.Join(where, " AND ")

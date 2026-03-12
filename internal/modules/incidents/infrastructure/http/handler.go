@@ -35,6 +35,8 @@ func NewHandler(service *incapp.Service) *Handler {
 //	@Param			filter[incident_type_id]	query		string	false	"Filter by incident type id"
 //	@Param			filter[district_id]			query		string	false	"Filter by district id"
 //	@Param			filter[facility_id]			query		string	false	"Filter by facility id"
+//	@Param			filter[date_from]			query		string	false	"Filter by reported_at from (ISO 8601)"
+//	@Param			filter[date_to]				query		string	false	"Filter by reported_at to (ISO 8601)"
 //	@Success		200							{object}	map[string]interface{}
 //	@Failure		500							{object}	map[string]interface{}
 //	@Router			/incidents [get]
@@ -52,6 +54,8 @@ func (h *Handler) List(c *gin.Context) {
 			"incident_type_id":    {},
 			"district_id":         {},
 			"facility_id":         {},
+			"date_from":           {},
+			"date_to":             {},
 		},
 	)
 	out, err := h.service.List(c.Request.Context(), p)

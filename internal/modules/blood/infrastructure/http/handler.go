@@ -70,6 +70,8 @@ func (h *Handler) Broadcast(c *gin.Context) {
 //	@Param			status			query		string	false	"Filter by status"
 //	@Param			blood_type		query		string	false	"Filter by blood type"
 //	@Param			urgency_level	query		string	false	"Filter by urgency level"
+//	@Param			filter[date_from] query	string	false	"Filter by created_at from (ISO 8601)"
+//	@Param			filter[date_to]	query		string	false	"Filter by created_at to (ISO 8601)"
 //	@Param			sort_by			query		string	false	"Sort by field: created_at, status, urgency_level"
 //	@Param			sort_order		query		string	false	"Sort order: asc or desc"
 //	@Success		200				{object}	map[string]interface{}
@@ -84,6 +86,8 @@ func (h *Handler) ListRequisitions(c *gin.Context) {
 	}, map[string]struct{}{
 		"status":        {},
 		"urgency_level": {},
+		"date_from":     {},
+		"date_to":       {},
 	})
 	out, err := h.service.ListRequisitions(c.Request.Context(), p)
 	if err != nil {

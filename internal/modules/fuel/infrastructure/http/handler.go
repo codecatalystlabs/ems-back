@@ -30,6 +30,8 @@ func NewHandler(svc *fuelapp.Service) *Handler {
 //	@Param			sort_by					query		string	false	"Sort by field"			default(created_at)
 //	@Param			sort_order				query		string	false	"Sort order (ASC/DESC)"	default(DESC)
 //	@Param			filter[ambulance_id]	query		string	false	"Filter by ambulance_id (UUID)"
+//	@Param			filter[date_from]		query		string	false	"Filter by filled_at from (ISO 8601)"
+//	@Param			filter[date_to]			query		string	false	"Filter by filled_at to (ISO 8601)"
 //	@Success		200						{object}	platformdb.PageResult[domain.FuelLog]
 //	@Failure		401						{object}	map[string]any
 //	@Failure		403						{object}	map[string]any
@@ -47,6 +49,8 @@ func (h *Handler) List(c *gin.Context) {
 		},
 		map[string]struct{}{
 			"ambulance_id": {},
+			"date_from":    {},
+			"date_to":      {},
 		},
 	)
 

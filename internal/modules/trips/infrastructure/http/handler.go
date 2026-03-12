@@ -30,6 +30,8 @@ func NewHandler(service *tripsapp.Service) *Handler {
 //	@Param		sort_order				query		string	false	"Sort order"	Enums(ASC,DESC)
 //	@Param		filter[incident_id]		query		string	false	"Filter by incident id"
 //	@Param		filter[ambulance_id]	query		string	false	"Filter by ambulance id"
+//	@Param		filter[date_from]		query		string	false	"Filter by started_at from (ISO 8601)"
+//	@Param		filter[date_to]			query		string	false	"Filter by started_at to (ISO 8601)"
 //	@Success	200						{object}	map[string]interface{}
 //	@Failure	500						{object}	map[string]interface{}
 //	@Router		/trips [get]
@@ -43,6 +45,8 @@ func (h *Handler) List(c *gin.Context) {
 		map[string]struct{}{
 			"incident_id":  {},
 			"ambulance_id": {},
+			"date_from":    {},
+			"date_to":      {},
 		},
 	)
 	out, err := h.service.List(c.Request.Context(), p)

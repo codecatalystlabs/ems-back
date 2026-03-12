@@ -66,6 +66,14 @@ func (r *Repository) ListIncidents(ctx context.Context, p platformdb.Pagination)
 			where = append(where, fmt.Sprintf("i.facility_id = $%d", argPos))
 			args = append(args, value)
 			argPos++
+		case "date_from":
+			where = append(where, fmt.Sprintf("i.reported_at >= $%d", argPos))
+			args = append(args, value)
+			argPos++
+		case "date_to":
+			where = append(where, fmt.Sprintf("i.reported_at <= $%d", argPos))
+			args = append(args, value)
+			argPos++
 		}
 	}
 

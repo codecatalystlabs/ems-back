@@ -31,9 +31,6 @@ func (r *Repository) List(ctx context.Context, p platformdb.Pagination) ([]domai
 		"cost":        "fl.cost",
 		"odometer_km": "fl.odometer_km",
 	}
-	allowedFilters := map[string]struct{}{
-		"ambulance_id": {},
-	}
 
 	// note: ParsePagination already filtered p.Filters keys, but we also allow the caller to pass p in directly.
 	where := []string{"1=1"}
@@ -51,12 +48,17 @@ func (r *Repository) List(ctx context.Context, p platformdb.Pagination) ([]domai
 	}
 
 	for k, v := range p.Filters {
-		if _, ok := allowedFilters[k]; !ok {
-			continue
-		}
 		switch k {
 		case "ambulance_id":
 			where = append(where, fmt.Sprintf("fl.ambulance_id = $%d", pos))
+			args = append(args, v)
+			pos++
+		case "date_from":
+			where = append(where, fmt.Sprintf("fl.filled_at >= $%d", pos))
+			args = append(args, v)
+			pos++
+		case "date_to":
+			where = append(where, fmt.Sprintf("fl.filled_at <= $%d", pos))
 			args = append(args, v)
 			pos++
 		}

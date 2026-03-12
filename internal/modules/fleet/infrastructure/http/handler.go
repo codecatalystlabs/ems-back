@@ -34,6 +34,8 @@ func NewHandler(service *fleetapp.Service) *Handler {
 //	@Param			filter[dispatch_readiness]	query		string	false	"Filter by dispatch readiness"
 //	@Param			filter[district_id]			query		string	false	"Filter by district id"
 //	@Param			filter[category_id]			query		string	false	"Filter by ambulance category id"
+//	@Param			filter[date_from]			query		string	false	"Filter by created_at from (ISO 8601)"
+//	@Param			filter[date_to]				query		string	false	"Filter by created_at to (ISO 8601)"
 //	@Success		200							{object}	map[string]interface{}
 //	@Failure		500							{object}	map[string]interface{}
 //	@Router			/ambulances [get]
@@ -51,6 +53,8 @@ func (h *Handler) List(c *gin.Context) {
 			"dispatch_readiness": {},
 			"district_id":        {},
 			"category_id":        {},
+			"date_from":          {},
+			"date_to":            {},
 		},
 	)
 	out, err := h.service.ListAmbulances(c.Request.Context(), p)

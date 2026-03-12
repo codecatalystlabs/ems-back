@@ -41,6 +41,14 @@ func (r *Repository) ListTrips(ctx context.Context, p platformdb.Pagination) ([]
 			where = append(where, fmt.Sprintf("t.ambulance_id = $%d", argPos))
 			args = append(args, value)
 			argPos++
+		case "date_from":
+			where = append(where, fmt.Sprintf("t.started_at >= $%d", argPos))
+			args = append(args, value)
+			argPos++
+		case "date_to":
+			where = append(where, fmt.Sprintf("t.started_at <= $%d", argPos))
+			args = append(args, value)
+			argPos++
 		}
 	}
 

@@ -47,6 +47,14 @@ func (r *Repository) ListNotifications(ctx context.Context, userID string, p pla
 			where = append(where, fmt.Sprintf("n.channel = $%d", argPos))
 			args = append(args, strings.ToUpper(value))
 			argPos++
+		case "date_from":
+			where = append(where, fmt.Sprintf("n.created_at >= $%d", argPos))
+			args = append(args, value)
+			argPos++
+		case "date_to":
+			where = append(where, fmt.Sprintf("n.created_at <= $%d", argPos))
+			args = append(args, value)
+			argPos++
 		}
 	}
 

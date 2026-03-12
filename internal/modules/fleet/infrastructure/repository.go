@@ -64,6 +64,14 @@ func (r *Repository) ListAmbulances(ctx context.Context, p platformdb.Pagination
 			where = append(where, fmt.Sprintf("a.category_id = $%d", argPos))
 			args = append(args, value)
 			argPos++
+		case "date_from":
+			where = append(where, fmt.Sprintf("a.created_at >= $%d", argPos))
+			args = append(args, value)
+			argPos++
+		case "date_to":
+			where = append(where, fmt.Sprintf("a.created_at <= $%d", argPos))
+			args = append(args, value)
+			argPos++
 		}
 	}
 
