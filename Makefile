@@ -1,5 +1,5 @@
 APP_NAME := dispatch-backend
-DB_URL ?= postgres://dispatch:dispatch@localhost:5431/dispatch_db?sslmode=disable
+DB_URL ?= postgres://postgres:pwaiswa@localhost:5432/dispatch_db?sslmode=disable
 GOOSE_DRIVER ?= postgres
 GOOSE_DIR ?= migrations
 GOOSE ?= goose
