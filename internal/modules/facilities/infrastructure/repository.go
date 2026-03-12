@@ -24,7 +24,7 @@ var _ application.Repository = (*Repository)(nil)
 
 func (r *Repository) ListFacilities(ctx context.Context, p platformdb.Pagination) ([]domain.Facility, int64, error) {
 	allowedSorts := map[string]string{
-		"created_at":   "f.facility", // default sort by facility name
+		"created_at":    "f.facility", // default sort by facility name
 		"facility":      "f.facility",
 		"level":         "f.level",
 		"ownership":     "f.ownership",

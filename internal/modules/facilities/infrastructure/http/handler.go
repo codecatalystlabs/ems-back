@@ -42,7 +42,7 @@ func (h *Handler) List(c *gin.Context) {
 	p := platformdb.ParsePagination(
 		c.Request.URL.Query(),
 		map[string]string{
-			"created_at":   "f.facility", // default sort by facility name
+			"created_at":    "f.facility", // default sort by facility name
 			"facility":      "f.facility",
 			"level":         "f.level",
 			"ownership":     "f.ownership",

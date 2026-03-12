@@ -6,6 +6,10 @@ definitions:
         type: string
       access_token_expires_in:
         type: integer
+      permissions:
+        items:
+          type: string
+        type: array
       refresh_token:
         type: string
       refresh_token_expires_in:
@@ -1988,6 +1992,317 @@ paths:
       summary: Get my permissions
       tags:
       - RBAC
+  /reference/ambulance-categories:
+    get:
+      description: Returns active ambulance categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List ambulance categories
+      tags:
+      - Reference
+  /reference/capabilities:
+    get:
+      description: Returns active capabilities
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List capabilities
+      tags:
+      - Reference
+  /reference/districts:
+    get:
+      description: Returns paginated districts
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search by district name, code, or region
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - name
+        - region
+        - created_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by active flag
+        in: query
+        name: filter[is_active]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List districts
+      tags:
+      - Reference
+  /reference/facilities:
+    get:
+      description: Returns paginated facilities, optionally filtered by district,
+        subcounty, or facility level
+      parameters:
+      - description: District ID
+        in: query
+        name: district_id
+        type: string
+      - description: Subcounty ID
+        in: query
+        name: subcounty_id
+        type: string
+      - description: Facility level ID
+        in: query
+        name: level_id
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search by facility name, short name, NHFR ID, or code
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - name
+        - created_at
+        - ownership
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by active flag
+        in: query
+        name: filter[is_active]
+        type: string
+      - description: Filter by dispatch station flag
+        in: query
+        name: filter[is_dispatch_station]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List facilities
+      tags:
+      - Reference
+  /reference/facility-levels:
+    get:
+      description: Returns active facility levels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List facility levels
+      tags:
+      - Reference
+  /reference/incident-types:
+    get:
+      description: Returns active incident types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List incident types
+      tags:
+      - Reference
+  /reference/priority-levels:
+    get:
+      description: Returns active priority levels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List priority levels
+      tags:
+      - Reference
+  /reference/severity-levels:
+    get:
+      description: Returns active severity levels
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List severity levels
+      tags:
+      - Reference
+  /reference/subcounties:
+    get:
+      description: Returns paginated subcounties, optionally filtered by district
+      parameters:
+      - description: District ID
+        in: query
+        name: district_id
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search by subcounty name or code
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - name
+        - created_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by active flag
+        in: query
+        name: filter[is_active]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List subcounties
+      tags:
+      - Reference
   /trips:
     get:
       parameters:

@@ -24,7 +24,7 @@ var _ application.Repository = (*Repository)(nil)
 
 func (r *Repository) ListIncidents(ctx context.Context, p platformdb.Pagination) ([]domain.Incident, int64, error) {
 	allowedSorts := map[string]string{
-		"created_at": "i.created_at",
+		"created_at":  "i.created_at",
 		"reported_at": "i.reported_at",
 		"status":      "i.status",
 	}

@@ -11,6 +11,7 @@ import (
 	incidentmod "dispatch/internal/modules/incidents"
 	notifmod "dispatch/internal/modules/notifications"
 	rbacmod "dispatch/internal/modules/rbac"
+	refmod "dispatch/internal/modules/reference"
 	tripsmod "dispatch/internal/modules/trips"
 	usermod "dispatch/internal/modules/users"
 	"dispatch/internal/shared/types"
@@ -44,6 +45,7 @@ func RegisterModules(deps types.ModuleDeps) {
 	tripsmod.Register(securedDeps, rbacSvc)
 	notifmod.Register(securedDeps, rbacSvc)
 	fuelmod.Register(securedDeps, rbacSvc)
+	refmod.Register(securedDeps)
 	// availabilitymod.Register(securedDeps, rbacSvc)
 	// dispatchmod.Register(securedDeps, rbacSvc)
 }

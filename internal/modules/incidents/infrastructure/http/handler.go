@@ -42,7 +42,7 @@ func (h *Handler) List(c *gin.Context) {
 	p := platformdb.ParsePagination(
 		c.Request.URL.Query(),
 		map[string]string{
-			"created_at": "i.created_at",
+			"created_at":  "i.created_at",
 			"reported_at": "i.reported_at",
 			"status":      "i.status",
 		},

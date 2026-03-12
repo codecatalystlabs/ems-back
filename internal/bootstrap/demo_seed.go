@@ -447,4 +447,3 @@ func SeedDemoData(ctx context.Context, db *pgxpool.Pool) error {
 	fmt.Println("demo data seeding completed")
 	return nil
 }
-
