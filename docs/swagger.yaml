@@ -280,6 +280,72 @@ definitions:
       year_of_manufacture:
         type: integer
     type: object
+  dispatch_internal_modules_fuel_application.CreateFuelLogRequest:
+    properties:
+      ambulance_id:
+        type: string
+      cost:
+        type: number
+      filled_at:
+        type: string
+      fuel_type:
+        type: string
+      liters:
+        type: number
+      notes:
+        type: string
+      odometer_km:
+        type: integer
+      station_name:
+        type: string
+    required:
+    - ambulance_id
+    - liters
+    type: object
+  dispatch_internal_modules_fuel_application.UpdateFuelLogRequest:
+    properties:
+      cost:
+        type: number
+      filled_at:
+        type: string
+      fuel_type:
+        type: string
+      liters:
+        type: number
+      notes:
+        type: string
+      odometer_km:
+        type: integer
+      station_name:
+        type: string
+    type: object
+  dispatch_internal_modules_fuel_domain.FuelLog:
+    properties:
+      ambulance_id:
+        type: string
+      cost:
+        type: number
+      created_at:
+        type: string
+      filled_at:
+        type: string
+      filled_by:
+        type: string
+      fuel_type:
+        type: string
+      id:
+        type: string
+      liters:
+        type: number
+      notes:
+        type: string
+      odometer_km:
+        type: integer
+      station_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dispatch_internal_modules_incidents_application.CreateIncidentRequest:
     properties:
       caller_name:
@@ -505,6 +571,32 @@ definitions:
         type: string
       status:
         type: string
+    type: object
+  dispatch_internal_platform_db.PageMeta:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      search:
+        type: string
+      sort_by:
+        type: string
+      sort_order:
+        type: string
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dispatch_internal_platform_db.PageResult-dispatch_internal_modules_fuel_domain_FuelLog:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dispatch_internal_modules_fuel_domain.FuelLog'
+        type: array
+      meta:
+        $ref: '#/definitions/dispatch_internal_platform_db.PageMeta'
     type: object
 info:
   contact: {}
@@ -1328,6 +1420,233 @@ paths:
       summary: Update facility
       tags:
       - Facilities
+  /fuel/logs:
+    get:
+      description: List fuel logs with pagination
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search query
+        in: query
+        name: search
+        type: string
+      - default: created_at
+        description: Sort by field
+        in: query
+        name: sort_by
+        type: string
+      - default: DESC
+        description: Sort order (ASC/DESC)
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by ambulance_id (UUID)
+        in: query
+        name: filter[ambulance_id]
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dispatch_internal_platform_db.PageResult-dispatch_internal_modules_fuel_domain_FuelLog'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List fuel logs
+      tags:
+      - Fuel
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Fuel log payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_fuel_application.CreateFuelLogRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create fuel log
+      tags:
+      - Fuel
+  /fuel/logs/{id}:
+    delete:
+      parameters:
+      - description: Fuel log ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete fuel log
+      tags:
+      - Fuel
+    get:
+      parameters:
+      - description: Fuel log ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get fuel log by id
+      tags:
+      - Fuel
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Fuel log ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_fuel_application.UpdateFuelLogRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update fuel log
+      tags:
+      - Fuel
   /incidents:
     get:
       description: Returns paginated incidents with filters for status and type
