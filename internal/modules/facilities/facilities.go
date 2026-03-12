@@ -15,4 +15,3 @@ func Register(deps types.ModuleDeps, rbacSvc *rbacapp.Service) {
 	group := deps.Router.Group("/facilities")
 	http.RegisterRoutes(group, handler, rbacSvc)
 }
-

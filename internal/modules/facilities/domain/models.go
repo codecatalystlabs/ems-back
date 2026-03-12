@@ -30,4 +30,3 @@ type Facility struct {
 	District    string `json:"district"`
 	Subcounty   string `json:"subcounty"`
 }
-

@@ -20,17 +20,17 @@ func NewHandler(service *notifapp.Service) *Handler {
 
 // ListMy godoc
 //
-//	@Summary		List my notifications
-//	@Tags			Notifications
-//	@Produce		json
-//	@Security		BearerAuth
-//	@Param			page		query	int		false	"Page number"	default(1)
-//	@Param			page_size	query	int		false	"Page size"		default(20)
-//	@Param			filter[status]	query	string	false	"Filter by status"
-//	@Param			filter[channel]	query	string	false	"Filter by channel"
-//	@Success		200		{object}	map[string]interface{}
-//	@Failure		500		{object}	map[string]interface{}
-//	@Router			/notifications [get]
+//	@Summary	List my notifications
+//	@Tags		Notifications
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		page			query		int		false	"Page number"	default(1)
+//	@Param		page_size		query		int		false	"Page size"		default(20)
+//	@Param		filter[status]	query		string	false	"Filter by status"
+//	@Param		filter[channel]	query		string	false	"Filter by channel"
+//	@Success	200				{object}	map[string]interface{}
+//	@Failure	500				{object}	map[string]interface{}
+//	@Router		/notifications [get]
 func (h *Handler) ListMy(c *gin.Context) {
 	userID := c.GetString("user_id")
 	p := platformdb.ParsePagination(
@@ -53,14 +53,14 @@ func (h *Handler) ListMy(c *gin.Context) {
 
 // Get godoc
 //
-//	@Summary		Get notification
-//	@Tags			Notifications
-//	@Produce		json
-//	@Security		BearerAuth
-//	@Param			id	path	string	true	"Notification ID"
-//	@Success		200	{object}	map[string]interface{}
-//	@Failure		404	{object}	map[string]interface{}
-//	@Router			/notifications/{id} [get]
+//	@Summary	Get notification
+//	@Tags		Notifications
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		id	path		string	true	"Notification ID"
+//	@Success	200	{object}	map[string]interface{}
+//	@Failure	404	{object}	map[string]interface{}
+//	@Router		/notifications/{id} [get]
 func (h *Handler) Get(c *gin.Context) {
 	id := c.Param("id")
 	out, err := h.service.Get(c.Request.Context(), id)
@@ -73,16 +73,16 @@ func (h *Handler) Get(c *gin.Context) {
 
 // Create godoc
 //
-//	@Summary		Create notification
-//	@Tags			Notifications
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerAuth
-//	@Param			payload	body		notifapp.CreateNotificationRequest	true	"Create notification payload"
-//	@Success		201		{object}	map[string]interface{}
-//	@Failure		400		{object}	map[string]interface{}
-//	@Failure		500		{object}	map[string]interface{}
-//	@Router			/notifications [post]
+//	@Summary	Create notification
+//	@Tags		Notifications
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		payload	body		notifapp.CreateNotificationRequest	true	"Create notification payload"
+//	@Success	201		{object}	map[string]interface{}
+//	@Failure	400		{object}	map[string]interface{}
+//	@Failure	500		{object}	map[string]interface{}
+//	@Router		/notifications [post]
 func (h *Handler) Create(c *gin.Context) {
 	var req notifapp.CreateNotificationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -99,14 +99,14 @@ func (h *Handler) Create(c *gin.Context) {
 
 // MarkRead godoc
 //
-//	@Summary		Mark notification as read
-//	@Tags			Notifications
-//	@Produce		json
-//	@Security		BearerAuth
-//	@Param			id	path	string	true	"Notification ID"
-//	@Success		200	{object}	map[string]interface{}
-//	@Failure		500	{object}	map[string]interface{}
-//	@Router			/notifications/{id}/read [post]
+//	@Summary	Mark notification as read
+//	@Tags		Notifications
+//	@Produce	json
+//	@Security	BearerAuth
+//	@Param		id	path		string	true	"Notification ID"
+//	@Success	200	{object}	map[string]interface{}
+//	@Failure	500	{object}	map[string]interface{}
+//	@Router		/notifications/{id}/read [post]
 func (h *Handler) MarkRead(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.UpdateStatus(c.Request.Context(), id, "READ"); err != nil {
@@ -115,4 +115,3 @@ func (h *Handler) MarkRead(c *gin.Context) {
 	}
 	httpx.OK(c, gin.H{"message": "notification marked read"})
 }
-

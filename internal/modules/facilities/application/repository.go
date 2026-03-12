@@ -14,4 +14,3 @@ type Repository interface {
 	Update(ctx context.Context, uid string, req UpdateFacilityRequest) (domain.Facility, error)
 	Delete(ctx context.Context, uid string) error
 }
-

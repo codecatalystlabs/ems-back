@@ -14,4 +14,3 @@ func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service) {
 	rg.PUT("/:uid", rbacmiddleware.RequirePermission(rbacSvc, "facilities.manage"), h.Update)
 	rg.DELETE("/:uid", rbacmiddleware.RequirePermission(rbacSvc, "facilities.manage"), h.Delete)
 }
-

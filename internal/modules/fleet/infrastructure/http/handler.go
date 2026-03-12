@@ -25,17 +25,17 @@ func NewHandler(service *fleetapp.Service) *Handler {
 //	@Tags			Fleet
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			page					query		int		false	"Page number"			default(1)
-//	@Param			page_size				query		int		false	"Page size"				default(20)
-//	@Param			search					query		string	false	"Search term (code, plate, VIN, make, model)"
-//	@Param			sort_by					query		string	false	"Sort field"			Enums(created_at,plate_number,status,dispatch_readiness)
-//	@Param			sort_order				query		string	false	"Sort order"			Enums(ASC,DESC)
-//	@Param			filter[status]			query		string	false	"Filter by status"
-//	@Param			filter[dispatch_readiness] query	string	false	"Filter by dispatch readiness"
-//	@Param			filter[district_id]		query		string	false	"Filter by district id"
-//	@Param			filter[category_id]		query		string	false	"Filter by ambulance category id"
-//	@Success		200						{object}	map[string]interface{}
-//	@Failure		500						{object}	map[string]interface{}
+//	@Param			page						query		int		false	"Page number"	default(1)
+//	@Param			page_size					query		int		false	"Page size"		default(20)
+//	@Param			search						query		string	false	"Search term (code, plate, VIN, make, model)"
+//	@Param			sort_by						query		string	false	"Sort field"	Enums(created_at,plate_number,status,dispatch_readiness)
+//	@Param			sort_order					query		string	false	"Sort order"	Enums(ASC,DESC)
+//	@Param			filter[status]				query		string	false	"Filter by status"
+//	@Param			filter[dispatch_readiness]	query		string	false	"Filter by dispatch readiness"
+//	@Param			filter[district_id]			query		string	false	"Filter by district id"
+//	@Param			filter[category_id]			query		string	false	"Filter by ambulance category id"
+//	@Success		200							{object}	map[string]interface{}
+//	@Failure		500							{object}	map[string]interface{}
 //	@Router			/ambulances [get]
 func (h *Handler) List(c *gin.Context) {
 	p := platformdb.ParsePagination(
@@ -68,7 +68,7 @@ func (h *Handler) List(c *gin.Context) {
 //	@Tags			Fleet
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			id	path	string	true	"Ambulance ID"
+//	@Param			id	path		string	true	"Ambulance ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
 //	@Router			/ambulances/{id} [get]
@@ -117,7 +117,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			id		path	string							true	"Ambulance ID"
+//	@Param			id		path		string							true	"Ambulance ID"
 //	@Param			payload	body		fleetapp.UpdateAmbulanceRequest	true	"Update ambulance payload"
 //	@Success		200		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -145,7 +145,7 @@ func (h *Handler) Update(c *gin.Context) {
 //	@Tags			Fleet
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			id	path	string	true	"Ambulance ID"
+//	@Param			id	path		string	true	"Ambulance ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/ambulances/{id} [delete]

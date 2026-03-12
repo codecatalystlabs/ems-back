@@ -36,7 +36,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := bootstrap.SeedFacilities(ctx, pool, "migrations/data/Masterfacility.csv"); err != nil {
+	if err := bootstrap.SeedFacilities(ctx, pool, "migrations/data/MasterFacility.csv"); err != nil {
 		log.Fatal(err)
 	}
 

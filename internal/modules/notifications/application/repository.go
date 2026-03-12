@@ -13,4 +13,3 @@ type Repository interface {
 	Create(ctx context.Context, in domain.Notification) (domain.Notification, error)
 	UpdateStatus(ctx context.Context, id string, status string) error
 }
-

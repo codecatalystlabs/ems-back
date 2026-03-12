@@ -24,16 +24,16 @@ func NewHandler(svc *fuelapp.Service) *Handler {
 //	@Description	List fuel logs with pagination
 //	@Tags			Fuel
 //	@Security		BearerAuth
-//	@Param			page				query		int		false	"Page number"			default(1)
-//	@Param			page_size			query		int		false	"Page size"				default(20)
-//	@Param			search				query		string	false	"Search query"
-//	@Param			sort_by				query		string	false	"Sort by field"			default(created_at)
-//	@Param			sort_order			query		string	false	"Sort order (ASC/DESC)"	default(DESC)
+//	@Param			page					query		int		false	"Page number"	default(1)
+//	@Param			page_size				query		int		false	"Page size"		default(20)
+//	@Param			search					query		string	false	"Search query"
+//	@Param			sort_by					query		string	false	"Sort by field"			default(created_at)
+//	@Param			sort_order				query		string	false	"Sort order (ASC/DESC)"	default(DESC)
 //	@Param			filter[ambulance_id]	query		string	false	"Filter by ambulance_id (UUID)"
-//	@Success		200					{object}	platformdb.PageResult[domain.FuelLog]
-//	@Failure		401					{object}	map[string]any
-//	@Failure		403					{object}	map[string]any
-//	@Failure		500					{object}	map[string]any
+//	@Success		200						{object}	platformdb.PageResult[domain.FuelLog]
+//	@Failure		401						{object}	map[string]any
+//	@Failure		403						{object}	map[string]any
+//	@Failure		500						{object}	map[string]any
 //	@Router			/fuel/logs [get]
 func (h *Handler) List(c *gin.Context) {
 	p := platformdb.ParsePagination(
@@ -64,16 +64,16 @@ func (h *Handler) List(c *gin.Context) {
 
 // GetFuelLog godoc
 //
-//	@Summary		Get fuel log by id
-//	@Tags			Fuel
-//	@Security		BearerAuth
-//	@Param			id	path		string	true	"Fuel log ID (UUID)"
-//	@Success		200	{object}	map[string]any
-//	@Failure		401	{object}	map[string]any
-//	@Failure		403	{object}	map[string]any
-//	@Failure		404	{object}	map[string]any
-//	@Failure		500	{object}	map[string]any
-//	@Router			/fuel/logs/{id} [get]
+//	@Summary	Get fuel log by id
+//	@Tags		Fuel
+//	@Security	BearerAuth
+//	@Param		id	path		string	true	"Fuel log ID (UUID)"
+//	@Success	200	{object}	map[string]any
+//	@Failure	401	{object}	map[string]any
+//	@Failure	403	{object}	map[string]any
+//	@Failure	404	{object}	map[string]any
+//	@Failure	500	{object}	map[string]any
+//	@Router		/fuel/logs/{id} [get]
 func (h *Handler) Get(c *gin.Context) {
 	id := c.Param("id")
 	item, err := h.svc.Get(c.Request.Context(), id)
@@ -86,18 +86,18 @@ func (h *Handler) Get(c *gin.Context) {
 
 // CreateFuelLog godoc
 //
-//	@Summary		Create fuel log
-//	@Tags			Fuel
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			payload	body		fuelapp.CreateFuelLogRequest	true	"Fuel log payload"
-//	@Success		201		{object}	map[string]any
-//	@Failure		400		{object}	map[string]any
-//	@Failure		401		{object}	map[string]any
-//	@Failure		403		{object}	map[string]any
-//	@Failure		500		{object}	map[string]any
-//	@Router			/fuel/logs [post]
+//	@Summary	Create fuel log
+//	@Tags		Fuel
+//	@Security	BearerAuth
+//	@Accept		json
+//	@Produce	json
+//	@Param		payload	body		fuelapp.CreateFuelLogRequest	true	"Fuel log payload"
+//	@Success	201		{object}	map[string]any
+//	@Failure	400		{object}	map[string]any
+//	@Failure	401		{object}	map[string]any
+//	@Failure	403		{object}	map[string]any
+//	@Failure	500		{object}	map[string]any
+//	@Router		/fuel/logs [post]
 func (h *Handler) Create(c *gin.Context) {
 	var req fuelapp.CreateFuelLogRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -118,20 +118,20 @@ func (h *Handler) Create(c *gin.Context) {
 
 // UpdateFuelLog godoc
 //
-//	@Summary		Update fuel log
-//	@Tags			Fuel
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			id		path		string						true	"Fuel log ID (UUID)"
-//	@Param			payload	body		fuelapp.UpdateFuelLogRequest	true	"Update payload"
-//	@Success		200		{object}	map[string]any
-//	@Failure		400		{object}	map[string]any
-//	@Failure		401		{object}	map[string]any
-//	@Failure		403		{object}	map[string]any
-//	@Failure		404		{object}	map[string]any
-//	@Failure		500		{object}	map[string]any
-//	@Router			/fuel/logs/{id} [put]
+//	@Summary	Update fuel log
+//	@Tags		Fuel
+//	@Security	BearerAuth
+//	@Accept		json
+//	@Produce	json
+//	@Param		id		path		string							true	"Fuel log ID (UUID)"
+//	@Param		payload	body		fuelapp.UpdateFuelLogRequest	true	"Update payload"
+//	@Success	200		{object}	map[string]any
+//	@Failure	400		{object}	map[string]any
+//	@Failure	401		{object}	map[string]any
+//	@Failure	403		{object}	map[string]any
+//	@Failure	404		{object}	map[string]any
+//	@Failure	500		{object}	map[string]any
+//	@Router		/fuel/logs/{id} [put]
 func (h *Handler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req fuelapp.UpdateFuelLogRequest
@@ -149,16 +149,16 @@ func (h *Handler) Update(c *gin.Context) {
 
 // DeleteFuelLog godoc
 //
-//	@Summary		Delete fuel log
-//	@Tags			Fuel
-//	@Security		BearerAuth
-//	@Param			id	path		string	true	"Fuel log ID (UUID)"
-//	@Success		204	{object}	nil
-//	@Failure		401	{object}	map[string]any
-//	@Failure		403	{object}	map[string]any
-//	@Failure		404	{object}	map[string]any
-//	@Failure		500	{object}	map[string]any
-//	@Router			/fuel/logs/{id} [delete]
+//	@Summary	Delete fuel log
+//	@Tags		Fuel
+//	@Security	BearerAuth
+//	@Param		id	path		string	true	"Fuel log ID (UUID)"
+//	@Success	204	{object}	nil
+//	@Failure	401	{object}	map[string]any
+//	@Failure	403	{object}	map[string]any
+//	@Failure	404	{object}	map[string]any
+//	@Failure	500	{object}	map[string]any
+//	@Router		/fuel/logs/{id} [delete]
 func (h *Handler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.svc.Delete(c.Request.Context(), id); err != nil {
@@ -167,4 +167,3 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 	c.Status(http.StatusNoContent)
 }
-

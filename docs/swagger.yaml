@@ -939,123 +939,6 @@ paths:
       summary: Create blood offer
       tags:
       - Blood
-  /blood/pickups/{assignmentId}/collect:
-    post:
-      consumes:
-      - application/json
-      description: Marks a blood pickup assignment as collected by the assigned user
-      parameters:
-      - description: Pickup Assignment ID
-        in: path
-        name: assignmentId
-        required: true
-        type: string
-      - description: Payload with requisition ID and optional actor user ID
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.MarkCollectedRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Mark blood as collected
-      tags:
-      - Blood
-  /blood/pickups/{assignmentId}/deliver:
-    post:
-      consumes:
-      - application/json
-      description: Marks a blood pickup assignment as delivered, completing the pickup
-        process
-      parameters:
-      - description: Pickup Assignment ID
-        in: path
-        name: assignmentId
-        required: true
-        type: string
-      - description: Payload with requisition ID and optional actor user ID
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.MarkDeliveredRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Mark blood as delivered
-      tags:
-      - Blood
-  /blood/pickups/assign:
-    post:
-      consumes:
-      - application/json
-      description: Assigns a pickup for an accepted blood offer, creating a new assignment
-        record
-      parameters:
-      - description: Pickup assignment details
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.AssignBloodPickupRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Assign blood pickup
-      tags:
-      - Blood
   /blood/requisitions:
     get:
       description: Returns paginated blood requisitions with search, sorting, and
@@ -1967,6 +1850,123 @@ paths:
       summary: Mark notification as read
       tags:
       - Notifications
+  /pickup-assignments:
+    post:
+      consumes:
+      - application/json
+      description: Assigns a pickup for an accepted blood offer, creating a new assignment
+        record
+      parameters:
+      - description: Pickup assignment details
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.AssignBloodPickupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign blood pickup
+      tags:
+      - Blood
+  /pickup-assignments/{assignmentId}/collect:
+    post:
+      consumes:
+      - application/json
+      description: Marks a blood pickup assignment as collected by the assigned user
+      parameters:
+      - description: Pickup Assignment ID
+        in: path
+        name: assignmentId
+        required: true
+        type: string
+      - description: Payload with requisition ID and optional actor user ID
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.MarkCollectedRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark blood as collected
+      tags:
+      - Blood
+  /pickup-assignments/{assignmentId}/deliver:
+    post:
+      consumes:
+      - application/json
+      description: Marks a blood pickup assignment as delivered, completing the pickup
+        process
+      parameters:
+      - description: Pickup Assignment ID
+        in: path
+        name: assignmentId
+        required: true
+        type: string
+      - description: Payload with requisition ID and optional actor user ID
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_blood_application_dto.MarkDeliveredRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark blood as delivered
+      tags:
+      - Blood
   /rbac/me/permissions:
     get:
       description: Returns the list of permissions granted to the authenticated user

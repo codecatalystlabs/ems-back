@@ -36,19 +36,19 @@ func (s *Service) Get(ctx context.Context, id string) (domain.Notification, erro
 func (s *Service) Create(ctx context.Context, req CreateNotificationRequest) (domain.Notification, error) {
 	now := time.Now().UTC()
 	n := domain.Notification{
-		ID:              uuid.NewString(),
-		Type:            req.Type,
-		RecipientUserID: req.RecipientUserID,
-		RecipientPhone:  req.RecipientPhone,
-		RecipientEmail:  req.RecipientEmail,
-		Title:           req.Title,
-		Body:            req.Body,
-		Channel:         strings.ToUpper(strings.TrimSpace(req.Channel)),
+		ID:               uuid.NewString(),
+		Type:             req.Type,
+		RecipientUserID:  req.RecipientUserID,
+		RecipientPhone:   req.RecipientPhone,
+		RecipientEmail:   req.RecipientEmail,
+		Title:            req.Title,
+		Body:             req.Body,
+		Channel:          strings.ToUpper(strings.TrimSpace(req.Channel)),
 		LinkedEntityType: req.LinkedEntityType,
-		LinkedEntityID:  req.LinkedEntityID,
-		Status:          "PENDING",
-		Attempts:        0,
-		CreatedAt:       now,
+		LinkedEntityID:   req.LinkedEntityID,
+		Status:           "PENDING",
+		Attempts:         0,
+		CreatedAt:        now,
 	}
 	return s.repo.Create(ctx, n)
 }
@@ -56,4 +56,3 @@ func (s *Service) Create(ctx context.Context, req CreateNotificationRequest) (do
 func (s *Service) UpdateStatus(ctx context.Context, id string, status string) error {
 	return s.repo.UpdateStatus(ctx, id, strings.ToUpper(strings.TrimSpace(status)))
 }
-

@@ -17,4 +17,3 @@ type Repository interface {
 	ListTripEvents(ctx context.Context, tripID string, p platformdb.Pagination) ([]domain.TripEvent, int64, error)
 	CreateTripEvent(ctx context.Context, tripID string, in domain.TripEvent) (domain.TripEvent, error)
 }
-

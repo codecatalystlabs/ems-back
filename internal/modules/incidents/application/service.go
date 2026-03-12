@@ -82,5 +82,3 @@ func (s *Service) Update(ctx context.Context, id string, req UpdateIncidentReque
 func (s *Service) Delete(ctx context.Context, id string) error {
 	return s.repo.DeleteIncident(ctx, id)
 }
-
-
