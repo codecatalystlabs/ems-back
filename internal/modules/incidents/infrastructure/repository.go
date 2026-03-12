@@ -9,6 +9,7 @@ import (
 	"dispatch/internal/modules/incidents/domain"
 	platformdb "dispatch/internal/platform/db"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -439,4 +440,89 @@ func (r *Repository) UpdateIncident(ctx context.Context, id string, req applicat
 func (r *Repository) DeleteIncident(ctx context.Context, id string) error {
 	_, err := r.db.Exec(ctx, `DELETE FROM incidents WHERE id = $1`, id)
 	return err
+}
+
+// ResolveIncidentTypeID resolves either a UUID, a code, or a name (case-insensitive)
+// into a concrete incident_type id from ref_incident_types.
+func (r *Repository) ResolveIncidentTypeID(ctx context.Context, value string) (string, error) {
+	v := strings.TrimSpace(value)
+	if v == "" {
+		return "", fmt.Errorf("incident_type_id is required")
+	}
+
+	// If it's already a valid UUID and exists, use it directly.
+	var id string
+	if _, err := uuid.Parse(v); err == nil {
+		if err := r.db.QueryRow(ctx, `SELECT id FROM ref_incident_types WHERE id = $1`, v).Scan(&id); err == nil {
+			return id, nil
+		}
+		// fall through to code/name lookup if not found by id
+	}
+
+	// Try by code, then by name (case-insensitive)
+	err := r.db.QueryRow(ctx,
+		`SELECT id FROM ref_incident_types WHERE code = $1 OR LOWER(name) = LOWER($1) LIMIT 1`,
+		v,
+	).Scan(&id)
+	if err != nil {
+		return "", fmt.Errorf("unknown incident_type %q", v)
+	}
+	return id, nil
+}
+
+// ResolveDistrictID resolves a human-friendly district identifier into ref_districts.id.
+// Accepts UUID (id), or name/code; empty string results in nil.
+func (r *Repository) ResolveDistrictID(ctx context.Context, value string) (*string, error) {
+	v := strings.TrimSpace(value)
+	if v == "" {
+		return nil, nil
+	}
+
+	var id string
+	// If it's a UUID and exists, use it.
+	if _, err := uuid.Parse(v); err == nil {
+		if err := r.db.QueryRow(ctx, `SELECT id FROM ref_districts WHERE id = $1`, v).Scan(&id); err == nil {
+			return &id, nil
+		}
+	}
+
+	// Try by code or name.
+	err := r.db.QueryRow(ctx,
+		`SELECT id FROM ref_districts WHERE code = $1 OR LOWER(name) = LOWER($1) LIMIT 1`,
+		v,
+	).Scan(&id)
+	if err != nil {
+		// If we can't resolve, return nil (leave district unset) rather than failing the whole request.
+		return nil, nil
+	}
+	return &id, nil
+}
+
+// ResolveFacilityID resolves facility identifier into ref_facilities.id.
+// Accepts UUID (id), or code; empty string results in nil. Name resolution is not attempted
+// because facility names are frequently non-unique.
+func (r *Repository) ResolveFacilityID(ctx context.Context, value string) (*string, error) {
+	v := strings.TrimSpace(value)
+	if v == "" {
+		return nil, nil
+	}
+
+	var id string
+	// If it's a UUID and exists, use it.
+	if _, err := uuid.Parse(v); err == nil {
+		if err := r.db.QueryRow(ctx, `SELECT id FROM ref_facilities WHERE id = $1`, v).Scan(&id); err == nil {
+			return &id, nil
+		}
+	}
+
+	// Try by code (our facility UID)
+	err := r.db.QueryRow(ctx,
+		`SELECT id FROM ref_facilities WHERE code = $1 LIMIT 1`,
+		v,
+	).Scan(&id)
+	if err != nil {
+		// If we can't resolve, leave facility unset.
+		return nil, nil
+	}
+	return &id, nil
 }

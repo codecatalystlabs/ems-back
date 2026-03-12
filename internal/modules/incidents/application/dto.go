@@ -8,17 +8,20 @@ type CreateIncidentRequest struct {
 	PatientPhone    *string  `json:"patient_phone,omitempty"`
 	PatientAgeGroup *string  `json:"patient_age_group,omitempty"`
 	PatientSex      *string  `json:"patient_sex,omitempty"`
+	// IncidentTypeID can be a UUID, a code, or a name; it will be resolved server-side.
 	IncidentTypeID  string   `json:"incident_type_id" binding:"required"`
 	Summary         *string  `json:"summary,omitempty"`
 	Description     *string  `json:"description,omitempty"`
-	DistrictID      *string  `json:"district_id,omitempty"`
-	FacilityID      *string  `json:"facility_id,omitempty"`
-	Village         *string  `json:"village,omitempty"`
-	Parish          *string  `json:"parish,omitempty"`
-	Subcounty       *string  `json:"subcounty,omitempty"`
-	Landmark        *string  `json:"landmark,omitempty"`
-	Latitude        *float64 `json:"latitude,omitempty"`
-	Longitude       *float64 `json:"longitude,omitempty"`
+	// DistrictID can be a UUID, code, or name; it will be resolved server-side.
+	DistrictID *string `json:"district_id,omitempty"`
+	// FacilityID can be a UUID or facility code (UID); it will be resolved server-side.
+	FacilityID *string  `json:"facility_id,omitempty"`
+	Village    *string  `json:"village,omitempty"`
+	Parish     *string  `json:"parish,omitempty"`
+	Subcounty  *string  `json:"subcounty,omitempty"`
+	Landmark   *string  `json:"landmark,omitempty"`
+	Latitude   *float64 `json:"latitude,omitempty"`
+	Longitude  *float64 `json:"longitude,omitempty"`
 }
 
 type UpdateIncidentRequest struct {

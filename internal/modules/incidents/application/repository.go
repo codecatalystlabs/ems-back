@@ -13,4 +13,9 @@ type Repository interface {
 	GetByID(ctx context.Context, id string) (domain.Incident, error)
 	UpdateIncident(ctx context.Context, id string, req UpdateIncidentRequest) (domain.Incident, error)
 	DeleteIncident(ctx context.Context, id string) error
+
+	// Helpers for resolving human-friendly values (codes/names) to internal IDs.
+	ResolveIncidentTypeID(ctx context.Context, value string) (string, error)
+	ResolveDistrictID(ctx context.Context, value string) (*string, error)
+	ResolveFacilityID(ctx context.Context, value string) (*string, error)
 }

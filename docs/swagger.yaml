@@ -782,6 +782,14 @@ paths:
         in: query
         name: filter[category_id]
         type: string
+      - description: Filter by created_at from (ISO 8601)
+        in: query
+        name: filter[date_from]
+        type: string
+      - description: Filter by created_at to (ISO 8601)
+        in: query
+        name: filter[date_to]
+        type: string
       produces:
       - application/json
       responses:
@@ -1096,6 +1104,14 @@ paths:
       - description: Filter by urgency level
         in: query
         name: urgency_level
+        type: string
+      - description: Filter by created_at from (ISO 8601)
+        in: query
+        name: filter[date_from]
+        type: string
+      - description: Filter by created_at to (ISO 8601)
+        in: query
+        name: filter[date_to]
         type: string
       - description: 'Sort by field: created_at, status, urgency_level'
         in: query
@@ -1462,6 +1478,14 @@ paths:
         in: query
         name: filter[ambulance_id]
         type: string
+      - description: Filter by filled_at from (ISO 8601)
+        in: query
+        name: filter[date_from]
+        type: string
+      - description: Filter by filled_at to (ISO 8601)
+        in: query
+        name: filter[date_to]
+        type: string
       responses:
         "200":
           description: OK
@@ -1709,6 +1733,14 @@ paths:
         in: query
         name: filter[facility_id]
         type: string
+      - description: Filter by reported_at from (ISO 8601)
+        in: query
+        name: filter[date_from]
+        type: string
+      - description: Filter by reported_at to (ISO 8601)
+        in: query
+        name: filter[date_to]
+        type: string
       produces:
       - application/json
       responses:
@@ -1873,6 +1905,14 @@ paths:
       - description: Filter by channel
         in: query
         name: filter[channel]
+        type: string
+      - description: Filter by created_at from (ISO 8601)
+        in: query
+        name: filter[date_from]
+        type: string
+      - description: Filter by created_at to (ISO 8601)
+        in: query
+        name: filter[date_to]
         type: string
       produces:
       - application/json
@@ -2460,6 +2500,14 @@ paths:
       - description: Filter by ambulance id
         in: query
         name: filter[ambulance_id]
+        type: string
+      - description: Filter by started_at from (ISO 8601)
+        in: query
+        name: filter[date_from]
+        type: string
+      - description: Filter by started_at to (ISO 8601)
+        in: query
+        name: filter[date_to]
         type: string
       produces:
       - application/json

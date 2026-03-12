@@ -96,6 +96,18 @@ const docTemplate = `{
                         "description": "Filter by ambulance category id",
                         "name": "filter[category_id]",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by created_at from (ISO 8601)",
+                        "name": "filter[date_from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by created_at to (ISO 8601)",
+                        "name": "filter[date_to]",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -577,6 +589,18 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Filter by urgency level",
                         "name": "urgency_level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by created_at from (ISO 8601)",
+                        "name": "filter[date_from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by created_at to (ISO 8601)",
+                        "name": "filter[date_to]",
                         "in": "query"
                     },
                     {
@@ -1127,6 +1151,18 @@ const docTemplate = `{
                         "description": "Filter by ambulance_id (UUID)",
                         "name": "filter[ambulance_id]",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by filled_at from (ISO 8601)",
+                        "name": "filter[date_from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by filled_at to (ISO 8601)",
+                        "name": "filter[date_to]",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1501,6 +1537,18 @@ const docTemplate = `{
                         "description": "Filter by facility id",
                         "name": "filter[facility_id]",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by reported_at from (ISO 8601)",
+                        "name": "filter[date_from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by reported_at to (ISO 8601)",
+                        "name": "filter[date_to]",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1753,6 +1801,18 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Filter by channel",
                         "name": "filter[channel]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by created_at from (ISO 8601)",
+                        "name": "filter[date_from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by created_at to (ISO 8601)",
+                        "name": "filter[date_to]",
                         "in": "query"
                     }
                 ],
@@ -2648,6 +2708,18 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Filter by ambulance id",
                         "name": "filter[ambulance_id]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by started_at from (ISO 8601)",
+                        "name": "filter[date_from]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by started_at to (ISO 8601)",
+                        "name": "filter[date_to]",
                         "in": "query"
                     }
                 ],

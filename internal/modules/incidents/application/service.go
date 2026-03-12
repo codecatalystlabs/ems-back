@@ -34,6 +34,28 @@ func (s *Service) List(ctx context.Context, p platformdb.Pagination) (platformdb
 
 func (s *Service) Create(ctx context.Context, req CreateIncidentRequest, createdBy *string) (domain.Incident, error) {
 	now := time.Now().UTC()
+
+	// Resolve incident type: allow UUID, code, or name.
+	incidentTypeID, err := s.repo.ResolveIncidentTypeID(ctx, req.IncidentTypeID)
+	if err != nil {
+		return domain.Incident{}, err
+	}
+
+	// Resolve optional district and facility IDs from human-friendly values.
+	var districtID *string
+	if req.DistrictID != nil {
+		if id, err := s.repo.ResolveDistrictID(ctx, *req.DistrictID); err == nil {
+			districtID = id
+		}
+	}
+
+	var facilityID *string
+	if req.FacilityID != nil {
+		if id, err := s.repo.ResolveFacilityID(ctx, *req.FacilityID); err == nil {
+			facilityID = id
+		}
+	}
+
 	incident := domain.Incident{
 		ID:                 uuid.NewString(),
 		IncidentNumber:     s.generateIncidentNumber(now),
@@ -44,11 +66,11 @@ func (s *Service) Create(ctx context.Context, req CreateIncidentRequest, created
 		PatientPhone:       req.PatientPhone,
 		PatientAgeGroup:    req.PatientAgeGroup,
 		PatientSex:         req.PatientSex,
-		IncidentTypeID:     req.IncidentTypeID,
+		IncidentTypeID:     incidentTypeID,
 		Summary:            req.Summary,
 		Description:        req.Description,
-		DistrictID:         req.DistrictID,
-		FacilityID:         req.FacilityID,
+		DistrictID:         districtID,
+		FacilityID:         facilityID,
 		Village:            req.Village,
 		Parish:             req.Parish,
 		Subcounty:          req.Subcounty,
