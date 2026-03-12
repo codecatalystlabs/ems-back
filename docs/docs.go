@@ -74,12 +74,30 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "AVAILABLE",
+                            "RESERVED",
+                            "ASSIGNED",
+                            "ENROUTE",
+                            "AT_SCENE",
+                            "TRANSPORTING",
+                            "RETURNING",
+                            "MAINTENANCE",
+                            "BREAKDOWN",
+                            "OFFLINE",
+                            "RETIRED"
+                        ],
                         "type": "string",
                         "description": "Filter by status",
                         "name": "filter[status]",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "DISPATCHABLE",
+                            "RESTRICTED",
+                            "NOT_DISPATCHABLE"
+                        ],
                         "type": "string",
                         "description": "Filter by dispatch readiness",
                         "name": "filter[dispatch_readiness]",
@@ -574,6 +592,16 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "OPEN",
+                            "BROADCASTING",
+                            "MATCHED",
+                            "PICKUP_ASSIGNED",
+                            "COLLECTED",
+                            "DELIVERED",
+                            "CANCELLED",
+                            "EXPIRED"
+                        ],
                         "type": "string",
                         "description": "Filter by status",
                         "name": "status",
@@ -586,6 +614,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "EMERGENCY",
+                            "URGENT",
+                            "ROUTINE"
+                        ],
                         "type": "string",
                         "description": "Filter by urgency level",
                         "name": "urgency_level",
@@ -1509,12 +1542,31 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "NEW",
+                            "PENDING_VERIFICATION",
+                            "VERIFIED",
+                            "AWAITING_ASSIGNMENT",
+                            "ASSIGNED",
+                            "ENROUTE",
+                            "AT_SCENE",
+                            "TRANSPORTING",
+                            "COMPLETED",
+                            "CANCELLED",
+                            "ESCALATED",
+                            "REJECTED"
+                        ],
                         "type": "string",
                         "description": "Filter by status",
                         "name": "filter[status]",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "PENDING",
+                            "VERIFIED",
+                            "REJECTED"
+                        ],
                         "type": "string",
                         "description": "Filter by verification status",
                         "name": "filter[verification_status]",
@@ -1792,12 +1844,25 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "PENDING",
+                            "SENT",
+                            "DELIVERED",
+                            "READ",
+                            "FAILED"
+                        ],
                         "type": "string",
                         "description": "Filter by status",
                         "name": "filter[status]",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "SMS",
+                            "EMAIL",
+                            "PUSH",
+                            "IN_APP"
+                        ],
                         "type": "string",
                         "description": "Filter by channel",
                         "name": "filter[channel]",
@@ -4042,7 +4107,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "vehicle_type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "AMBULANCE",
+                        "PICKUP",
+                        "MOTORCYCLE",
+                        "OTHER"
+                    ]
                 }
             }
         },
@@ -4151,7 +4222,12 @@ const docTemplate = `{
                     "minimum": 1
                 },
                 "urgency_level": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "EMERGENCY",
+                        "URGENT",
+                        "ROUTINE"
+                    ]
                 }
             }
         },
@@ -4239,7 +4315,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "dispatch_readiness": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "DISPATCHABLE",
+                        "RESTRICTED",
+                        "NOT_DISPATCHABLE"
+                    ]
                 },
                 "district_id": {
                     "type": "string"
@@ -4260,7 +4341,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "AVAILABLE",
+                        "RESERVED",
+                        "ASSIGNED",
+                        "ENROUTE",
+                        "AT_SCENE",
+                        "TRANSPORTING",
+                        "RETURNING",
+                        "MAINTENANCE",
+                        "BREAKDOWN",
+                        "OFFLINE",
+                        "RETIRED"
+                    ]
                 },
                 "vin": {
                     "type": "string"
@@ -4280,7 +4374,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "dispatch_readiness": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "DISPATCHABLE",
+                        "RESTRICTED",
+                        "NOT_DISPATCHABLE"
+                    ]
                 },
                 "district_id": {
                     "type": "string"
@@ -4298,7 +4397,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "AVAILABLE",
+                        "RESERVED",
+                        "ASSIGNED",
+                        "ENROUTE",
+                        "AT_SCENE",
+                        "TRANSPORTING",
+                        "RETURNING",
+                        "MAINTENANCE",
+                        "BREAKDOWN",
+                        "OFFLINE",
+                        "RETIRED"
+                    ]
                 },
                 "vin": {
                     "type": "string"
@@ -4425,12 +4537,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "district_id": {
+                    "description": "DistrictID can be a UUID, code, or name; it will be resolved server-side.",
                     "type": "string"
                 },
                 "facility_id": {
+                    "description": "FacilityID can be a UUID or facility code (UID); it will be resolved server-side.",
                     "type": "string"
                 },
                 "incident_type_id": {
+                    "description": "IncidentTypeID can be a UUID, a code, or a name; it will be resolved server-side.",
                     "type": "string"
                 },
                 "landmark": {
@@ -4446,7 +4561,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "patient_age_group": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "INFANT",
+                        "CHILD",
+                        "ADOLESCENT",
+                        "ADULT",
+                        "ELDERLY"
+                    ]
                 },
                 "patient_name": {
                     "type": "string"
@@ -4455,10 +4577,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "patient_sex": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "MALE",
+                        "FEMALE",
+                        "OTHER",
+                        "UNKNOWN"
+                    ]
                 },
                 "source_channel": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "SMS",
+                        "USSD",
+                        "CALL",
+                        "MOBILE_APP",
+                        "WEB_PORTAL",
+                        "FACILITY_REFERRAL"
+                    ]
                 },
                 "subcounty": {
                     "type": "string"
@@ -4517,7 +4653,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "NEW",
+                        "PENDING_VERIFICATION",
+                        "VERIFIED",
+                        "AWAITING_ASSIGNMENT",
+                        "ASSIGNED",
+                        "ENROUTE",
+                        "AT_SCENE",
+                        "TRANSPORTING",
+                        "COMPLETED",
+                        "CANCELLED",
+                        "ESCALATED",
+                        "REJECTED"
+                    ]
                 },
                 "subcounty": {
                     "type": "string"
@@ -4526,7 +4676,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "verification_status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "PENDING",
+                        "VERIFIED",
+                        "REJECTED"
+                    ]
                 },
                 "village": {
                     "type": "string"
@@ -4545,7 +4700,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "channel": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "SMS",
+                        "EMAIL",
+                        "PUSH",
+                        "IN_APP"
+                    ]
                 },
                 "linked_entity_id": {
                     "type": "string"
@@ -4583,7 +4744,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "event_type": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "ASSIGNED",
+                        "ACCEPTED",
+                        "DEPARTED",
+                        "ARRIVED_SCENE",
+                        "PATIENT_LOADED",
+                        "ARRIVED_DESTINATION",
+                        "COMPLETED",
+                        "CANCELLED",
+                        "GPS_PING",
+                        "NOTE"
+                    ]
                 },
                 "latitude": {
                     "type": "number"
@@ -4926,7 +5099,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "ACTIVE",
+                        "INACTIVE",
+                        "SUSPENDED",
+                        "LOCKED"
+                    ]
                 },
                 "timezone": {
                     "type": "string"

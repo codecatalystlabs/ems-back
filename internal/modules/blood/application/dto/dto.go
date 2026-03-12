@@ -14,7 +14,7 @@ type CreateBloodRequisitionRequest struct {
 	BloodGroupCode        string     `json:"blood_group_code" binding:"required"`
 	BloodProductCode      string     `json:"blood_product_code" binding:"required"`
 	UnitsRequested        int        `json:"units_requested" binding:"required,min=1"`
-	UrgencyLevel          string     `json:"urgency_level"`
+	UrgencyLevel          string     `json:"urgency_level" enums:"EMERGENCY,URGENT,ROUTINE"`
 	ReporterPhone         string     `json:"reporter_phone"`
 	DestinationFacilityID *string    `json:"destination_facility_id"`
 	DestinationLat        *float64   `json:"destination_lat"`
@@ -39,7 +39,7 @@ type CreateBloodOfferRequest struct {
 type AssignBloodPickupRequest struct {
 	BloodRequisitionID      string  `json:"blood_requisition_id" binding:"required"`
 	BloodRequisitionOfferID *string `json:"blood_requisition_offer_id"`
-	VehicleType             string  `json:"vehicle_type" binding:"required"`
+	VehicleType             string  `json:"vehicle_type" binding:"required" enums:"AMBULANCE,PICKUP,MOTORCYCLE,OTHER"`
 	AmbulanceID             *string `json:"ambulance_id"`
 	DispatchAssignmentID    *string `json:"dispatch_assignment_id"`
 	AssignedDriverUserID    *string `json:"assigned_driver_user_id"`

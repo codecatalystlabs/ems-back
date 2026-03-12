@@ -36,7 +36,7 @@ type UpdateUserRequest struct {
 	Gender            *string `json:"gender"`
 	Phone             *string `json:"phone"`
 	Email             *string `json:"email"`
-	Status            *string `json:"status"`
+	Status            *string `json:"status" enums:"ACTIVE,INACTIVE,SUSPENDED,LOCKED"`
 	IsActive          *bool   `json:"is_active"`
 	IsLocked          *bool   `json:"is_locked"`
 	PreferredLanguage *string `json:"preferred_language"`

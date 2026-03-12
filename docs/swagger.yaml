@@ -103,6 +103,11 @@ definitions:
       pickup_site_id:
         type: string
       vehicle_type:
+        enum:
+        - AMBULANCE
+        - PICKUP
+        - MOTORCYCLE
+        - OTHER
         type: string
     required:
     - blood_requisition_id
@@ -176,6 +181,10 @@ definitions:
         minimum: 1
         type: integer
       urgency_level:
+        enum:
+        - EMERGENCY
+        - URGENT
+        - ROUTINE
         type: string
     required:
     - blood_group_code
@@ -236,6 +245,10 @@ definitions:
       code:
         type: string
       dispatch_readiness:
+        enum:
+        - DISPATCHABLE
+        - RESTRICTED
+        - NOT_DISPATCHABLE
         type: string
       district_id:
         type: string
@@ -250,6 +263,18 @@ definitions:
       station_facility_id:
         type: string
       status:
+        enum:
+        - AVAILABLE
+        - RESERVED
+        - ASSIGNED
+        - ENROUTE
+        - AT_SCENE
+        - TRANSPORTING
+        - RETURNING
+        - MAINTENANCE
+        - BREAKDOWN
+        - OFFLINE
+        - RETIRED
         type: string
       vin:
         type: string
@@ -266,6 +291,10 @@ definitions:
       code:
         type: string
       dispatch_readiness:
+        enum:
+        - DISPATCHABLE
+        - RESTRICTED
+        - NOT_DISPATCHABLE
         type: string
       district_id:
         type: string
@@ -278,6 +307,18 @@ definitions:
       station_facility_id:
         type: string
       status:
+        enum:
+        - AVAILABLE
+        - RESERVED
+        - ASSIGNED
+        - ENROUTE
+        - AT_SCENE
+        - TRANSPORTING
+        - RETURNING
+        - MAINTENANCE
+        - BREAKDOWN
+        - OFFLINE
+        - RETIRED
         type: string
       vin:
         type: string
@@ -359,10 +400,16 @@ definitions:
       description:
         type: string
       district_id:
+        description: DistrictID can be a UUID, code, or name; it will be resolved
+          server-side.
         type: string
       facility_id:
+        description: FacilityID can be a UUID or facility code (UID); it will be resolved
+          server-side.
         type: string
       incident_type_id:
+        description: IncidentTypeID can be a UUID, a code, or a name; it will be resolved
+          server-side.
         type: string
       landmark:
         type: string
@@ -373,14 +420,32 @@ definitions:
       parish:
         type: string
       patient_age_group:
+        enum:
+        - INFANT
+        - CHILD
+        - ADOLESCENT
+        - ADULT
+        - ELDERLY
         type: string
       patient_name:
         type: string
       patient_phone:
         type: string
       patient_sex:
+        enum:
+        - MALE
+        - FEMALE
+        - OTHER
+        - UNKNOWN
         type: string
       source_channel:
+        enum:
+        - SMS
+        - USSD
+        - CALL
+        - MOBILE_APP
+        - WEB_PORTAL
+        - FACILITY_REFERRAL
         type: string
       subcounty:
         type: string
@@ -423,12 +488,29 @@ definitions:
       severity_level_id:
         type: string
       status:
+        enum:
+        - NEW
+        - PENDING_VERIFICATION
+        - VERIFIED
+        - AWAITING_ASSIGNMENT
+        - ASSIGNED
+        - ENROUTE
+        - AT_SCENE
+        - TRANSPORTING
+        - COMPLETED
+        - CANCELLED
+        - ESCALATED
+        - REJECTED
         type: string
       subcounty:
         type: string
       summary:
         type: string
       verification_status:
+        enum:
+        - PENDING
+        - VERIFIED
+        - REJECTED
         type: string
       village:
         type: string
@@ -438,6 +520,11 @@ definitions:
       body:
         type: string
       channel:
+        enum:
+        - SMS
+        - EMAIL
+        - PUSH
+        - IN_APP
         type: string
       linked_entity_id:
         type: string
@@ -465,6 +552,17 @@ definitions:
       event_time:
         type: string
       event_type:
+        enum:
+        - ASSIGNED
+        - ACCEPTED
+        - DEPARTED
+        - ARRIVED_SCENE
+        - PATIENT_LOADED
+        - ARRIVED_DESTINATION
+        - COMPLETED
+        - CANCELLED
+        - GPS_PING
+        - NOTE
         type: string
       latitude:
         type: number
@@ -695,6 +793,11 @@ definitions:
       staff_no:
         type: string
       status:
+        enum:
+        - ACTIVE
+        - INACTIVE
+        - SUSPENDED
+        - LOCKED
         type: string
       timezone:
         type: string
@@ -767,10 +870,26 @@ paths:
         name: sort_order
         type: string
       - description: Filter by status
+        enum:
+        - AVAILABLE
+        - RESERVED
+        - ASSIGNED
+        - ENROUTE
+        - AT_SCENE
+        - TRANSPORTING
+        - RETURNING
+        - MAINTENANCE
+        - BREAKDOWN
+        - OFFLINE
+        - RETIRED
         in: query
         name: filter[status]
         type: string
       - description: Filter by dispatch readiness
+        enum:
+        - DISPATCHABLE
+        - RESTRICTED
+        - NOT_DISPATCHABLE
         in: query
         name: filter[dispatch_readiness]
         type: string
@@ -1094,6 +1213,15 @@ paths:
         name: search
         type: string
       - description: Filter by status
+        enum:
+        - OPEN
+        - BROADCASTING
+        - MATCHED
+        - PICKUP_ASSIGNED
+        - COLLECTED
+        - DELIVERED
+        - CANCELLED
+        - EXPIRED
         in: query
         name: status
         type: string
@@ -1102,6 +1230,10 @@ paths:
         name: blood_type
         type: string
       - description: Filter by urgency level
+        enum:
+        - EMERGENCY
+        - URGENT
+        - ROUTINE
         in: query
         name: urgency_level
         type: string
@@ -1714,10 +1846,27 @@ paths:
         name: sort_order
         type: string
       - description: Filter by status
+        enum:
+        - NEW
+        - PENDING_VERIFICATION
+        - VERIFIED
+        - AWAITING_ASSIGNMENT
+        - ASSIGNED
+        - ENROUTE
+        - AT_SCENE
+        - TRANSPORTING
+        - COMPLETED
+        - CANCELLED
+        - ESCALATED
+        - REJECTED
         in: query
         name: filter[status]
         type: string
       - description: Filter by verification status
+        enum:
+        - PENDING
+        - VERIFIED
+        - REJECTED
         in: query
         name: filter[verification_status]
         type: string
@@ -1899,10 +2048,21 @@ paths:
         name: page_size
         type: integer
       - description: Filter by status
+        enum:
+        - PENDING
+        - SENT
+        - DELIVERED
+        - READ
+        - FAILED
         in: query
         name: filter[status]
         type: string
       - description: Filter by channel
+        enum:
+        - SMS
+        - EMAIL
+        - PUSH
+        - IN_APP
         in: query
         name: filter[channel]
         type: string

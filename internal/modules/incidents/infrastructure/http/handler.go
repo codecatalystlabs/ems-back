@@ -30,8 +30,8 @@ func NewHandler(service *incapp.Service) *Handler {
 //	@Param			search						query		string	false	"Search term (number, caller, patient, summary)"
 //	@Param			sort_by						query		string	false	"Sort field"	Enums(reported_at,status)
 //	@Param			sort_order					query		string	false	"Sort order"	Enums(ASC,DESC)
-//	@Param			filter[status]				query		string	false	"Filter by status"
-//	@Param			filter[verification_status]	query		string	false	"Filter by verification status"
+//	@Param			filter[status]				query		string	false	"Filter by status"				Enums(NEW,PENDING_VERIFICATION,VERIFIED,AWAITING_ASSIGNMENT,ASSIGNED,ENROUTE,AT_SCENE,TRANSPORTING,COMPLETED,CANCELLED,ESCALATED,REJECTED)
+//	@Param			filter[verification_status]	query		string	false	"Filter by verification status"	Enums(PENDING,VERIFIED,REJECTED)
 //	@Param			filter[incident_type_id]	query		string	false	"Filter by incident type id"
 //	@Param			filter[district_id]			query		string	false	"Filter by district id"
 //	@Param			filter[facility_id]			query		string	false	"Filter by facility id"

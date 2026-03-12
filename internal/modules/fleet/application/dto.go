@@ -11,8 +11,8 @@ type CreateAmbulanceRequest struct {
 	OwnershipType     *string `json:"ownership_type,omitempty"`
 	StationFacilityID *string `json:"station_facility_id,omitempty"`
 	DistrictID        *string `json:"district_id,omitempty"`
-	Status            *string `json:"status,omitempty"`
-	DispatchReadiness *string `json:"dispatch_readiness,omitempty"`
+	Status            *string `json:"status,omitempty" enums:"AVAILABLE,RESERVED,ASSIGNED,ENROUTE,AT_SCENE,TRANSPORTING,RETURNING,MAINTENANCE,BREAKDOWN,OFFLINE,RETIRED"`
+	DispatchReadiness *string `json:"dispatch_readiness,omitempty" enums:"DISPATCHABLE,RESTRICTED,NOT_DISPATCHABLE"`
 }
 
 type UpdateAmbulanceRequest struct {
@@ -25,6 +25,6 @@ type UpdateAmbulanceRequest struct {
 	OwnershipType     *string `json:"ownership_type,omitempty"`
 	StationFacilityID *string `json:"station_facility_id,omitempty"`
 	DistrictID        *string `json:"district_id,omitempty"`
-	Status            *string `json:"status,omitempty"`
-	DispatchReadiness *string `json:"dispatch_readiness,omitempty"`
+	Status            *string `json:"status,omitempty" enums:"AVAILABLE,RESERVED,ASSIGNED,ENROUTE,AT_SCENE,TRANSPORTING,RETURNING,MAINTENANCE,BREAKDOWN,OFFLINE,RETIRED"`
+	DispatchReadiness *string `json:"dispatch_readiness,omitempty" enums:"DISPATCHABLE,RESTRICTED,NOT_DISPATCHABLE"`
 }

@@ -35,7 +35,7 @@ type UpdateTripRequest struct {
 }
 
 type CreateTripEventRequest struct {
-	EventType   string   `json:"event_type" binding:"required"`
+	EventType   string   `json:"event_type" binding:"required" enums:"ASSIGNED,ACCEPTED,DEPARTED,ARRIVED_SCENE,PATIENT_LOADED,ARRIVED_DESTINATION,COMPLETED,CANCELLED,GPS_PING,NOTE"`
 	EventTime   *string  `json:"event_time,omitempty"`
 	Latitude    *float64 `json:"latitude,omitempty"`
 	Longitude   *float64 `json:"longitude,omitempty"`
