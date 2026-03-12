@@ -27,9 +27,15 @@ func (r *Repository) ListNotifications(ctx context.Context, userID string, p pla
 		"created_at": "n.created_at",
 	}
 
-	where := []string{"(n.recipient_user_id = $1 OR $1 = '')"}
-	args := []any{userID}
-	argPos := 2
+	where := []string{"1=1"}
+	args := make([]any, 0)
+	argPos := 1
+
+	if userID != "" {
+		where = append(where, fmt.Sprintf("n.recipient_user_id = $%d", argPos))
+		args = append(args, userID)
+		argPos++
+	}
 
 	for key, value := range p.Filters {
 		switch key {
