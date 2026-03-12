@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -185,28 +186,31 @@ func SeedDemoData(ctx context.Context, db *pgxpool.Pool) error {
 	// Dispatch assignment (dispatch module)
 	// ------------------------------------------------------------------
 	var dispatchID string
-	if err := tx.QueryRow(
-		ctx,
-		`INSERT INTO dispatch_assignments (
-			incident_id, ambulance_id, assigned_by_user_id,
-			driver_user_id, assignment_mode, status, assigned_at, created_at, updated_at
-		) VALUES (
-			$1,$2,$3,
-			$4,'MANUAL','ASSIGNED',$5,$5,$5
-		)
-		ON CONFLICT (incident_id) DO UPDATE
-		    SET ambulance_id = EXCLUDED.ambulance_id,
-		        status = EXCLUDED.status,
-		        assigned_at = EXCLUDED.assigned_at,
-		        updated_at = EXCLUDED.updated_at
-		RETURNING id`,
-		incidentID,
-		ambulanceID,
-		adminUserID,
-		adminUserID,
-		now,
-	).Scan(&dispatchID); err != nil {
-		return fmt.Errorf("failed to seed demo dispatch assignment: %w", err)
+	// First try to reuse an existing assignment for this incident (idempotent)
+	err = tx.QueryRow(ctx, `SELECT id FROM dispatch_assignments WHERE incident_id = $1 ORDER BY created_at LIMIT 1`, incidentID).Scan(&dispatchID)
+	if err != nil {
+		if err != pgx.ErrNoRows {
+			return fmt.Errorf("failed to lookup existing dispatch assignment: %w", err)
+		}
+		// No existing assignment; create a new one
+		if err := tx.QueryRow(
+			ctx,
+			`INSERT INTO dispatch_assignments (
+				incident_id, ambulance_id, assigned_by_user_id,
+				driver_user_id, assignment_mode, status, assigned_at, created_at, updated_at
+			) VALUES (
+				$1,$2,$3,
+				$4,'MANUAL','ASSIGNED',$5,$5,$5
+			)
+			RETURNING id`,
+			incidentID,
+			ambulanceID,
+			adminUserID,
+			adminUserID,
+			now,
+		).Scan(&dispatchID); err != nil {
+			return fmt.Errorf("failed to seed demo dispatch assignment: %w", err)
+		}
 	}
 
 	// ------------------------------------------------------------------
