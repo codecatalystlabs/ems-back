@@ -143,20 +143,20 @@ func SeedFacilities(ctx context.Context, db *pgxpool.Pool, path string) error {
 		// -------------------------
 
 		_, err = db.Exec(ctx, `
-INSERT INTO ref_facilities
-(code, name, short_name, nhfr_id, district_id, subcounty_id, level_id, ownership, is_active)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-ON CONFLICT (code) DO UPDATE SET
-    name = EXCLUDED.name,
-    short_name = EXCLUDED.short_name,
-    nhfr_id = EXCLUDED.nhfr_id,
-    district_id = EXCLUDED.district_id,
-    subcounty_id = EXCLUDED.subcounty_id,
-    level_id = EXCLUDED.level_id,
-    ownership = EXCLUDED.ownership,
-    is_active = EXCLUDED.is_active,
-    updated_at = now()
-`,
+		INSERT INTO ref_facilities
+		(code, name, short_name, nhfr_id, district_id, subcounty_id, level_id, ownership, is_active)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		ON CONFLICT (code) DO UPDATE SET
+			name = EXCLUDED.name,
+			short_name = EXCLUDED.short_name,
+			nhfr_id = EXCLUDED.nhfr_id,
+			district_id = EXCLUDED.district_id,
+			subcounty_id = EXCLUDED.subcounty_id,
+			level_id = EXCLUDED.level_id,
+			ownership = EXCLUDED.ownership,
+			is_active = EXCLUDED.is_active,
+			updated_at = now()
+		`,
 			row.UID,
 			row.Name,
 			row.ShortName,
