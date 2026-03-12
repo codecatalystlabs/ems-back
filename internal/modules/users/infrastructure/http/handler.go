@@ -173,3 +173,234 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 	httpx.OK(c, gin.H{"message": "user deleted"})
 }
+
+// ChangePassword godoc
+//
+//	@Summary		Change user password
+//	@Description	Changes a user's password using current password or admin reset flow
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string							true	"User ID"
+//	@Param			payload	body		userdto.ChangePasswordRequest	true	"Change password payload"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		404		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/users/{id}/change-password [post]
+func (h *Handler) ChangePassword(c *gin.Context) {
+	var req dto.ChangePasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := h.service.ChangePassword(c.Request.Context(), c.Param("id"), req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "password changed successfully"})
+}
+
+// AssignRole godoc
+//
+//	@Summary		Assign role to user
+//	@Description	Assigns a role to a user with optional scope
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string						true	"User ID"
+//	@Param			payload	body		userdto.AssignRoleRequest	true	"Assign role payload"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/users/{id}/roles [post]
+func (h *Handler) AssignRole(c *gin.Context) {
+	var req dto.AssignRoleRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := h.service.AssignRole(c.Request.Context(), c.Param("id"), req); err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "role assigned"})
+}
+
+// RemoveRole godoc
+//
+//	@Summary		Remove role from user
+//	@Description	Deactivates a role assignment for a user
+//	@Tags			Users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string	true	"User ID"
+//	@Param			roleId	path		string	true	"Role ID"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/users/{id}/roles/{roleId} [delete]
+func (h *Handler) RemoveRole(c *gin.Context) {
+	if err := h.service.RemoveRole(c.Request.Context(), c.Param("id"), c.Param("roleId")); err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "role removed"})
+}
+
+// AssignUser godoc
+//
+//	@Summary		Assign user to organization scope
+//	@Description	Assigns user to district, subcounty, or facility
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string						true	"User ID"
+//	@Param			payload	body		userdto.AssignUserRequest	true	"Assignment payload"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/users/{id}/assignments [post]
+func (h *Handler) AssignUser(c *gin.Context) {
+	var req dto.AssignUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := h.service.AssignUser(c.Request.Context(), c.Param("id"), req); err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "assignment created"})
+}
+
+// UpdateAssignment godoc
+//
+//	@Summary		Update user assignment
+//	@Description	Updates a user assignment record
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			assignmentId	path		string						true	"Assignment ID"
+//	@Param			payload			body		userdto.AssignUserRequest	true	"Assignment payload"
+//	@Success		200				{object}	map[string]interface{}
+//	@Failure		400				{object}	map[string]interface{}
+//	@Failure		500				{object}	map[string]interface{}
+//	@Router			/users/assignments/{assignmentId} [patch]
+func (h *Handler) UpdateAssignment(c *gin.Context) {
+	var req dto.AssignUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := h.service.UpdateAssignment(c.Request.Context(), c.Param("assignmentId"), req); err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "assignment updated"})
+}
+
+// AssignCapability godoc
+//
+//	@Summary		Assign capability to user
+//	@Description	Assigns a capability to a user
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string							true	"User ID"
+//	@Param			payload	body		userdto.AssignCapabilityRequest	true	"Capability payload"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/users/{id}/capabilities [post]
+func (h *Handler) AssignCapability(c *gin.Context) {
+	var req dto.AssignCapabilityRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := h.service.AssignCapability(c.Request.Context(), c.Param("id"), req); err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "capability assigned"})
+}
+
+// UpdateCapability godoc
+//
+//	@Summary		Update user capability
+//	@Description	Updates a user capability record
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			capabilityRecordId	path		string							true	"User capability record ID"
+//	@Param			payload				body		userdto.AssignCapabilityRequest	true	"Capability payload"
+//	@Success		200					{object}	map[string]interface{}
+//	@Failure		400					{object}	map[string]interface{}
+//	@Failure		500					{object}	map[string]interface{}
+//	@Router			/users/capabilities/{capabilityRecordId} [patch]
+func (h *Handler) UpdateCapability(c *gin.Context) {
+	var req dto.AssignCapabilityRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := h.service.UpdateCapability(c.Request.Context(), c.Param("capabilityRecordId"), req); err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "capability updated"})
+}
+
+// UpdateProfile godoc
+//
+//	@Summary		Update user profile
+//	@Description	Updates profile details for a user
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string								true	"User ID"
+//	@Param			payload	body		userdto.UpdateUserProfileRequest	true	"Update profile payload"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/users/{id}/profile [patch]
+func (h *Handler) UpdateProfile(c *gin.Context) {
+	var req dto.UpdateUserProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := h.service.UpdateProfile(c.Request.Context(), c.Param("id"), req); err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, gin.H{"message": "profile updated"})
+}
+
+// GetDetails godoc
+//
+//	@Summary		Get user details
+//	@Description	Returns user, profile, roles, assignments, and capabilities
+//	@Tags			Users
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		string	true	"User ID"
+//	@Success		200	{object}	map[string]interface{}
+//	@Failure		404	{object}	map[string]interface{}
+//	@Failure		500	{object}	map[string]interface{}
+//	@Router			/users/{id}/details [get]
+func (h *Handler) GetDetails(c *gin.Context) {
+	out, err := h.service.GetDetails(c.Request.Context(), c.Param("id"))
+	if err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, out)
+}

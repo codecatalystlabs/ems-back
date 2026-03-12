@@ -540,18 +540,108 @@ definitions:
       started_at:
         type: string
     type: object
+  dispatch_internal_modules_users_application_dto.AssignCapabilityRequest:
+    properties:
+      capability_id:
+        type: string
+      expires_at:
+        type: string
+      is_active:
+        type: boolean
+      level_no:
+        type: integer
+    required:
+    - capability_id
+    type: object
+  dispatch_internal_modules_users_application_dto.AssignRoleRequest:
+    properties:
+      assigned_by:
+        type: string
+      role_id:
+        type: string
+      scope_id:
+        type: string
+      scope_type:
+        type: string
+    required:
+    - role_id
+    - scope_type
+    type: object
+  dispatch_internal_modules_users_application_dto.AssignUserRequest:
+    properties:
+      active:
+        type: boolean
+      assignment_level:
+        type: string
+      district_id:
+        type: string
+      end_date:
+        type: string
+      facility_id:
+        type: string
+      is_primary:
+        type: boolean
+      start_date:
+        type: string
+      subcounty_id:
+        type: string
+      team_name:
+        type: string
+    required:
+    - assignment_level
+    type: object
+  dispatch_internal_modules_users_application_dto.ChangePasswordRequest:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        minLength: 8
+        type: string
+      reset_by_admin:
+        type: boolean
+    required:
+    - new_password
+    type: object
   dispatch_internal_modules_users_application_dto.CreateUserRequest:
     properties:
+      address:
+        type: string
+      avatar_url:
+        type: string
+      cadre:
+        type: string
+      date_of_birth:
+        type: string
       email:
+        type: string
+      emergency_contact_name:
+        type: string
+      emergency_contact_phone:
         type: string
       first_name:
         type: string
+      gender:
+        type: string
       last_name:
+        type: string
+      license_number:
+        type: string
+      national_id:
+        type: string
+      other_name:
         type: string
       password:
         minLength: 8
         type: string
       phone:
+        type: string
+      preferred_language:
+        type: string
+      specialization:
+        type: string
+      staff_no:
+        type: string
+      timezone:
         type: string
       username:
         type: string
@@ -561,19 +651,52 @@ definitions:
     - password
     - username
     type: object
+  dispatch_internal_modules_users_application_dto.UpdateUserProfileRequest:
+    properties:
+      address:
+        type: string
+      avatar_url:
+        type: string
+      cadre:
+        type: string
+      date_of_birth:
+        type: string
+      emergency_contact_name:
+        type: string
+      emergency_contact_phone:
+        type: string
+      license_number:
+        type: string
+      national_id:
+        type: string
+      specialization:
+        type: string
+    type: object
   dispatch_internal_modules_users_application_dto.UpdateUserRequest:
     properties:
       email:
         type: string
       first_name:
         type: string
+      gender:
+        type: string
       is_active:
+        type: boolean
+      is_locked:
         type: boolean
       last_name:
         type: string
+      other_name:
+        type: string
       phone:
         type: string
+      preferred_language:
+        type: string
+      staff_no:
+        type: string
       status:
+        type: string
+      timezone:
         type: string
     type: object
   dispatch_internal_platform_db.PageMeta:
@@ -2752,6 +2875,356 @@ paths:
       security:
       - BearerAuth: []
       summary: Update user
+      tags:
+      - Users
+  /users/{id}/assignments:
+    post:
+      consumes:
+      - application/json
+      description: Assigns user to district, subcounty, or facility
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Assignment payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.AssignUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign user to organization scope
+      tags:
+      - Users
+  /users/{id}/capabilities:
+    post:
+      consumes:
+      - application/json
+      description: Assigns a capability to a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Capability payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.AssignCapabilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign capability to user
+      tags:
+      - Users
+  /users/{id}/change-password:
+    post:
+      consumes:
+      - application/json
+      description: Changes a user's password using current password or admin reset
+        flow
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Change password payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - Users
+  /users/{id}/details:
+    get:
+      description: Returns user, profile, roles, assignments, and capabilities
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user details
+      tags:
+      - Users
+  /users/{id}/profile:
+    patch:
+      consumes:
+      - application/json
+      description: Updates profile details for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update profile payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.UpdateUserProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - Users
+  /users/{id}/roles:
+    post:
+      consumes:
+      - application/json
+      description: Assigns a role to a user with optional scope
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Assign role payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.AssignRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Assign role to user
+      tags:
+      - Users
+  /users/{id}/roles/{roleId}:
+    delete:
+      description: Deactivates a role assignment for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role ID
+        in: path
+        name: roleId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove role from user
+      tags:
+      - Users
+  /users/assignments/{assignmentId}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates a user assignment record
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: assignmentId
+        required: true
+        type: string
+      - description: Assignment payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.AssignUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user assignment
+      tags:
+      - Users
+  /users/capabilities/{capabilityRecordId}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates a user capability record
+      parameters:
+      - description: User capability record ID
+        in: path
+        name: capabilityRecordId
+        required: true
+        type: string
+      - description: Capability payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_users_application_dto.AssignCapabilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user capability
       tags:
       - Users
 securityDefinitions:
