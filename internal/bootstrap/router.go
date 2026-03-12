@@ -12,6 +12,8 @@ import (
 func NewRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.Use(CORSMiddleware())
+
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "ts": time.Now().UTC()})
 	})
