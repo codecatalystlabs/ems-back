@@ -439,6 +439,19 @@ func (r *Repository) GetProfile(ctx context.Context, userID string) (map[string]
 		&avatarURL, &emergencyName, &emergencyPhone, &address,
 	)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return map[string]any{
+				"cadre":                   "",
+				"license_number":          "",
+				"specialization":          "",
+				"date_of_birth":           nil,
+				"national_id":             "",
+				"avatar_url":              "",
+				"emergency_contact_name":  "",
+				"emergency_contact_phone": "",
+				"address":                 "",
+			}, nil
+		}
 		return nil, err
 	}
 
