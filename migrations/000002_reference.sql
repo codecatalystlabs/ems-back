@@ -33,9 +33,12 @@ CREATE TABLE ref_facility_levels (
 
 CREATE TABLE ref_facilities (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    code TEXT UNIQUE,
+    code TEXT NOT NULL UNIQUE,         -- this is the CSV uid
     name TEXT NOT NULL,
+    short_name TEXT,
+    nhfr_id TEXT,
     district_id UUID REFERENCES ref_districts(id),
+    subcounty_id UUID REFERENCES ref_subcounties(id),
     level_id UUID REFERENCES ref_facility_levels(id),
     ownership TEXT,
     phone TEXT,
@@ -51,15 +54,10 @@ CREATE TABLE ref_facilities (
     UNIQUE(name, district_id)
 );
 
-ALTER TABLE ref_facilities
-    ADD COLUMN IF NOT EXISTS subcounty_id UUID REFERENCES ref_subcounties(id);
-
-CREATE INDEX IF NOT EXISTS idx_ref_facilities_subcounty_id ON ref_facilities(subcounty_id);
-
-
 CREATE INDEX idx_ref_facilities_district_id ON ref_facilities(district_id);
+CREATE INDEX idx_ref_facilities_subcounty_id ON ref_facilities(subcounty_id);
 CREATE INDEX idx_ref_facilities_level_id ON ref_facilities(level_id);
-CREATE INDEX idx_ref_facilities_location ON ref_facilities USING GIST(location);
+CREATE INDEX idx_ref_facilities_nhfr_id ON ref_facilities(nhfr_id);
 
 CREATE TABLE ref_incident_types (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

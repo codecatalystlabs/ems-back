@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"dispatch/internal/bootstrap"
 	"dispatch/internal/platform/auth"
 	"dispatch/internal/platform/config"
 )
@@ -32,23 +32,39 @@ func main() {
 	}
 	defer pool.Close()
 
+	if err := seedAdminUser(ctx, pool); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := bootstrap.SeedFacilities(ctx, pool, "migrations/data/Masterfacility.csv"); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("seeding finished")
+}
+
+func seedAdminUser(ctx context.Context, pool *pgxpool.Pool) error {
 	username := "admin"
 	password := "admin123"
 
 	var exists bool
-	err = pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE username=$1 AND deleted_at IS NULL)`, username).Scan(&exists)
+	err := pool.QueryRow(
+		ctx,
+		`SELECT EXISTS(SELECT 1 FROM users WHERE username=$1 AND deleted_at IS NULL)`,
+		username,
+	).Scan(&exists)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if exists {
 		fmt.Println("admin user already exists")
-		os.Exit(0)
+		return nil
 	}
 
 	hash, err := auth.HashPassword(password)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	userID := uuid.NewString()
@@ -56,37 +72,41 @@ func main() {
 
 	tx, err := pool.Begin(ctx)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer tx.Rollback(ctx)
 
 	_, err = tx.Exec(ctx, `
-	INSERT INTO users (
-		id, username, first_name, last_name, email, phone,
-		password_hash, status, is_active, created_at, updated_at
-	)
-	VALUES ($1,$2,'System','Administrator','admin@dispatch.local','+256780000000', $3,'ACTIVE',true,$4,$4)
+		INSERT INTO users (
+			id, username, first_name, last_name, email, phone,
+			password_hash, status, is_active, created_at, updated_at
+		)
+		VALUES ($1,$2,'System','Administrator','admin@dispatch.local','+256780000000',$3,'ACTIVE',true,$4,$4)
 	`, userID, username, hash, now)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	var adminRoleID string
-	err = tx.QueryRow(ctx, `SELECT id FROM roles WHERE name='Super Admin'`).Scan(&adminRoleID)
+	err = tx.QueryRow(ctx, `SELECT id FROM roles WHERE code='SUPER_ADMIN'`).Scan(&adminRoleID)
 	if err != nil {
-		log.Fatal("admin role not found. Ensure RBAC seed ran first.")
+		return fmt.Errorf("super admin role not found: %w", err)
 	}
 
-	_, err = tx.Exec(ctx, `INSERT INTO user_roles (user_id, role_id) VALUES ($1,$2)`, userID, adminRoleID)
+	_, err = tx.Exec(ctx, `
+		INSERT INTO user_roles (user_id, role_id, scope_type, active, assigned_at)
+		VALUES ($1,$2,'GLOBAL',true,$3)
+	`, userID, adminRoleID, now)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	fmt.Println("Default admin user created")
 	fmt.Println("username: admin")
 	fmt.Println("password: admin123")
+	return nil
 }
