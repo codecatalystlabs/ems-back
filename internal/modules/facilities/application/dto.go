@@ -14,4 +14,3 @@ type UpdateFacilityRequest struct {
 	Level        *string `json:"level,omitempty"`
 	Ownership    *string `json:"ownership,omitempty"`
 }
-

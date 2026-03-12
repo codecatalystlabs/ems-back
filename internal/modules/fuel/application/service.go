@@ -11,8 +11,8 @@ import (
 )
 
 type Service struct {
-	repo   Repository
-	log    *zap.Logger
+	repo Repository
+	log  *zap.Logger
 }
 
 func NewService(repo Repository, log *zap.Logger) *Service {
@@ -34,17 +34,17 @@ func (s *Service) Create(ctx context.Context, req CreateFuelLogRequest, filledBy
 		filledAt = *req.FilledAt
 	}
 	in := domain.FuelLog{
-		AmbulanceID:  req.AmbulanceID,
-		FuelType:     req.FuelType,
-		Liters:       req.Liters,
-		Cost:         req.Cost,
-		OdometerKM:   req.OdometerKM,
-		StationName:  req.StationName,
-		FilledAt:     filledAt,
-		FilledBy:     filledByUserID,
-		Notes:        req.Notes,
-		CreatedAt:    now,
-		UpdatedAt:    now,
+		AmbulanceID: req.AmbulanceID,
+		FuelType:    req.FuelType,
+		Liters:      req.Liters,
+		Cost:        req.Cost,
+		OdometerKM:  req.OdometerKM,
+		StationName: req.StationName,
+		FilledAt:    filledAt,
+		FilledBy:    filledByUserID,
+		Notes:       req.Notes,
+		CreatedAt:   now,
+		UpdatedAt:   now,
 	}
 	return s.repo.Create(ctx, in)
 }
@@ -56,4 +56,3 @@ func (s *Service) Update(ctx context.Context, id string, req UpdateFuelLogReques
 func (s *Service) Delete(ctx context.Context, id string) error {
 	return s.repo.Delete(ctx, id)
 }
-

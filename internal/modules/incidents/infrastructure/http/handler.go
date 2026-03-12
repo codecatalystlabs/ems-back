@@ -25,18 +25,18 @@ func NewHandler(service *incapp.Service) *Handler {
 //	@Tags			Incidents
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			page					query		int		false	"Page number"				default(1)
-//	@Param			page_size				query		int		false	"Page size"					default(20)
-//	@Param			search					query		string	false	"Search term (number, caller, patient, summary)"
-//	@Param			sort_by					query		string	false	"Sort field"				Enums(reported_at,status)
-//	@Param			sort_order				query		string	false	"Sort order"				Enums(ASC,DESC)
-//	@Param			filter[status]			query		string	false	"Filter by status"
-//	@Param			filter[verification_status] query	string	false	"Filter by verification status"
-//	@Param			filter[incident_type_id] query	string	false	"Filter by incident type id"
-//	@Param			filter[district_id]		query		string	false	"Filter by district id"
-//	@Param			filter[facility_id]		query		string	false	"Filter by facility id"
-//	@Success		200						{object}	map[string]interface{}
-//	@Failure		500						{object}	map[string]interface{}
+//	@Param			page						query		int		false	"Page number"	default(1)
+//	@Param			page_size					query		int		false	"Page size"		default(20)
+//	@Param			search						query		string	false	"Search term (number, caller, patient, summary)"
+//	@Param			sort_by						query		string	false	"Sort field"	Enums(reported_at,status)
+//	@Param			sort_order					query		string	false	"Sort order"	Enums(ASC,DESC)
+//	@Param			filter[status]				query		string	false	"Filter by status"
+//	@Param			filter[verification_status]	query		string	false	"Filter by verification status"
+//	@Param			filter[incident_type_id]	query		string	false	"Filter by incident type id"
+//	@Param			filter[district_id]			query		string	false	"Filter by district id"
+//	@Param			filter[facility_id]			query		string	false	"Filter by facility id"
+//	@Success		200							{object}	map[string]interface{}
+//	@Failure		500							{object}	map[string]interface{}
 //	@Router			/incidents [get]
 func (h *Handler) List(c *gin.Context) {
 	p := platformdb.ParsePagination(
@@ -100,7 +100,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Tags			Incidents
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			id	path	string	true	"Incident ID"
+//	@Param			id	path		string	true	"Incident ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
 //	@Router			/incidents/{id} [get]
@@ -122,7 +122,7 @@ func (h *Handler) Get(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			id		path	string							true	"Incident ID"
+//	@Param			id		path		string							true	"Incident ID"
 //	@Param			payload	body		incapp.UpdateIncidentRequest	true	"Update incident payload"
 //	@Success		200		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -150,7 +150,7 @@ func (h *Handler) Update(c *gin.Context) {
 //	@Tags			Incidents
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			id	path	string	true	"Incident ID"
+//	@Param			id	path		string	true	"Incident ID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/incidents/{id} [delete]
@@ -162,5 +162,3 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 	httpx.OK(c, gin.H{"message": "incident deleted"})
 }
-
-

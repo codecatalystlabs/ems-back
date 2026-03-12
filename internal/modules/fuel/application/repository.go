@@ -14,4 +14,3 @@ type Repository interface {
 	Update(ctx context.Context, id string, req UpdateFuelLogRequest) (domain.FuelLog, error)
 	Delete(ctx context.Context, id string) error
 }
-

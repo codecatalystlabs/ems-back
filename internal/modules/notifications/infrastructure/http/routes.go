@@ -13,4 +13,3 @@ func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service) {
 	rg.POST("", rbacmiddleware.RequirePermission(rbacSvc, "notifications.manage"), h.Create)
 	rg.POST("/:id/read", rbacmiddleware.RequirePermission(rbacSvc, "notifications.manage"), h.MarkRead)
 }
-

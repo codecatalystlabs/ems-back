@@ -24,9 +24,9 @@ var _ fleetapp.Repository = (*Repository)(nil)
 
 func (r *Repository) ListAmbulances(ctx context.Context, p platformdb.Pagination) ([]domain.Ambulance, int64, error) {
 	allowedSorts := map[string]string{
-		"created_at":        "a.created_at",
-		"plate_number":      "a.plate_number",
-		"status":            "a.status",
+		"created_at":         "a.created_at",
+		"plate_number":       "a.plate_number",
+		"status":             "a.status",
 		"dispatch_readiness": "a.dispatch_readiness",
 	}
 
@@ -313,5 +313,3 @@ func (r *Repository) Delete(ctx context.Context, id string) error {
 	_, err := r.db.Exec(ctx, `DELETE FROM ambulances WHERE id = $1`, id)
 	return err
 }
-
-

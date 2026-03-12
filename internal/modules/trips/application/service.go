@@ -35,23 +35,23 @@ func (s *Service) Get(ctx context.Context, id string) (domain.Trip, error) {
 func (s *Service) Create(ctx context.Context, req CreateTripRequest) (domain.Trip, error) {
 	now := time.Now().UTC()
 	in := domain.Trip{
-		ID:                   uuid.NewString(),
-		DispatchAssignmentID: req.DispatchAssignmentID,
-		IncidentID:           req.IncidentID,
-		AmbulanceID:          req.AmbulanceID,
-		OriginLat:            req.OriginLat,
-		OriginLon:            req.OriginLon,
-		SceneLat:             req.SceneLat,
-		SceneLon:             req.SceneLon,
+		ID:                    uuid.NewString(),
+		DispatchAssignmentID:  req.DispatchAssignmentID,
+		IncidentID:            req.IncidentID,
+		AmbulanceID:           req.AmbulanceID,
+		OriginLat:             req.OriginLat,
+		OriginLon:             req.OriginLon,
+		SceneLat:              req.SceneLat,
+		SceneLon:              req.SceneLon,
 		DestinationFacilityID: req.DestinationFacilityID,
-		DestinationLat:       req.DestinationLat,
-		DestinationLon:       req.DestinationLon,
-		OdometerStart:        req.OdometerStart,
-		OdometerEnd:          req.OdometerEnd,
-		Outcome:              req.Outcome,
-		Notes:                req.Notes,
-		CreatedAt:            now,
-		UpdatedAt:            now,
+		DestinationLat:        req.DestinationLat,
+		DestinationLon:        req.DestinationLon,
+		OdometerStart:         req.OdometerStart,
+		OdometerEnd:           req.OdometerEnd,
+		Outcome:               req.Outcome,
+		Notes:                 req.Notes,
+		CreatedAt:             now,
+		UpdatedAt:             now,
 	}
 	return s.repo.CreateTrip(ctx, in)
 }
@@ -84,15 +84,14 @@ func (s *Service) CreateEvent(ctx context.Context, tripID string, req CreateTrip
 		t = time.Now().UTC()
 	}
 	in := domain.TripEvent{
-		ID:         uuid.NewString(),
-		TripID:     tripID,
-		EventType:  req.EventType,
-		EventTime:  t,
-		Latitude:   req.Latitude,
-		Longitude:  req.Longitude,
+		ID:          uuid.NewString(),
+		TripID:      tripID,
+		EventType:   req.EventType,
+		EventTime:   t,
+		Latitude:    req.Latitude,
+		Longitude:   req.Longitude,
 		ActorUserID: req.ActorUserID,
-		Notes:      req.Notes,
+		Notes:       req.Notes,
 	}
 	return s.repo.CreateTripEvent(ctx, tripID, in)
 }
-

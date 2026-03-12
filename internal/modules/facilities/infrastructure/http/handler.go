@@ -25,18 +25,18 @@ func NewHandler(service *facapp.Service) *Handler {
 //	@Tags			Facilities
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			page				query		int		false	"Page number"			default(1)
-//	@Param			page_size			query		int		false	"Page size"				default(20)
-//	@Param			search				query		string	false	"Search term (facility, district, subcounty, region)"
-//	@Param			sort_by				query		string	false	"Sort field"			Enums(facility,level,ownership,region,district,subcounty,facility_uid,subcounty_uid)
-//	@Param			sort_order			query		string	false	"Sort order"			Enums(ASC,DESC)
-//	@Param			filter[region_uid]	query		string	false	"Filter by region UID"
-//	@Param			filter[district_uid] query		string	false	"Filter by district UID"
-//	@Param			filter[subcounty_uid] query	string	false	"Filter by subcounty UID"
-//	@Param			filter[level]		query		string	false	"Filter by facility level"
-//	@Param			filter[ownership]	query		string	false	"Filter by ownership"
-//	@Success		200					{object}	map[string]interface{}
-//	@Failure		500					{object}	map[string]interface{}
+//	@Param			page					query		int		false	"Page number"	default(1)
+//	@Param			page_size				query		int		false	"Page size"		default(20)
+//	@Param			search					query		string	false	"Search term (facility, district, subcounty, region)"
+//	@Param			sort_by					query		string	false	"Sort field"	Enums(facility,level,ownership,region,district,subcounty,facility_uid,subcounty_uid)
+//	@Param			sort_order				query		string	false	"Sort order"	Enums(ASC,DESC)
+//	@Param			filter[region_uid]		query		string	false	"Filter by region UID"
+//	@Param			filter[district_uid]	query		string	false	"Filter by district UID"
+//	@Param			filter[subcounty_uid]	query		string	false	"Filter by subcounty UID"
+//	@Param			filter[level]			query		string	false	"Filter by facility level"
+//	@Param			filter[ownership]		query		string	false	"Filter by ownership"
+//	@Success		200						{object}	map[string]interface{}
+//	@Failure		500						{object}	map[string]interface{}
 //	@Router			/facilities [get]
 func (h *Handler) List(c *gin.Context) {
 	p := platformdb.ParsePagination(
@@ -52,11 +52,11 @@ func (h *Handler) List(c *gin.Context) {
 			"subcounty_uid": "f.subcounty_uid",
 		},
 		map[string]struct{}{
-			"region_uid":   {},
-			"district_uid": {},
+			"region_uid":    {},
+			"district_uid":  {},
 			"subcounty_uid": {},
-			"level":        {},
-			"ownership":    {},
+			"level":         {},
+			"ownership":     {},
 		},
 	)
 	out, err := h.service.ListFacilities(c.Request.Context(), p)
@@ -74,7 +74,7 @@ func (h *Handler) List(c *gin.Context) {
 //	@Tags			Facilities
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			uid	path	string	true	"Facility UID"
+//	@Param			uid	path		string	true	"Facility UID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		404	{object}	map[string]interface{}
 //	@Router			/facilities/{uid} [get]
@@ -123,7 +123,7 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			uid		path	string							true	"Facility UID"
+//	@Param			uid		path		string							true	"Facility UID"
 //	@Param			payload	body		facapp.UpdateFacilityRequest	true	"Update facility payload"
 //	@Success		200		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
@@ -151,7 +151,7 @@ func (h *Handler) Update(c *gin.Context) {
 //	@Tags			Facilities
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			uid	path	string	true	"Facility UID"
+//	@Param			uid	path		string	true	"Facility UID"
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/facilities/{uid} [delete]
@@ -163,5 +163,3 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 	httpx.OK(c, gin.H{"message": "facility deleted"})
 }
-
-

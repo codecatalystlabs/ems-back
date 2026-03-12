@@ -431,4 +431,3 @@ func (r *Repository) DeleteIncident(ctx context.Context, id string) error {
 	_, err := r.db.Exec(ctx, `DELETE FROM incidents WHERE id = $1`, id)
 	return err
 }
-

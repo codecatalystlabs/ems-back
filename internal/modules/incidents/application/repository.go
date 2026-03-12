@@ -14,4 +14,3 @@ type Repository interface {
 	UpdateIncident(ctx context.Context, id string, req UpdateIncidentRequest) (domain.Incident, error)
 	DeleteIncident(ctx context.Context, id string) error
 }
-

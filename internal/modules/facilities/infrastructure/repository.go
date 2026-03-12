@@ -220,5 +220,3 @@ func (r *Repository) Delete(ctx context.Context, uid string) error {
 	_, err := r.db.Exec(ctx, `DELETE FROM facilities WHERE facility_uid = $1`, uid)
 	return err
 }
-
-

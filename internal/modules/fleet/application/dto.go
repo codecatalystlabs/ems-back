@@ -28,4 +28,3 @@ type UpdateAmbulanceRequest struct {
 	Status            *string `json:"status,omitempty"`
 	DispatchReadiness *string `json:"dispatch_readiness,omitempty"`
 }
-

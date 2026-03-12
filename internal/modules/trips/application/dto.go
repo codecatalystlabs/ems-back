@@ -42,4 +42,3 @@ type CreateTripEventRequest struct {
 	ActorUserID *string  `json:"actor_user_id,omitempty"`
 	Notes       *string  `json:"notes,omitempty"`
 }
-

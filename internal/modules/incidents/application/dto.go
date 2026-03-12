@@ -22,25 +22,23 @@ type CreateIncidentRequest struct {
 }
 
 type UpdateIncidentRequest struct {
-	CallerName      *string  `json:"caller_name,omitempty"`
-	CallerPhone     *string  `json:"caller_phone,omitempty"`
-	PatientName     *string  `json:"patient_name,omitempty"`
-	PatientPhone    *string  `json:"patient_phone,omitempty"`
-	PatientAgeGroup *string  `json:"patient_age_group,omitempty"`
-	PatientSex      *string  `json:"patient_sex,omitempty"`
-	IncidentTypeID  *string  `json:"incident_type_id,omitempty"`
-	SeverityLevelID *string  `json:"severity_level_id,omitempty"`
-	PriorityLevelID *string  `json:"priority_level_id,omitempty"`
-	Summary         *string  `json:"summary,omitempty"`
-	Description     *string  `json:"description,omitempty"`
-	DistrictID      *string  `json:"district_id,omitempty"`
-	FacilityID      *string  `json:"facility_id,omitempty"`
-	Village         *string  `json:"village,omitempty"`
-	Parish          *string  `json:"parish,omitempty"`
-	Subcounty       *string  `json:"subcounty,omitempty"`
-	Landmark        *string  `json:"landmark,omitempty"`
-	Status          *string  `json:"status,omitempty"`
-	Verification    *string  `json:"verification_status,omitempty"`
+	CallerName      *string `json:"caller_name,omitempty"`
+	CallerPhone     *string `json:"caller_phone,omitempty"`
+	PatientName     *string `json:"patient_name,omitempty"`
+	PatientPhone    *string `json:"patient_phone,omitempty"`
+	PatientAgeGroup *string `json:"patient_age_group,omitempty"`
+	PatientSex      *string `json:"patient_sex,omitempty"`
+	IncidentTypeID  *string `json:"incident_type_id,omitempty"`
+	SeverityLevelID *string `json:"severity_level_id,omitempty"`
+	PriorityLevelID *string `json:"priority_level_id,omitempty"`
+	Summary         *string `json:"summary,omitempty"`
+	Description     *string `json:"description,omitempty"`
+	DistrictID      *string `json:"district_id,omitempty"`
+	FacilityID      *string `json:"facility_id,omitempty"`
+	Village         *string `json:"village,omitempty"`
+	Parish          *string `json:"parish,omitempty"`
+	Subcounty       *string `json:"subcounty,omitempty"`
+	Landmark        *string `json:"landmark,omitempty"`
+	Status          *string `json:"status,omitempty"`
+	Verification    *string `json:"verification_status,omitempty"`
 }
-
-

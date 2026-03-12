@@ -5,6 +5,7 @@ import (
 
 	"dispatch/internal/modules/facilities/domain"
 	platformdb "dispatch/internal/platform/db"
+
 	"go.uber.org/zap"
 )
 
@@ -50,4 +51,3 @@ func (s *Service) UpdateFacility(ctx context.Context, uid string, req UpdateFaci
 func (s *Service) DeleteFacility(ctx context.Context, uid string) error {
 	return s.repo.Delete(ctx, uid)
 }
-

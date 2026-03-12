@@ -378,4 +378,3 @@ RETURNING event_time`
 	}
 	return in, nil
 }
-

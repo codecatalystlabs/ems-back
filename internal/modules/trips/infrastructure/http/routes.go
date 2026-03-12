@@ -16,4 +16,3 @@ func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service) {
 	rg.GET("/:id/events", rbacmiddleware.RequirePermission(rbacSvc, "trips.read"), h.ListEvents)
 	rg.POST("/:id/events", rbacmiddleware.RequirePermission(rbacSvc, "trips.manage"), h.CreateEvent)
 }
-

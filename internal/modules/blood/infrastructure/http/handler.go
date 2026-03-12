@@ -187,7 +187,7 @@ func (h *Handler) AcceptOffer(c *gin.Context) {
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}
 //	@Failure		500		{object}	map[string]interface{}
-//	@Router			/blood/pickups/assign [post]
+//	@Router			/pickup-assignments [post]
 func (h *Handler) AssignPickup(c *gin.Context) {
 	var req dto.AssignBloodPickupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -215,7 +215,7 @@ func (h *Handler) AssignPickup(c *gin.Context) {
 //	@Success		200				{object}	map[string]interface{}
 //	@Failure		400				{object}	map[string]interface{}
 //	@Failure		500				{object}	map[string]interface{}
-//	@Router			/blood/pickups/{assignmentId}/collect [post]
+//	@Router			/pickup-assignments/{assignmentId}/collect [post]
 func (h *Handler) MarkCollected(c *gin.Context) {
 	assignmentID := c.Param("assignmentId")
 	var body dto.MarkCollectedRequest
@@ -243,7 +243,7 @@ func (h *Handler) MarkCollected(c *gin.Context) {
 //	@Success		200				{object}	map[string]interface{}
 //	@Failure		400				{object}	map[string]interface{}
 //	@Failure		500				{object}	map[string]interface{}
-//	@Router			/blood/pickups/{assignmentId}/deliver [post]
+//	@Router			/pickup-assignments/{assignmentId}/deliver [post]
 func (h *Handler) MarkDelivered(c *gin.Context) {
 	assignmentID := c.Param("assignmentId")
 	var body dto.MarkDeliveredRequest

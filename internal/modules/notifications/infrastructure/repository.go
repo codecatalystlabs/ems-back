@@ -191,4 +191,3 @@ func (r *Repository) UpdateStatus(ctx context.Context, id string, status string)
 	_, err := r.db.Exec(ctx, `UPDATE notifications SET status=$2 WHERE id=$1`, id, status)
 	return err
 }
-
