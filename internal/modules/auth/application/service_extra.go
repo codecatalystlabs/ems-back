@@ -12,6 +12,8 @@ import (
 
 	"dispatch/internal/modules/auth/application/dto"
 	authdomain "dispatch/internal/modules/auth/domain"
+	"dispatch/internal/modules/rbac/application"
+
 	platformauth "dispatch/internal/platform/auth"
 )
 
@@ -25,6 +27,7 @@ var (
 
 type Service struct {
 	repo       Repository
+	rbacRepo   application.Repository
 	jwt        *platformauth.JWTManager
 	redis      *redis.Client
 	log        *zap.Logger
@@ -32,9 +35,10 @@ type Service struct {
 	refreshTTL time.Duration
 }
 
-func NewService(repo Repository, jwt *platformauth.JWTManager, redisClient *redis.Client, log *zap.Logger, accessTTL, refreshTTL time.Duration) *Service {
+func NewService(repo Repository, rbacRepo application.Repository, jwt *platformauth.JWTManager, redisClient *redis.Client, log *zap.Logger, accessTTL, refreshTTL time.Duration) *Service {
 	return &Service{
 		repo:       repo,
+		rbacRepo:   rbacRepo,
 		jwt:        jwt,
 		redis:      redisClient,
 		log:        log,
@@ -96,6 +100,22 @@ func (s *Service) Login(ctx context.Context, req dto.LoginRequest, deviceID, dev
 		s.log.Warn("cache session", zap.Error(err))
 	}
 
+	perms, err := s.rbacRepo.ListPermissionGrants(ctx, user.ID)
+	if err != nil {
+		return dto.AuthResponse{}, err
+	}
+
+	permissionCodes := make([]string, 0, len(perms))
+	seen := make(map[string]struct{})
+
+	for _, p := range perms {
+		if _, exists := seen[p.PermCode]; exists {
+			continue
+		}
+		seen[p.PermCode] = struct{}{}
+		permissionCodes = append(permissionCodes, p.PermCode)
+	}
+
 	return dto.AuthResponse{
 		AccessToken:           accessToken,
 		RefreshToken:          refreshToken,
@@ -118,6 +138,7 @@ func (s *Service) Login(ctx context.Context, req dto.LoginRequest, deviceID, dev
 			Status:   user.Status,
 			Roles:    user.Roles,
 		},
+		Permissions: permissionCodes,
 	}, nil
 }
 

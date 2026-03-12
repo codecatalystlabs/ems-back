@@ -21,6 +21,7 @@ type AuthResponse struct {
 	RefreshTokenExpiresIn int64            `json:"refresh_token_expires_in"`
 	Session               SessionResponse  `json:"session"`
 	User                  AuthUserResponse `json:"user"`
+	Permissions           []string         `json:"permissions"`
 }
 
 type AuthUserResponse struct {
@@ -40,4 +41,12 @@ type SessionResponse struct {
 	UserAgent      string `json:"user_agent"`
 	LastActivityAt string `json:"last_activity_at"`
 	ExpiresAt      string `json:"expires_at"`
+}
+
+type PermissionGrantDTO struct {
+	UserID    string  `json:"user_id"`
+	RoleCode  string  `json:"role_code"`
+	PermCode  string  `json:"perm_code"`
+	ScopeType string  `json:"scope_type"`
+	ScopeID   *string `json:"scope_id,omitempty"`
 }
