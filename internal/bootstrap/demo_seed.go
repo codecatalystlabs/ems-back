@@ -260,12 +260,12 @@ func SeedDemoData(ctx context.Context, db *pgxpool.Pool) error {
 		`INSERT INTO trip_events (
 			trip_id, event_type, event_time, actor_user_id, notes
 		) VALUES
-			($1,'ASSIGNED',$2,$3,'Trip assigned'),
-			($1,'DEPARTED',$3,$3,'Ambulance departed'),
-			($1,'ARRIVED_SCENE',$4,$3,'Arrived at scene'),
-			($1,'PATIENT_LOADED',$5,$3,'Patient loaded'),
-			($1,'ARRIVED_DESTINATION',$6,$3,'Arrived at destination'),
-			($1,'COMPLETED',$6,$3,'Trip completed')
+			($1,'ASSIGNED',$2,$7,'Trip assigned'),
+			($1,'DEPARTED',$3,$7,'Ambulance departed'),
+			($1,'ARRIVED_SCENE',$4,$7,'Arrived at scene'),
+			($1,'PATIENT_LOADED',$5,$7,'Patient loaded'),
+			($1,'ARRIVED_DESTINATION',$6,$7,'Arrived at destination'),
+			($1,'COMPLETED',$6,$7,'Trip completed')
 		ON CONFLICT DO NOTHING`,
 		tripID,
 		now.Add(-25*time.Minute),
