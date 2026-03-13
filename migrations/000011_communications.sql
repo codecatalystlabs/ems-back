@@ -1,6 +1,6 @@
 
 -- ============================================
--- File: 000010_communications.sql
+-- File: 000011_communications.sql
 -- ============================================
 -- +goose Up
 CREATE TABLE inbound_sms (

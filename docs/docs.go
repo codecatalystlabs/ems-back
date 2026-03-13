@@ -501,6 +501,575 @@ const docTemplate = `{
                 }
             }
         },
+        "/availability/shifts": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns paginated shifts with optional filters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "List user shifts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "District ID",
+                        "name": "district_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Facility ID",
+                        "name": "facility_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Shift date (YYYY-MM-DD)",
+                        "name": "shift_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Shift status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search shift type",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "shift_date",
+                            "starts_at",
+                            "status",
+                            "created_at"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a new shift for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Create user shift",
+                "parameters": [
+                    {
+                        "description": "Create shift payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_availability_application_dto.CreateShiftRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/availability/shifts/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a shift by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Get shift by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Shift ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Partially updates a shift by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Update user shift",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Shift ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update shift payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_availability_application_dto.UpdateShiftRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/availability/users/availability": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns paginated user availability records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "List user availability",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Availability status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Dispatchable flag",
+                        "name": "dispatchable",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "updated_at",
+                            "availability_status",
+                            "last_seen_at"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates or updates a user's availability record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Upsert user availability",
+                "parameters": [
+                    {
+                        "description": "Availability payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_availability_application_dto.UpsertAvailabilityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/availability/users/presence-logs": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns paginated user presence logs",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "List presence logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Channel",
+                        "name": "channel",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "seen_at",
+                            "channel"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Stores a user presence log entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Create presence log",
+                "parameters": [
+                    {
+                        "description": "Presence log payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_availability_application_dto.CreatePresenceLogRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/availability/users/{userId}/availability": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns availability for a specific user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Availability"
+                ],
+                "summary": "Get user availability",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/blood/offers": {
             "post": {
                 "security": [
@@ -806,6 +1375,494 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/dispatch/assignments": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns paginated dispatch assignments",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "List dispatch assignments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident ID",
+                        "name": "incident_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Ambulance ID",
+                        "name": "ambulance_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Assignment status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "created_at",
+                            "status",
+                            "assigned_at"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a manual, assisted, or automatic dispatch assignment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "Create dispatch assignment",
+                "parameters": [
+                    {
+                        "description": "Dispatch assignment payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_dispatch_application_dto.CreateDispatchAssignmentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/dispatch/assignments/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a dispatch assignment by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "Get dispatch assignment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Dispatch assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/dispatch/assignments/{id}/status": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates dispatch assignment lifecycle status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "Update dispatch assignment status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Dispatch assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dispatch status payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_dispatch_application_dto.UpdateDispatchStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/dispatch/evaluate": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Uses triage responses to determine whether automatic dispatch should be triggered",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "Evaluate automatic dispatch",
+                "parameters": [
+                    {
+                        "description": "Triage dispatch evaluation payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_dispatch_application_dto.EvaluateDispatchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/dispatch/recommendations": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns generated dispatch recommendations for an incident",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "List dispatch recommendations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident ID",
+                        "name": "incident_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "generated_at",
+                            "score"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/dispatch/recommendations/generate": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates scored dispatch recommendations for an incident",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "Generate dispatch recommendations",
+                "parameters": [
+                    {
+                        "description": "Recommendation payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_dispatch_application_dto.GenerateRecommendationsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/dispatch/triage": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Saves incident triage responses and derives dispatch priority",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dispatch"
+                ],
+                "summary": "Persist incident triage",
+                "parameters": [
+                    {
+                        "description": "Persist triage payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_dispatch_application_dto.PersistTriageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1492,7 +2549,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns paginated incidents with filters for status and type",
+                "description": "Returns paginated incidents",
                 "produces": [
                     "application/json"
                 ],
@@ -1501,6 +2558,30 @@ const docTemplate = `{
                 ],
                 "summary": "List incidents",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "District ID",
+                        "name": "district_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Facility ID",
+                        "name": "facility_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Priority level ID",
+                        "name": "priority_id",
+                        "in": "query"
+                    },
                     {
                         "type": "integer",
                         "default": 1,
@@ -1517,13 +2598,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Search term (number, caller, patient, summary)",
+                        "description": "Search by incident number, summary, or patient name",
                         "name": "search",
                         "in": "query"
                     },
                     {
                         "enum": [
                             "reported_at",
+                            "created_at",
                             "status"
                         ],
                         "type": "string",
@@ -1539,67 +2621,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Sort order",
                         "name": "sort_order",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "NEW",
-                            "PENDING_VERIFICATION",
-                            "VERIFIED",
-                            "AWAITING_ASSIGNMENT",
-                            "ASSIGNED",
-                            "ENROUTE",
-                            "AT_SCENE",
-                            "TRANSPORTING",
-                            "COMPLETED",
-                            "CANCELLED",
-                            "ESCALATED",
-                            "REJECTED"
-                        ],
-                        "type": "string",
-                        "description": "Filter by status",
-                        "name": "filter[status]",
-                        "in": "query"
-                    },
-                    {
-                        "enum": [
-                            "PENDING",
-                            "VERIFIED",
-                            "REJECTED"
-                        ],
-                        "type": "string",
-                        "description": "Filter by verification status",
-                        "name": "filter[verification_status]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by incident type id",
-                        "name": "filter[incident_type_id]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by district id",
-                        "name": "filter[district_id]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by facility id",
-                        "name": "filter[facility_id]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by reported_at from (ISO 8601)",
-                        "name": "filter[date_from]",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by reported_at to (ISO 8601)",
-                        "name": "filter[date_to]",
                         "in": "query"
                     }
                 ],
@@ -1626,7 +2647,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Creates a new incident record from an emergency alert",
+                "description": "Creates an incident and optionally persists triage responses on creation",
                 "consumes": [
                     "application/json"
                 ],
@@ -1636,10 +2657,10 @@ const docTemplate = `{
                 "tags": [
                     "Incidents"
                 ],
-                "summary": "Create incident",
+                "summary": "Create incident with triage",
                 "parameters": [
                     {
-                        "description": "Create incident payload",
+                        "description": "Incident payload",
                         "name": "payload",
                         "in": "body",
                         "required": true,
@@ -1680,14 +2701,14 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a single incident by ID",
+                "description": "Returns an incident by ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Incidents"
                 ],
-                "summary": "Get incident",
+                "summary": "Get incident by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -1700,65 +2721,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update an existing incident",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Incidents"
-                ],
-                "summary": "Update incident",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Incident ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update incident payload",
-                        "name": "payload",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dispatch_internal_modules_incidents_application.UpdateIncidentRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -1772,21 +2734,26 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
+            }
+        },
+        "/incidents/{id}/status": {
+            "patch": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete an incident by ID",
+                "description": "Updates incident lifecycle status",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Incidents"
                 ],
-                "summary": "Delete incident",
+                "summary": "Update incident status",
                 "parameters": [
                     {
                         "type": "string",
@@ -1794,11 +2761,27 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Incident status payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_incidents_application.UpdateIncidentStatusRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -4064,6 +5047,136 @@ const docTemplate = `{
                 }
             }
         },
+        "dispatch_internal_modules_availability_application_dto.CreatePresenceLogRequest": {
+            "type": "object",
+            "required": [
+                "channel",
+                "user_id"
+            ],
+            "properties": {
+                "channel": {
+                    "type": "string"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "user_agent": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_availability_application_dto.CreateShiftRequest": {
+            "type": "object",
+            "required": [
+                "ends_at",
+                "shift_date",
+                "starts_at",
+                "user_id"
+            ],
+            "properties": {
+                "created_by": {
+                    "type": "string"
+                },
+                "district_id": {
+                    "type": "string"
+                },
+                "ends_at": {
+                    "type": "string"
+                },
+                "facility_id": {
+                    "type": "string"
+                },
+                "shift_date": {
+                    "type": "string"
+                },
+                "shift_type": {
+                    "type": "string"
+                },
+                "starts_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_availability_application_dto.UpdateShiftRequest": {
+            "type": "object",
+            "properties": {
+                "district_id": {
+                    "type": "string"
+                },
+                "ends_at": {
+                    "type": "string"
+                },
+                "facility_id": {
+                    "type": "string"
+                },
+                "shift_date": {
+                    "type": "string"
+                },
+                "shift_type": {
+                    "type": "string"
+                },
+                "starts_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_availability_application_dto.UpsertAvailabilityRequest": {
+            "type": "object",
+            "required": [
+                "availability_status",
+                "user_id"
+            ],
+            "properties": {
+                "availability_status": {
+                    "type": "string"
+                },
+                "current_ambulance_id": {
+                    "type": "string"
+                },
+                "current_dispatch_assignment_id": {
+                    "type": "string"
+                },
+                "current_incident_id": {
+                    "type": "string"
+                },
+                "dispatchable": {
+                    "type": "boolean"
+                },
+                "last_seen_at": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dispatch_internal_modules_blood_application_dto.AcceptOfferRequest": {
             "type": "object",
             "properties": {
@@ -4255,6 +5368,136 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "blood_requisition_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_dispatch_application_dto.CreateDispatchAssignmentRequest": {
+            "type": "object",
+            "required": [
+                "incident_id"
+            ],
+            "properties": {
+                "ambulance_id": {
+                    "type": "string"
+                },
+                "assigned_by_user_id": {
+                    "type": "string"
+                },
+                "assignment_mode": {
+                    "type": "string"
+                },
+                "driver_user_id": {
+                    "type": "string"
+                },
+                "eta_minutes": {
+                    "type": "integer"
+                },
+                "incident_id": {
+                    "type": "string"
+                },
+                "lead_medic_user_id": {
+                    "type": "string"
+                },
+                "ranking_score": {
+                    "type": "number"
+                }
+            }
+        },
+        "dispatch_internal_modules_dispatch_application_dto.EvaluateDispatchRequest": {
+            "type": "object",
+            "required": [
+                "incident_id",
+                "responses"
+            ],
+            "properties": {
+                "incident_id": {
+                    "type": "string"
+                },
+                "responses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "question_code",
+                            "response_value"
+                        ],
+                        "properties": {
+                            "question_code": {
+                                "type": "string"
+                            },
+                            "response_value": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "dispatch_internal_modules_dispatch_application_dto.GenerateRecommendationsRequest": {
+            "type": "object",
+            "required": [
+                "incident_id"
+            ],
+            "properties": {
+                "auto": {
+                    "type": "boolean"
+                },
+                "incident_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_dispatch_application_dto.PersistTriageRequest": {
+            "type": "object",
+            "required": [
+                "incident_id",
+                "questionnaire_code",
+                "responses"
+            ],
+            "properties": {
+                "incident_id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "questionnaire_code": {
+                    "type": "string"
+                },
+                "responses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "question_code",
+                            "response_value"
+                        ],
+                        "properties": {
+                            "question_code": {
+                                "type": "string"
+                            },
+                            "response_value": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "triage_mode": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_dispatch_application_dto.UpdateDispatchStatusRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "cancellation_reason": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }
@@ -4524,7 +5767,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "incident_type_id",
-                "source_channel"
+                "source_channel",
+                "summary"
             ],
             "properties": {
                 "caller_name": {
@@ -4533,19 +5777,19 @@ const docTemplate = `{
                 "caller_phone": {
                     "type": "string"
                 },
+                "created_by_user_id": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
                 "district_id": {
-                    "description": "DistrictID can be a UUID, code, or name; it will be resolved server-side.",
                     "type": "string"
                 },
                 "facility_id": {
-                    "description": "FacilityID can be a UUID or facility code (UID); it will be resolved server-side.",
                     "type": "string"
                 },
                 "incident_type_id": {
-                    "description": "IncidentTypeID can be a UUID, a code, or a name; it will be resolved server-side.",
                     "type": "string"
                 },
                 "landmark": {
@@ -4556,80 +5800,6 @@ const docTemplate = `{
                 },
                 "longitude": {
                     "type": "number"
-                },
-                "parish": {
-                    "type": "string"
-                },
-                "patient_age_group": {
-                    "type": "string",
-                    "enum": [
-                        "INFANT",
-                        "CHILD",
-                        "ADOLESCENT",
-                        "ADULT",
-                        "ELDERLY"
-                    ]
-                },
-                "patient_name": {
-                    "type": "string"
-                },
-                "patient_phone": {
-                    "type": "string"
-                },
-                "patient_sex": {
-                    "type": "string",
-                    "enum": [
-                        "MALE",
-                        "FEMALE",
-                        "OTHER",
-                        "UNKNOWN"
-                    ]
-                },
-                "source_channel": {
-                    "type": "string",
-                    "enum": [
-                        "SMS",
-                        "USSD",
-                        "CALL",
-                        "MOBILE_APP",
-                        "WEB_PORTAL",
-                        "FACILITY_REFERRAL"
-                    ]
-                },
-                "subcounty": {
-                    "type": "string"
-                },
-                "summary": {
-                    "type": "string"
-                },
-                "village": {
-                    "type": "string"
-                }
-            }
-        },
-        "dispatch_internal_modules_incidents_application.UpdateIncidentRequest": {
-            "type": "object",
-            "properties": {
-                "caller_name": {
-                    "type": "string"
-                },
-                "caller_phone": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "district_id": {
-                    "type": "string"
-                },
-                "facility_id": {
-                    "type": "string"
-                },
-                "incident_type_id": {
-                    "type": "string"
-                },
-                "landmark": {
-                    "type": "string"
                 },
                 "parish": {
                     "type": "string"
@@ -4649,25 +5819,14 @@ const docTemplate = `{
                 "priority_level_id": {
                     "type": "string"
                 },
+                "questionnaire_code": {
+                    "type": "string"
+                },
                 "severity_level_id": {
                     "type": "string"
                 },
-                "status": {
-                    "type": "string",
-                    "enum": [
-                        "NEW",
-                        "PENDING_VERIFICATION",
-                        "VERIFIED",
-                        "AWAITING_ASSIGNMENT",
-                        "ASSIGNED",
-                        "ENROUTE",
-                        "AT_SCENE",
-                        "TRANSPORTING",
-                        "COMPLETED",
-                        "CANCELLED",
-                        "ESCALATED",
-                        "REJECTED"
-                    ]
+                "source_channel": {
+                    "type": "string"
                 },
                 "subcounty": {
                     "type": "string"
@@ -4675,15 +5834,45 @@ const docTemplate = `{
                 "summary": {
                     "type": "string"
                 },
-                "verification_status": {
-                    "type": "string",
-                    "enum": [
-                        "PENDING",
-                        "VERIFIED",
-                        "REJECTED"
-                    ]
+                "triage_notes": {
+                    "type": "string"
+                },
+                "triage_responses": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dispatch_internal_modules_incidents_application.TriageResponseInput"
+                    }
                 },
                 "village": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_incidents_application.TriageResponseInput": {
+            "type": "object",
+            "required": [
+                "question_code",
+                "response_value"
+            ],
+            "properties": {
+                "question_code": {
+                    "type": "string"
+                },
+                "response_value": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_incidents_application.UpdateIncidentStatusRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "notes": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }

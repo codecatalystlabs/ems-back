@@ -1,5 +1,5 @@
 -- ============================================
--- File: 000006_availability.sql
+-- File: 000007_availability.sql
 -- ============================================
 -- +goose Up
 CREATE TABLE user_shifts (

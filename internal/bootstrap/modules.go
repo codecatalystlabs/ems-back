@@ -1,10 +1,10 @@
 package bootstrap
 
 import (
-	// availabilitymod "dispatch/internal/modules/availability"
-	// dispatchmod "dispatch/internal/modules/dispatch"
 	authmod "dispatch/internal/modules/auth"
+	availabilitymod "dispatch/internal/modules/availability"
 	bloodmod "dispatch/internal/modules/blood"
+	dispatchmod "dispatch/internal/modules/dispatch"
 	facilitiesmod "dispatch/internal/modules/facilities"
 	fleetmod "dispatch/internal/modules/fleet"
 	fuelmod "dispatch/internal/modules/fuel"
@@ -46,6 +46,6 @@ func RegisterModules(deps types.ModuleDeps) {
 	notifmod.Register(securedDeps, rbacSvc)
 	fuelmod.Register(securedDeps, rbacSvc)
 	refmod.Register(securedDeps)
-	// availabilitymod.Register(securedDeps, rbacSvc)
-	// dispatchmod.Register(securedDeps, rbacSvc)
+	availabilitymod.Register(securedDeps)
+	dispatchmod.Register(securedDeps)
 }

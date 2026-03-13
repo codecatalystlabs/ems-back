@@ -1,5 +1,5 @@
 -- ============================================
--- File: 000008_dispatch.sql
+-- File: 000009_dispatch.sql
 -- ============================================
 -- +goose Up
 CREATE TABLE dispatch_assignments (

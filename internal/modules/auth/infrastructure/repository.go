@@ -90,6 +90,7 @@ func (r *Repository) GetSessionByRefreshTokenID(ctx context.Context, refreshToke
 	)
 	return s, err
 }
+
 func (r *Repository) TouchSession(ctx context.Context, sessionID string, at time.Time, newAccessTokenID string) error {
 	_, err := r.db.Exec(ctx, `
 	UPDATE auth_sessions

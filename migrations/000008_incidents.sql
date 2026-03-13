@@ -1,6 +1,6 @@
 
 -- ============================================
--- File: 000007_incidents.sql
+-- File: 000008_incidents.sql
 -- ============================================
 -- +goose Up
 CREATE TABLE incidents (

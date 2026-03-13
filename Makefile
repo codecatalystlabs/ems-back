@@ -87,6 +87,10 @@ run-app:
 run-seed:
 	go run ./cmd/seed/main.go
 
+.PHONY: run-events
+run-events:
+	go run ./cmd/worker/main.go
+
 .PHONY: swagger
 swagger:
 	swag init -g ./cmd/server/main.go -o ./docs --parseDependency --parseInternal

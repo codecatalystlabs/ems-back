@@ -3,19 +3,27 @@ package application
 import (
 	"context"
 
-	"dispatch/internal/modules/incidents/domain"
-	platformdb "dispatch/internal/platform/db"
+	incidentdomain "dispatch/internal/modules/incidents/domain"
 )
 
-type Repository interface {
-	ListIncidents(ctx context.Context, p platformdb.Pagination) ([]domain.Incident, int64, error)
-	CreateIncident(ctx context.Context, in domain.Incident) (domain.Incident, error)
-	GetByID(ctx context.Context, id string) (domain.Incident, error)
-	UpdateIncident(ctx context.Context, id string, req UpdateIncidentRequest) (domain.Incident, error)
-	DeleteIncident(ctx context.Context, id string) error
+type QuestionDefinition struct {
+	QuestionID   string
+	ResponseType string
+	TrueScore    *int
+	FalseScore   *int
+}
 
-	// Helpers for resolving human-friendly values (codes/names) to internal IDs.
-	ResolveIncidentTypeID(ctx context.Context, value string) (string, error)
-	ResolveDistrictID(ctx context.Context, value string) (*string, error)
-	ResolveFacilityID(ctx context.Context, value string) (*string, error)
+type Repository interface {
+	CreateIncident(ctx context.Context, in incidentdomain.Incident) (incidentdomain.Incident, error)
+	GetIncidentByID(ctx context.Context, id string) (incidentdomain.Incident, error)
+	ListIncidents(ctx context.Context, params ListIncidentsParams) ([]incidentdomain.Incident, int64, error)
+	UpdateIncidentStatus(ctx context.Context, id, status string) (incidentdomain.Incident, error)
+	CreateIncidentUpdate(ctx context.Context, incidentID, updateType, oldValue, newValue, notes string, actorUserID *string) error
+	NextIncidentNumber(ctx context.Context) (string, error)
+	ResolvePriorityLevelIDByCode(ctx context.Context, code string) (*string, error)
+	SetIncidentPriorityByCode(ctx context.Context, incidentID, code string) error
+	SetIncidentTriageSummary(ctx context.Context, incidentID string, triagedByUserID *string) error
+	ResolveQuestionnaireIDByCode(ctx context.Context, questionnaireCode string) (string, error)
+	GetQuestionDefinitions(ctx context.Context, questionnaireCode string) (map[string]QuestionDefinition, error)
+	CreatePersistedTriageSession(ctx context.Context, session incidentdomain.PersistedTriageSession) (incidentdomain.PersistedTriageSession, error)
 }

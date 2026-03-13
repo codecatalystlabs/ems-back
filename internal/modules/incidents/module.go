@@ -11,7 +11,7 @@ import (
 
 func Register(deps types.ModuleDeps, rbacSvc *rbacapp.Service) {
 	repo := infrastructure.NewRepository(deps.DB)
-	service := incapp.NewService(repo, deps.Logger)
+	service := incapp.NewService(repo, deps.Bus, deps.Logger)
 	handler := http.NewHandler(service)
 	group := deps.Router.Group("/incidents")
 	http.RegisterRoutes(group, handler, rbacSvc)

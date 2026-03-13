@@ -64,18 +64,18 @@ func (h *Handler) Broadcast(c *gin.Context) {
 //	@Tags			Blood
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			page			query		int		false	"Page number"	default(1)
-//	@Param			page_size		query		int		false	"Page size"		default(20)
-//	@Param			search			query		string	false	"Search term"
-//	@Param			status			query		string	false	"Filter by status"				Enums(OPEN,BROADCASTING,MATCHED,PICKUP_ASSIGNED,COLLECTED,DELIVERED,CANCELLED,EXPIRED)
-//	@Param			blood_type		query		string	false	"Filter by blood type"
-//	@Param			urgency_level	query		string	false	"Filter by urgency level"		Enums(EMERGENCY,URGENT,ROUTINE)
-//	@Param			filter[date_from] query	string	false	"Filter by created_at from (ISO 8601)"
-//	@Param			filter[date_to]	query		string	false	"Filter by created_at to (ISO 8601)"
-//	@Param			sort_by			query		string	false	"Sort by field: created_at, status, urgency_level"
-//	@Param			sort_order		query		string	false	"Sort order: asc or desc"
-//	@Success		200				{object}	map[string]interface{}
-//	@Failure		500				{object}	map[string]interface{}
+//	@Param			page				query		int		false	"Page number"	default(1)
+//	@Param			page_size			query		int		false	"Page size"		default(20)
+//	@Param			search				query		string	false	"Search term"
+//	@Param			status				query		string	false	"Filter by status"	Enums(OPEN,BROADCASTING,MATCHED,PICKUP_ASSIGNED,COLLECTED,DELIVERED,CANCELLED,EXPIRED)
+//	@Param			blood_type			query		string	false	"Filter by blood type"
+//	@Param			urgency_level		query		string	false	"Filter by urgency level"	Enums(EMERGENCY,URGENT,ROUTINE)
+//	@Param			filter[date_from]	query		string	false	"Filter by created_at from (ISO 8601)"
+//	@Param			filter[date_to]		query		string	false	"Filter by created_at to (ISO 8601)"
+//	@Param			sort_by				query		string	false	"Sort by field: created_at, status, urgency_level"
+//	@Param			sort_order			query		string	false	"Sort order: asc or desc"
+//	@Success		200					{object}	map[string]interface{}
+//	@Failure		500					{object}	map[string]interface{}
 //	@Router			/blood/requisitions [get]
 func (h *Handler) ListRequisitions(c *gin.Context) {
 	p := platformdb.ParsePagination(c.Request.URL.Query(), map[string]string{

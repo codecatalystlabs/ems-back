@@ -24,14 +24,14 @@ func NewHandler(service *notifapp.Service) *Handler {
 //	@Tags		Notifications
 //	@Produce	json
 //	@Security	BearerAuth
-//	@Param		page				query		int		false	"Page number"							default(1)
-//	@Param		page_size			query		int		false	"Page size"								default(20)
+//	@Param		page				query		int		false	"Page number"		default(1)
+//	@Param		page_size			query		int		false	"Page size"			default(20)
 //	@Param		filter[status]		query		string	false	"Filter by status"	Enums(PENDING,SENT,DELIVERED,READ,FAILED)
 //	@Param		filter[channel]		query		string	false	"Filter by channel"	Enums(SMS,EMAIL,PUSH,IN_APP)
 //	@Param		filter[date_from]	query		string	false	"Filter by created_at from (ISO 8601)"
 //	@Param		filter[date_to]		query		string	false	"Filter by created_at to (ISO 8601)"
-//	@Success	200				{object}	map[string]interface{}
-//	@Failure	500				{object}	map[string]interface{}
+//	@Success	200					{object}	map[string]interface{}
+//	@Failure	500					{object}	map[string]interface{}
 //	@Router		/notifications [get]
 func (h *Handler) ListMy(c *gin.Context) {
 	userID := c.GetString("user_id")

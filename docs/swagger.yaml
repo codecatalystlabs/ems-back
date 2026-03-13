@@ -77,6 +77,93 @@ definitions:
       user_agent:
         type: string
     type: object
+  dispatch_internal_modules_availability_application_dto.CreatePresenceLogRequest:
+    properties:
+      channel:
+        type: string
+      ip_address:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      user_agent:
+        type: string
+      user_id:
+        type: string
+    required:
+    - channel
+    - user_id
+    type: object
+  dispatch_internal_modules_availability_application_dto.CreateShiftRequest:
+    properties:
+      created_by:
+        type: string
+      district_id:
+        type: string
+      ends_at:
+        type: string
+      facility_id:
+        type: string
+      shift_date:
+        type: string
+      shift_type:
+        type: string
+      starts_at:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    required:
+    - ends_at
+    - shift_date
+    - starts_at
+    - user_id
+    type: object
+  dispatch_internal_modules_availability_application_dto.UpdateShiftRequest:
+    properties:
+      district_id:
+        type: string
+      ends_at:
+        type: string
+      facility_id:
+        type: string
+      shift_date:
+        type: string
+      shift_type:
+        type: string
+      starts_at:
+        type: string
+      status:
+        type: string
+    type: object
+  dispatch_internal_modules_availability_application_dto.UpsertAvailabilityRequest:
+    properties:
+      availability_status:
+        type: string
+      current_ambulance_id:
+        type: string
+      current_dispatch_assignment_id:
+        type: string
+      current_incident_id:
+        type: string
+      dispatchable:
+        type: boolean
+      last_seen_at:
+        type: string
+      notes:
+        type: string
+      source:
+        type: string
+      updated_by:
+        type: string
+      user_id:
+        type: string
+    required:
+    - availability_status
+    - user_id
+    type: object
   dispatch_internal_modules_blood_application_dto.AcceptOfferRequest:
     properties:
       actor_user_id:
@@ -209,6 +296,92 @@ definitions:
         type: string
     required:
     - blood_requisition_id
+    type: object
+  dispatch_internal_modules_dispatch_application_dto.CreateDispatchAssignmentRequest:
+    properties:
+      ambulance_id:
+        type: string
+      assigned_by_user_id:
+        type: string
+      assignment_mode:
+        type: string
+      driver_user_id:
+        type: string
+      eta_minutes:
+        type: integer
+      incident_id:
+        type: string
+      lead_medic_user_id:
+        type: string
+      ranking_score:
+        type: number
+    required:
+    - incident_id
+    type: object
+  dispatch_internal_modules_dispatch_application_dto.EvaluateDispatchRequest:
+    properties:
+      incident_id:
+        type: string
+      responses:
+        items:
+          properties:
+            question_code:
+              type: string
+            response_value:
+              type: string
+          required:
+          - question_code
+          - response_value
+          type: object
+        type: array
+    required:
+    - incident_id
+    - responses
+    type: object
+  dispatch_internal_modules_dispatch_application_dto.GenerateRecommendationsRequest:
+    properties:
+      auto:
+        type: boolean
+      incident_id:
+        type: string
+    required:
+    - incident_id
+    type: object
+  dispatch_internal_modules_dispatch_application_dto.PersistTriageRequest:
+    properties:
+      incident_id:
+        type: string
+      notes:
+        type: string
+      questionnaire_code:
+        type: string
+      responses:
+        items:
+          properties:
+            question_code:
+              type: string
+            response_value:
+              type: string
+          required:
+          - question_code
+          - response_value
+          type: object
+        type: array
+      triage_mode:
+        type: string
+    required:
+    - incident_id
+    - questionnaire_code
+    - responses
+    type: object
+  dispatch_internal_modules_dispatch_application_dto.UpdateDispatchStatusRequest:
+    properties:
+      cancellation_reason:
+        type: string
+      status:
+        type: string
+    required:
+    - status
     type: object
   dispatch_internal_modules_facilities_application.CreateFacilityRequest:
     properties:
@@ -397,19 +570,15 @@ definitions:
         type: string
       caller_phone:
         type: string
+      created_by_user_id:
+        type: string
       description:
         type: string
       district_id:
-        description: DistrictID can be a UUID, code, or name; it will be resolved
-          server-side.
         type: string
       facility_id:
-        description: FacilityID can be a UUID or facility code (UID); it will be resolved
-          server-side.
         type: string
       incident_type_id:
-        description: IncidentTypeID can be a UUID, a code, or a name; it will be resolved
-          server-side.
         type: string
       landmark:
         type: string
@@ -417,62 +586,6 @@ definitions:
         type: number
       longitude:
         type: number
-      parish:
-        type: string
-      patient_age_group:
-        enum:
-        - INFANT
-        - CHILD
-        - ADOLESCENT
-        - ADULT
-        - ELDERLY
-        type: string
-      patient_name:
-        type: string
-      patient_phone:
-        type: string
-      patient_sex:
-        enum:
-        - MALE
-        - FEMALE
-        - OTHER
-        - UNKNOWN
-        type: string
-      source_channel:
-        enum:
-        - SMS
-        - USSD
-        - CALL
-        - MOBILE_APP
-        - WEB_PORTAL
-        - FACILITY_REFERRAL
-        type: string
-      subcounty:
-        type: string
-      summary:
-        type: string
-      village:
-        type: string
-    required:
-    - incident_type_id
-    - source_channel
-    type: object
-  dispatch_internal_modules_incidents_application.UpdateIncidentRequest:
-    properties:
-      caller_name:
-        type: string
-      caller_phone:
-        type: string
-      description:
-        type: string
-      district_id:
-        type: string
-      facility_id:
-        type: string
-      incident_type_id:
-        type: string
-      landmark:
-        type: string
       parish:
         type: string
       patient_age_group:
@@ -485,35 +598,47 @@ definitions:
         type: string
       priority_level_id:
         type: string
+      questionnaire_code:
+        type: string
       severity_level_id:
         type: string
-      status:
-        enum:
-        - NEW
-        - PENDING_VERIFICATION
-        - VERIFIED
-        - AWAITING_ASSIGNMENT
-        - ASSIGNED
-        - ENROUTE
-        - AT_SCENE
-        - TRANSPORTING
-        - COMPLETED
-        - CANCELLED
-        - ESCALATED
-        - REJECTED
+      source_channel:
         type: string
       subcounty:
         type: string
       summary:
         type: string
-      verification_status:
-        enum:
-        - PENDING
-        - VERIFIED
-        - REJECTED
+      triage_notes:
         type: string
+      triage_responses:
+        items:
+          $ref: '#/definitions/dispatch_internal_modules_incidents_application.TriageResponseInput'
+        type: array
       village:
         type: string
+    required:
+    - incident_type_id
+    - source_channel
+    - summary
+    type: object
+  dispatch_internal_modules_incidents_application.TriageResponseInput:
+    properties:
+      question_code:
+        type: string
+      response_value:
+        type: string
+    required:
+    - question_code
+    - response_value
+    type: object
+  dispatch_internal_modules_incidents_application.UpdateIncidentStatusRequest:
+    properties:
+      notes:
+        type: string
+      status:
+        type: string
+    required:
+    - status
     type: object
   dispatch_internal_modules_notifications_application.CreateNotificationRequest:
     properties:
@@ -1158,6 +1283,382 @@ paths:
       summary: List sessions
       tags:
       - Auth
+  /availability/shifts:
+    get:
+      description: Returns paginated shifts with optional filters
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: District ID
+        in: query
+        name: district_id
+        type: string
+      - description: Facility ID
+        in: query
+        name: facility_id
+        type: string
+      - description: Shift date (YYYY-MM-DD)
+        in: query
+        name: shift_date
+        type: string
+      - description: Shift status
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search shift type
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - shift_date
+        - starts_at
+        - status
+        - created_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List user shifts
+      tags:
+      - Availability
+    post:
+      consumes:
+      - application/json
+      description: Creates a new shift for a user
+      parameters:
+      - description: Create shift payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_availability_application_dto.CreateShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create user shift
+      tags:
+      - Availability
+  /availability/shifts/{id}:
+    get:
+      description: Returns a shift by ID
+      parameters:
+      - description: Shift ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get shift by ID
+      tags:
+      - Availability
+    patch:
+      consumes:
+      - application/json
+      description: Partially updates a shift by ID
+      parameters:
+      - description: Shift ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update shift payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_availability_application_dto.UpdateShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user shift
+      tags:
+      - Availability
+  /availability/users/{userId}/availability:
+    get:
+      description: Returns availability for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user availability
+      tags:
+      - Availability
+  /availability/users/availability:
+    get:
+      description: Returns paginated user availability records
+      parameters:
+      - description: Availability status
+        in: query
+        name: status
+        type: string
+      - description: Dispatchable flag
+        in: query
+        name: dispatchable
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Sort field
+        enum:
+        - updated_at
+        - availability_status
+        - last_seen_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List user availability
+      tags:
+      - Availability
+    post:
+      consumes:
+      - application/json
+      description: Creates or updates a user's availability record
+      parameters:
+      - description: Availability payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_availability_application_dto.UpsertAvailabilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Upsert user availability
+      tags:
+      - Availability
+  /availability/users/presence-logs:
+    get:
+      description: Returns paginated user presence logs
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Channel
+        in: query
+        name: channel
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Sort field
+        enum:
+        - seen_at
+        - channel
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List presence logs
+      tags:
+      - Availability
+    post:
+      consumes:
+      - application/json
+      description: Stores a user presence log entry
+      parameters:
+      - description: Presence log payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_availability_application_dto.CreatePresenceLogRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create presence log
+      tags:
+      - Availability
   /blood/offers:
     post:
       consumes:
@@ -1376,6 +1877,328 @@ paths:
       summary: Accept blood offer
       tags:
       - Blood
+  /dispatch/assignments:
+    get:
+      description: Returns paginated dispatch assignments
+      parameters:
+      - description: Incident ID
+        in: query
+        name: incident_id
+        type: string
+      - description: Ambulance ID
+        in: query
+        name: ambulance_id
+        type: string
+      - description: Assignment status
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Sort field
+        enum:
+        - created_at
+        - status
+        - assigned_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List dispatch assignments
+      tags:
+      - Dispatch
+    post:
+      consumes:
+      - application/json
+      description: Creates a manual, assisted, or automatic dispatch assignment
+      parameters:
+      - description: Dispatch assignment payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_dispatch_application_dto.CreateDispatchAssignmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create dispatch assignment
+      tags:
+      - Dispatch
+  /dispatch/assignments/{id}:
+    get:
+      description: Returns a dispatch assignment by ID
+      parameters:
+      - description: Dispatch assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get dispatch assignment
+      tags:
+      - Dispatch
+  /dispatch/assignments/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Updates dispatch assignment lifecycle status
+      parameters:
+      - description: Dispatch assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dispatch status payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_dispatch_application_dto.UpdateDispatchStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update dispatch assignment status
+      tags:
+      - Dispatch
+  /dispatch/evaluate:
+    post:
+      consumes:
+      - application/json
+      description: Uses triage responses to determine whether automatic dispatch should
+        be triggered
+      parameters:
+      - description: Triage dispatch evaluation payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_dispatch_application_dto.EvaluateDispatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Evaluate automatic dispatch
+      tags:
+      - Dispatch
+  /dispatch/recommendations:
+    get:
+      description: Returns generated dispatch recommendations for an incident
+      parameters:
+      - description: Incident ID
+        in: query
+        name: incident_id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Sort field
+        enum:
+        - generated_at
+        - score
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List dispatch recommendations
+      tags:
+      - Dispatch
+  /dispatch/recommendations/generate:
+    post:
+      consumes:
+      - application/json
+      description: Generates scored dispatch recommendations for an incident
+      parameters:
+      - description: Recommendation payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_dispatch_application_dto.GenerateRecommendationsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generate dispatch recommendations
+      tags:
+      - Dispatch
+  /dispatch/triage:
+    post:
+      consumes:
+      - application/json
+      description: Saves incident triage responses and derives dispatch priority
+      parameters:
+      - description: Persist triage payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_dispatch_application_dto.PersistTriageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Persist incident triage
+      tags:
+      - Dispatch
   /facilities:
     get:
       description: Returns paginated facilities with region/district/subcounty hierarchy
@@ -1815,8 +2638,24 @@ paths:
       - Fuel
   /incidents:
     get:
-      description: Returns paginated incidents with filters for status and type
+      description: Returns paginated incidents
       parameters:
+      - description: Incident status
+        in: query
+        name: status
+        type: string
+      - description: District ID
+        in: query
+        name: district_id
+        type: string
+      - description: Facility ID
+        in: query
+        name: facility_id
+        type: string
+      - description: Priority level ID
+        in: query
+        name: priority_id
+        type: string
       - default: 1
         description: Page number
         in: query
@@ -1827,13 +2666,14 @@ paths:
         in: query
         name: page_size
         type: integer
-      - description: Search term (number, caller, patient, summary)
+      - description: Search by incident number, summary, or patient name
         in: query
         name: search
         type: string
       - description: Sort field
         enum:
         - reported_at
+        - created_at
         - status
         in: query
         name: sort_by
@@ -1844,51 +2684,6 @@ paths:
         - DESC
         in: query
         name: sort_order
-        type: string
-      - description: Filter by status
-        enum:
-        - NEW
-        - PENDING_VERIFICATION
-        - VERIFIED
-        - AWAITING_ASSIGNMENT
-        - ASSIGNED
-        - ENROUTE
-        - AT_SCENE
-        - TRANSPORTING
-        - COMPLETED
-        - CANCELLED
-        - ESCALATED
-        - REJECTED
-        in: query
-        name: filter[status]
-        type: string
-      - description: Filter by verification status
-        enum:
-        - PENDING
-        - VERIFIED
-        - REJECTED
-        in: query
-        name: filter[verification_status]
-        type: string
-      - description: Filter by incident type id
-        in: query
-        name: filter[incident_type_id]
-        type: string
-      - description: Filter by district id
-        in: query
-        name: filter[district_id]
-        type: string
-      - description: Filter by facility id
-        in: query
-        name: filter[facility_id]
-        type: string
-      - description: Filter by reported_at from (ISO 8601)
-        in: query
-        name: filter[date_from]
-        type: string
-      - description: Filter by reported_at to (ISO 8601)
-        in: query
-        name: filter[date_to]
         type: string
       produces:
       - application/json
@@ -1911,9 +2706,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new incident record from an emergency alert
+      description: Creates an incident and optionally persists triage responses on
+        creation
       parameters:
-      - description: Create incident payload
+      - description: Incident payload
         in: body
         name: payload
         required: true
@@ -1939,12 +2735,12 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Create incident
+      summary: Create incident with triage
       tags:
       - Incidents
   /incidents/{id}:
-    delete:
-      description: Delete an incident by ID
+    get:
+      description: Returns an incident by ID
       parameters:
       - description: Incident ID
         in: path
@@ -1966,51 +2762,26 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Delete incident
+      summary: Get incident by ID
       tags:
       - Incidents
-    get:
-      description: Get a single incident by ID
-      parameters:
-      - description: Incident ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get incident
-      tags:
-      - Incidents
-    put:
+  /incidents/{id}/status:
+    patch:
       consumes:
       - application/json
-      description: Update an existing incident
+      description: Updates incident lifecycle status
       parameters:
       - description: Incident ID
         in: path
         name: id
         required: true
         type: string
-      - description: Update incident payload
+      - description: Incident status payload
         in: body
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/dispatch_internal_modules_incidents_application.UpdateIncidentRequest'
+          $ref: '#/definitions/dispatch_internal_modules_incidents_application.UpdateIncidentStatusRequest'
       produces:
       - application/json
       responses:
@@ -2031,7 +2802,7 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Update incident
+      summary: Update incident status
       tags:
       - Incidents
   /notifications:

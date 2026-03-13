@@ -1,5 +1,5 @@
 -- ============================================
--- File: 000011_notifications.sql
+-- File: 000012_notifications.sql
 -- ============================================
 -- +goose Up
 CREATE TABLE notifications (

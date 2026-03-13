@@ -28,8 +28,8 @@ func NewHandler(service *fleetapp.Service) *Handler {
 //	@Param			page						query		int		false	"Page number"	default(1)
 //	@Param			page_size					query		int		false	"Page size"		default(20)
 //	@Param			search						query		string	false	"Search term (code, plate, VIN, make, model)"
-//	@Param			sort_by						query		string	false	"Sort field"	Enums(created_at,plate_number,status,dispatch_readiness)
-//	@Param			sort_order					query		string	false	"Sort order"	Enums(ASC,DESC)
+//	@Param			sort_by						query		string	false	"Sort field"					Enums(created_at,plate_number,status,dispatch_readiness)
+//	@Param			sort_order					query		string	false	"Sort order"					Enums(ASC,DESC)
 //	@Param			filter[status]				query		string	false	"Filter by status"				Enums(AVAILABLE,RESERVED,ASSIGNED,ENROUTE,AT_SCENE,TRANSPORTING,RETURNING,MAINTENANCE,BREAKDOWN,OFFLINE,RETIRED)
 //	@Param			filter[dispatch_readiness]	query		string	false	"Filter by dispatch readiness"	Enums(DISPATCHABLE,RESTRICTED,NOT_DISPATCHABLE)
 //	@Param			filter[district_id]			query		string	false	"Filter by district id"
