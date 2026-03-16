@@ -15,8 +15,9 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the binary
+# Build binaries
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/migrate ./cmd/migrate
 
 # Runtime stage
 FROM alpine:3.21
@@ -25,8 +26,10 @@ RUN apk add --no-cache ca-certificates tzdata
 
 WORKDIR /app
 
-# Copy binary from builder
+# Copy binaries and migrations from builder
 COPY --from=builder /app/server .
+COPY --from=builder /app/migrate .
+COPY --from=builder /app/migrations ./migrations
 
 # Run as non-root user
 RUN adduser -D -g '' appuser

@@ -113,8 +113,12 @@ jobs:
             # Bring up all services (--no-build: use pulled image, don't build)
             docker compose -p ems-back up -d --no-build
 
+            # Run migrations (includes default admin user)
+            docker compose -p ems-back run --rm --entrypoint ./migrate -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/ems_db?sslmode=disable app -command up -dir migrations
+
             # Clean up unused images
             docker image prune -f
 
             echo "Deployment completed successfully!"
             echo "Application is running on port 3005"
+            echo "Default admin: username=admin, password=admin123"
