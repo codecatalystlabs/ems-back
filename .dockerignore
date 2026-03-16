@@ -1,8 +1,39 @@
+# Git and CI
 .git
+.gitignore
 .github
+
+# Documentation
 *.md
-.env*
+LICENSE
+docs/
+
+# Environment and secrets
+.env
+.env.*
+
+# Docker
 Dockerfile
 .dockerignore
+docker-compose*.yml
+
+# Build and test
+*.exe
 *.test
 vendor/
+coverage.out
+coverage.html
+
+# IDE and editors
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Local artifacts
+*.xlsx
+*.pdf
+*.log

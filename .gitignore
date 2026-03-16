@@ -1,4 +1,37 @@
+# Environment and secrets
 .env
-*server.exe
+.env.*
+!.env.example
+
+# Build output
+*.exe
+*.dll
+*.so
+*.dylib
+/bin/
+/dist/
+
+# Go
+vendor/
+*.test
+coverage.out
+coverage.html
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documents (local only)
 *.xlsx
 *.pdf
+
+# Docker (local overrides)
+docker-compose.override.yml
+docker-compose.override.yaml
