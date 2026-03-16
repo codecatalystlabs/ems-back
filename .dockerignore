@@ -3,10 +3,9 @@
 .gitignore
 .github
 
-# Documentation
+# Documentation (keep docs/ - required by dispatch/docs import)
 *.md
 LICENSE
-docs/
 
 # Environment and secrets
 .env
