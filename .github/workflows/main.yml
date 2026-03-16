@@ -90,8 +90,8 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
-          source: "docker-compose.yml"
-          target: "/opt/ems-back/"
+          source: 'docker-compose.yml'
+          target: '/opt/ems-back/'
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
