@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -93,7 +94,18 @@ func (h *Handler) Create(c *gin.Context) {
 		httpx.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	out, err := h.service.Create(c.Request.Context(), req)
+	out, err := h.service.Create(
+		c.Request.Context(),
+		req.Type, // string
+		strings.ToUpper(strings.TrimSpace(req.Channel)), // string
+		req.RecipientUserID,                             // *string
+		req.RecipientPhone,                              // *string
+		req.RecipientEmail,                              // *string
+		req.Title,                                       // *string
+		req.LinkedEntityType,                            // *string
+		req.Body,                                        // string
+		req.LinkedEntityID,                              // *string
+	)
 	if err != nil {
 		httpx.Error(c, http.StatusInternalServerError, err.Error())
 		return

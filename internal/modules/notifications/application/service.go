@@ -7,6 +7,8 @@ import (
 
 	"dispatch/internal/modules/notifications/domain"
 	platformdb "dispatch/internal/platform/db"
+	"dispatch/internal/platform/events"
+	"dispatch/internal/shared/constants"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -15,10 +17,11 @@ import (
 type Service struct {
 	repo Repository
 	log  *zap.Logger
+	bus  events.Publisher
 }
 
-func NewService(repo Repository, log *zap.Logger) *Service {
-	return &Service{repo: repo, log: log}
+func NewService(repo Repository, bus events.Publisher, log *zap.Logger) *Service {
+	return &Service{repo: repo, bus: bus, log: log}
 }
 
 func (s *Service) ListMy(ctx context.Context, userID string, p platformdb.Pagination) (platformdb.PageResult[domain.Notification], error) {
@@ -33,24 +36,67 @@ func (s *Service) Get(ctx context.Context, id string) (domain.Notification, erro
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *Service) Create(ctx context.Context, req CreateNotificationRequest) (domain.Notification, error) {
+func (s *Service) Create(ctx context.Context,
+	// req CreateNotificationRequest,
+	typ, channel string,
+	recipientUserID, recipientPhone, recipientEmail, title, linkedEntityType *string,
+	body string,
+	linkedEntityID *string,
+
+) (domain.Notification, error) {
 	now := time.Now().UTC()
 	n := domain.Notification{
+		// ID:               uuid.NewString(),
+		// Type:             req.Type,
+		// RecipientUserID:  req.RecipientUserID,
+		// RecipientPhone:   req.RecipientPhone,
+		// RecipientEmail:   req.RecipientEmail,
+		// Title:            req.Title,
+		// Body:             req.Body,
+		// Channel:          strings.ToUpper(strings.TrimSpace(req.Channel)),
+		// LinkedEntityType: req.LinkedEntityType,
+		// LinkedEntityID:   req.LinkedEntityID,
+		// Status:           "PENDING",
 		ID:               uuid.NewString(),
-		Type:             req.Type,
-		RecipientUserID:  req.RecipientUserID,
-		RecipientPhone:   req.RecipientPhone,
-		RecipientEmail:   req.RecipientEmail,
-		Title:            req.Title,
-		Body:             req.Body,
-		Channel:          strings.ToUpper(strings.TrimSpace(req.Channel)),
-		LinkedEntityType: req.LinkedEntityType,
-		LinkedEntityID:   req.LinkedEntityID,
+		Type:             typ,
+		RecipientUserID:  recipientUserID,
+		RecipientPhone:   recipientPhone,
+		RecipientEmail:   recipientEmail,
+		Title:            title,
+		Body:             body,
+		Channel:          channel,
+		LinkedEntityType: linkedEntityType,
+		LinkedEntityID:   linkedEntityID,
 		Status:           "PENDING",
 		Attempts:         0,
 		CreatedAt:        now,
 	}
-	return s.repo.Create(ctx, n)
+	created, err := s.repo.Create(ctx, n)
+	if err != nil {
+		return domain.Notification{}, err
+	}
+
+	_ = s.bus.Publish(ctx, constants.TopicNotificationSendRequested, events.Event{
+		ID:          uuid.NewString(),
+		Topic:       constants.TopicNotificationSendRequested,
+		AggregateID: created.ID,
+		Type:        constants.TopicNotificationSendRequested,
+		OccurredAt:  time.Now().UTC(),
+		Payload: map[string]any{
+			"notification_id":    created.ID,
+			"type":               created.Type,
+			"channel":            created.Channel,
+			"recipient_user_id":  created.RecipientUserID,
+			"recipient_phone":    created.RecipientPhone,
+			"recipient_email":    created.RecipientEmail,
+			"title":              created.Title,
+			"body":               created.Body,
+			"linked_entity_type": created.LinkedEntityType,
+			"linked_entity_id":   created.LinkedEntityID,
+		},
+	})
+
+	return created, nil
 }
 
 func (s *Service) UpdateStatus(ctx context.Context, id string, status string) error {

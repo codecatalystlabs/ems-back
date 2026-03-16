@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"dispatch/internal/modules/notifications/application"
 	"dispatch/internal/modules/notifications/domain"
@@ -204,4 +205,43 @@ RETURNING created_at`
 func (r *Repository) UpdateStatus(ctx context.Context, id string, status string) error {
 	_, err := r.db.Exec(ctx, `UPDATE notifications SET status=$2 WHERE id=$1`, id, status)
 	return err
+}
+
+func (r *Repository) MarkSent(ctx context.Context, id string) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE notifications
+		SET status='SENT', sent_at=now()
+		WHERE id=$1
+	`, id)
+	return err
+}
+
+func (r *Repository) MarkFailed(ctx context.Context, id string) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE notifications
+		SET status='FAILED'
+		WHERE id=$1
+	`, id)
+	return err
+}
+
+func (r *Repository) IncrementAttempts(ctx context.Context, id string) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE notifications
+		SET attempts = attempts + 1
+		WHERE id=$1
+	`, id)
+	return err
+}
+
+func nullIfEmpty(v string) any {
+	if v == "" {
+		return nil
+	}
+	return v
+}
+
+func nowPtr() *time.Time {
+	t := time.Now().UTC()
+	return &t
 }
