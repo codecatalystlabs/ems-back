@@ -41,6 +41,9 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      - name: Validate Docker Compose
+        run: docker compose -f docker-compose.yml config
+
   # Build, Push Docker Image and Deploy (only on push to main)
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -71,6 +74,25 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Ensure deploy directory exists
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script: mkdir -p /opt/ems-back
+
+      - name: Copy docker-compose to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          source: "docker-compose.yml"
+          target: "/opt/ems-back/"
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -79,22 +101,14 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: 22
           script: |
-            # Stop and remove existing container
-            docker stop ems-back || true
-            docker rm ems-back || true
+            set -e
+            cd /opt/ems-back
 
-            # Pull the latest image
-            docker pull ${{ env.IMAGE_NAME }}:latest
+            # Pull latest images (app from registry; infra from Docker Hub)
+            docker compose pull
 
-            # Run the new container (Go app listens on 8080)
-            # Configure DB_HOST, REDIS_ADDR, KAFKA_BROKERS, JWT_SECRET via secrets or server .env
-            docker run -d \
-              --name ems-back \
-              --restart unless-stopped \
-              -p 3002:8080 \
-              -e APP_ENV=production \
-              -e APP_PORT=8080 \
-              ${{ env.IMAGE_NAME }}:latest
+            # Bring up all services (--no-build: use pulled image, don't build)
+            docker compose up -d --no-build
 
             # Clean up unused images
             docker image prune -f

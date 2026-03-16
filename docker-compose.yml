@@ -1,0 +1,100 @@
+services:
+  postgres:
+    image: kartoza/postgis:16-3.4
+    container_name: ems-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ems_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5431:5432"
+    volumes:
+      - ems_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ems_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # redis:
+  #   image: redis:7.2-alpine
+  #   container_name: ems-redis
+  #   restart: unless-stopped
+  #   command: ["redis-server", "--appendonly", "yes"]
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - ems_redis_data:/data
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:7.6.1
+  #   container_name: ems-zookeeper
+  #   restart: unless-stopped
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #   ports:
+  #     - "2181:2181"
+
+  # kafka:
+  #   image: confluentinc/cp-kafka:7.6.1
+  #   container_name: ems-kafka
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "cub kafka-ready -b localhost:9092 1 20"]
+  #     interval: 15s
+  #     timeout: 10s
+  #     retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: joshmyles/ems-back:latest
+    container_name: ems-back
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      APP_PORT: 8080
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-ems_db}
+      DB_SSLMODE: ${DB_SSLMODE:-disable}
+      # REDIS_ADDR: ${REDIS_ADDR:-redis:6379}
+      # KAFKA_BROKERS: ${KAFKA_BROKERS:-kafka:9092}
+      # JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
+      # kafka:
+      #   condition: service_healthy
+    ports:
+      - "3002:8080"
+
+volumes:
+  ems_pgdata:
+    driver: local
+  # ems_redis_data:
+  #   driver: local
