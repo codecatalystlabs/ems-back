@@ -72,3 +72,14 @@ func (s *Service) ListAmbulanceCategories(ctx context.Context) ([]refdomain.Ambu
 func (s *Service) ListCapabilities(ctx context.Context) ([]refdomain.Capability, error) {
 	return s.repo.ListCapabilities(ctx)
 }
+
+func (s *Service) ListTriageQuestions(ctx context.Context, params dto.ListTriageQuestionsParams) (platformdb.PageResult[refdomain.TriageQuestion], error) {
+	items, total, err := s.repo.ListTriageQuestions(ctx, params)
+	if err != nil {
+		return platformdb.PageResult[refdomain.TriageQuestion]{}, err
+	}
+	return platformdb.PageResult[refdomain.TriageQuestion]{
+		Items: items,
+		Meta:  platformdb.NewPageMeta(params.Pagination, total),
+	}, nil
+}

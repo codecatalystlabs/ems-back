@@ -4,6 +4,7 @@ import (
 	authmod "dispatch/internal/modules/auth"
 	availabilitymod "dispatch/internal/modules/availability"
 	bloodmod "dispatch/internal/modules/blood"
+	devicetokens "dispatch/internal/modules/device_tokens"
 	dispatchmod "dispatch/internal/modules/dispatch"
 	facilitiesmod "dispatch/internal/modules/facilities"
 	fleetmod "dispatch/internal/modules/fleet"
@@ -48,4 +49,5 @@ func RegisterModules(deps types.ModuleDeps) {
 	refmod.Register(securedDeps)
 	availabilitymod.Register(securedDeps)
 	dispatchmod.Register(securedDeps)
+	devicetokens.Register(securedDeps)
 }

@@ -279,3 +279,54 @@ func (h *Handler) ListCapabilities(c *gin.Context) {
 	}
 	httpx.OK(c, out)
 }
+
+// ListTriageQuestions godoc
+//
+//	@Summary		List triage questions
+//	@Description	Returns paginated triage questions, optionally filtered by questionnaire code
+//	@Tags			Reference
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			questionnaire_code		query		string	false	"Questionnaire code"
+//	@Param			page					query		int		false	"Page number"	default(1)
+//	@Param			page_size				query		int		false	"Page size"		default(20)
+//	@Param			search					query		string	false	"Search by question code, text, or response type"
+//	@Param			sort_by					query		string	false	"Sort field"	Enums(display_order,created_at,code)
+//	@Param			sort_order				query		string	false	"Sort order"	Enums(ASC,DESC)
+//	@Param			filter[is_active]		query		string	false	"Filter by active flag"
+//	@Param			filter[is_required]		query		string	false	"Filter by required flag"
+//	@Param			filter[response_type]	query		string	false	"Filter by response type"
+//	@Success		200						{object}	map[string]interface{}
+//	@Failure		500						{object}	map[string]interface{}
+//	@Router			/reference/triage-questions [get]
+func (h *Handler) ListTriageQuestions(c *gin.Context) {
+	questionnaireCode := c.Query("questionnaire_code")
+	var questionnaireCodePtr *string
+	if questionnaireCode != "" {
+		questionnaireCodePtr = &questionnaireCode
+	}
+
+	params := dto.ListTriageQuestionsParams{
+		QuestionnaireCode: questionnaireCodePtr,
+		Pagination: platformdb.ParsePagination(
+			c.Request.URL.Query(),
+			map[string]string{
+				"display_order": "tq.display_order",
+				"created_at":    "tq.created_at",
+				"code":          "tq.code",
+			},
+			map[string]struct{}{
+				"is_active":     {},
+				"is_required":   {},
+				"response_type": {},
+			},
+		),
+	}
+
+	out, err := h.service.ListTriageQuestions(c.Request.Context(), params)
+	if err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	httpx.OK(c, out)
+}

@@ -3,6 +3,11 @@ package dto
 type LoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
+
+	DeviceID   string `json:"device_id"`
+	DeviceName string `json:"device_name"`
+	Platform   string `json:"platform"`
+	PushToken  string `json:"push_token"`
 }
 
 type RefreshRequest struct {

@@ -111,3 +111,16 @@ type Capability struct {
 	IsActive       bool      `json:"is_active"`
 	CreatedAt      time.Time `json:"created_at"`
 }
+
+type TriageQuestion struct {
+	ID                string    `json:"id"`
+	QuestionnaireID   string    `json:"questionnaire_id"`
+	QuestionnaireCode string    `json:"questionnaire_code"`
+	Code              string    `json:"code"`
+	QuestionText      string    `json:"question_text"`
+	ResponseType      string    `json:"response_type"`
+	DisplayOrder      int       `json:"display_order"`
+	IsRequired        bool      `json:"is_required"`
+	IsActive          bool      `json:"is_active"`
+	CreatedAt         time.Time `json:"created_at"`
+}

@@ -11,12 +11,17 @@ import (
 )
 
 type Config struct {
-	App   AppConfig
-	DB    DBConfig
-	Redis RedisConfig
-	Kafka KafkaConfig
-	JWT   JWTConfig
-	Log   LogConfig
+	App      AppConfig
+	DB       DBConfig
+	Redis    RedisConfig
+	Kafka    KafkaConfig
+	JWT      JWTConfig
+	Log      LogConfig
+	Firebase FirebaseConfig
+}
+
+type FirebaseConfig struct {
+	CredentialsFile string
 }
 
 type AppConfig struct {
@@ -111,6 +116,9 @@ func LoadConfig() (Config, error) {
 			RefreshTTL: mustDuration("JWT_REFRESH_TTL", "168h"),
 		},
 		Log: LogConfig{Level: getenv("LOG_LEVEL", "debug")},
+		Firebase: FirebaseConfig{
+			CredentialsFile: getenv("FIREBASE_CREDENTIALS_FILE", "./secrets/firebase-service-account.json"),
+		},
 	}
 
 	if cfg.JWT.Secret == "" {

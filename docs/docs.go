@@ -1397,6 +1397,315 @@ const docTemplate = `{
                 }
             }
         },
+        "/device-tokens": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns paginated device tokens",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DeviceTokens"
+                ],
+                "summary": "List device tokens",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Platform",
+                        "name": "platform",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Active flag",
+                        "name": "is_active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by device ID or token",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "created_at",
+                            "updated_at",
+                            "platform",
+                            "last_seen_at"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Registers or reactivates a push token for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DeviceTokens"
+                ],
+                "summary": "Register device token",
+                "parameters": [
+                    {
+                        "description": "Device token payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_device_tokens_application.RegisterDeviceTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/device-tokens/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a device token by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DeviceTokens"
+                ],
+                "summary": "Get device token by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device token ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deactivates a device token by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DeviceTokens"
+                ],
+                "summary": "Deactivate device token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device token ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates a device token record by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DeviceTokens"
+                ],
+                "summary": "Update device token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Device token ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_device_tokens_application.UpdateDeviceTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/dispatch/assignments": {
             "get": {
                 "security": [
@@ -3697,6 +4006,106 @@ const docTemplate = `{
                 }
             }
         },
+        "/reference/triage-questions": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns paginated triage questions, optionally filtered by questionnaire code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "List triage questions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Questionnaire code",
+                        "name": "questionnaire_code",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by question code, text, or response type",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "display_order",
+                            "created_at",
+                            "code"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by active flag",
+                        "name": "filter[is_active]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by required flag",
+                        "name": "filter[is_required]",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by response type",
+                        "name": "filter[response_type]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/trips": {
             "get": {
                 "security": [
@@ -4991,7 +5400,19 @@ const docTemplate = `{
                 "username"
             ],
             "properties": {
+                "device_id": {
+                    "type": "string"
+                },
+                "device_name": {
+                    "type": "string"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "push_token": {
                     "type": "string"
                 },
                 "username": {
@@ -5368,6 +5789,45 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "blood_requisition_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_device_tokens_application.RegisterDeviceTokenRequest": {
+            "type": "object",
+            "required": [
+                "platform",
+                "push_token",
+                "user_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "push_token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_device_tokens_application.UpdateDeviceTokenRequest": {
+            "type": "object",
+            "properties": {
+                "device_id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "push_token": {
                     "type": "string"
                 }
             }

@@ -150,7 +150,11 @@ func NewWorker(ctx context.Context) (*Worker, error) {
 
 	notificationRepo := notificationsinfra.NewRepository(db)
 	notificationService := notificationsapp.NewService(notificationRepo, bus, log)
-	notificationSender := notificationsinfra.NewSender()
+	tokenRepo := notificationsinfra.NewDeviceTokenRepository(db)
+	notificationSender, err := notificationsinfra.NewSender(cfg.Firebase.CredentialsFile, tokenRepo)
+	if err != nil {
+		return nil, err
+	}
 
 	bloodRecipientFinder := bloodinfra.NewBroadcastRecipientFinder(db)
 

@@ -5,6 +5,9 @@ import (
 	"time"
 
 	authdomain "dispatch/internal/modules/auth/domain"
+
+	deviceapp "dispatch/internal/modules/device_tokens/application"
+	devicedomain "dispatch/internal/modules/device_tokens/domain"
 )
 
 type Repository interface {
@@ -18,4 +21,8 @@ type Repository interface {
 	UpdateLastLogin(ctx context.Context, userID string, at time.Time) error
 	IncrementFailedLogin(ctx context.Context, userID string) error
 	ResetFailedLogin(ctx context.Context, userID string) error
+}
+
+type DeviceTokenService interface {
+	Register(ctx context.Context, req deviceapp.RegisterDeviceTokenRequest) (devicedomain.DeviceToken, error)
 }

@@ -15,4 +15,6 @@ func RegisterRoutes(rg *gin.RouterGroup, h *Handler) {
 	rg.GET("/severity-levels", h.ListSeverityLevels)
 	rg.GET("/ambulance-categories", h.ListAmbulanceCategories)
 	rg.GET("/capabilities", h.ListCapabilities)
+
+	rg.GET("/triage-questions", h.ListTriageQuestions)
 }

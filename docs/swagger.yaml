@@ -38,7 +38,15 @@ definitions:
     type: object
   dispatch_internal_modules_auth_application_dto.LoginRequest:
     properties:
+      device_id:
+        type: string
+      device_name:
+        type: string
       password:
+        type: string
+      platform:
+        type: string
+      push_token:
         type: string
       username:
         type: string
@@ -296,6 +304,32 @@ definitions:
         type: string
     required:
     - blood_requisition_id
+    type: object
+  dispatch_internal_modules_device_tokens_application.RegisterDeviceTokenRequest:
+    properties:
+      device_id:
+        type: string
+      platform:
+        type: string
+      push_token:
+        type: string
+      user_id:
+        type: string
+    required:
+    - platform
+    - push_token
+    - user_id
+    type: object
+  dispatch_internal_modules_device_tokens_application.UpdateDeviceTokenRequest:
+    properties:
+      device_id:
+        type: string
+      is_active:
+        type: boolean
+      platform:
+        type: string
+      push_token:
+        type: string
     type: object
   dispatch_internal_modules_dispatch_application_dto.CreateDispatchAssignmentRequest:
     properties:
@@ -1877,6 +1911,211 @@ paths:
       summary: Accept blood offer
       tags:
       - Blood
+  /device-tokens:
+    get:
+      description: Returns paginated device tokens
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Platform
+        in: query
+        name: platform
+        type: string
+      - description: Active flag
+        in: query
+        name: is_active
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search by device ID or token
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - created_at
+        - updated_at
+        - platform
+        - last_seen_at
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List device tokens
+      tags:
+      - DeviceTokens
+    post:
+      consumes:
+      - application/json
+      description: Registers or reactivates a push token for a user
+      parameters:
+      - description: Device token payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_device_tokens_application.RegisterDeviceTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Register device token
+      tags:
+      - DeviceTokens
+  /device-tokens/{id}:
+    delete:
+      description: Deactivates a device token by ID
+      parameters:
+      - description: Device token ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Deactivate device token
+      tags:
+      - DeviceTokens
+    get:
+      description: Returns a device token by ID
+      parameters:
+      - description: Device token ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get device token by ID
+      tags:
+      - DeviceTokens
+    patch:
+      consumes:
+      - application/json
+      description: Updates a device token record by ID
+      parameters:
+      - description: Device token ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_device_tokens_application.UpdateDeviceTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update device token
+      tags:
+      - DeviceTokens
   /dispatch/assignments:
     get:
       description: Returns paginated dispatch assignments
@@ -3395,6 +3634,74 @@ paths:
       security:
       - BearerAuth: []
       summary: List subcounties
+      tags:
+      - Reference
+  /reference/triage-questions:
+    get:
+      description: Returns paginated triage questions, optionally filtered by questionnaire
+        code
+      parameters:
+      - description: Questionnaire code
+        in: query
+        name: questionnaire_code
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Search by question code, text, or response type
+        in: query
+        name: search
+        type: string
+      - description: Sort field
+        enum:
+        - display_order
+        - created_at
+        - code
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: sort_order
+        type: string
+      - description: Filter by active flag
+        in: query
+        name: filter[is_active]
+        type: string
+      - description: Filter by required flag
+        in: query
+        name: filter[is_required]
+        type: string
+      - description: Filter by response type
+        in: query
+        name: filter[response_type]
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List triage questions
       tags:
       - Reference
   /trips:

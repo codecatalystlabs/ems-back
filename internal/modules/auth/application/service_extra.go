@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,9 +13,11 @@ import (
 
 	"dispatch/internal/modules/auth/application/dto"
 	authdomain "dispatch/internal/modules/auth/domain"
+	deviceapp "dispatch/internal/modules/device_tokens/application"
 	"dispatch/internal/modules/rbac/application"
 
 	platformauth "dispatch/internal/platform/auth"
+	"dispatch/internal/platform/events"
 )
 
 var (
@@ -26,24 +29,37 @@ var (
 )
 
 type Service struct {
-	repo       Repository
-	rbacRepo   application.Repository
-	jwt        *platformauth.JWTManager
-	redis      *redis.Client
-	log        *zap.Logger
-	accessTTL  time.Duration
-	refreshTTL time.Duration
+	repo         Repository
+	rbacRepo     application.Repository
+	jwt          *platformauth.JWTManager
+	redis        *redis.Client
+	log          *zap.Logger
+	accessTTL    time.Duration
+	refreshTTL   time.Duration
+	bus          events.Publisher
+	deviceTokens DeviceTokenService
 }
 
-func NewService(repo Repository, rbacRepo application.Repository, jwt *platformauth.JWTManager, redisClient *redis.Client, log *zap.Logger, accessTTL, refreshTTL time.Duration) *Service {
+func NewService(
+	repo Repository,
+	rbacRepo application.Repository,
+	jwt *platformauth.JWTManager,
+	redisClient *redis.Client,
+	log *zap.Logger,
+	accessTTL, refreshTTL time.Duration,
+	bus events.Publisher,
+	deviceTokens DeviceTokenService,
+) *Service {
 	return &Service{
-		repo:       repo,
-		rbacRepo:   rbacRepo,
-		jwt:        jwt,
-		redis:      redisClient,
-		log:        log,
-		accessTTL:  accessTTL,
-		refreshTTL: refreshTTL,
+		repo:         repo,
+		rbacRepo:     rbacRepo,
+		jwt:          jwt,
+		redis:        redisClient,
+		log:          log,
+		accessTTL:    accessTTL,
+		refreshTTL:   refreshTTL,
+		bus:          bus,
+		deviceTokens: deviceTokens,
 	}
 }
 
@@ -99,6 +115,21 @@ func (s *Service) Login(ctx context.Context, req dto.LoginRequest, deviceID, dev
 	if s.redis != nil {
 		if err := s.cacheSession(ctx, session); err != nil {
 			s.log.Warn("cache session", zap.Error(err))
+		}
+	}
+
+	if s.deviceTokens != nil && strings.TrimSpace(req.PushToken) != "" {
+		_, err := s.deviceTokens.Register(ctx, deviceapp.RegisterDeviceTokenRequest{
+			UserID:    user.ID,
+			DeviceID:  strings.TrimSpace(req.DeviceID),
+			Platform:  strings.ToUpper(strings.TrimSpace(req.Platform)),
+			PushToken: strings.TrimSpace(req.PushToken),
+		})
+		if err != nil && s.log != nil {
+			s.log.Warn("failed to register device token on login",
+				zap.String("user_id", user.ID),
+				zap.Error(err),
+			)
 		}
 	}
 

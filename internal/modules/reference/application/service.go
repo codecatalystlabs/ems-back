@@ -19,4 +19,6 @@ type Repository interface {
 	ListSeverityLevels(ctx context.Context) ([]refdomain.SeverityLevel, error)
 	ListAmbulanceCategories(ctx context.Context) ([]refdomain.AmbulanceCategory, error)
 	ListCapabilities(ctx context.Context) ([]refdomain.Capability, error)
+
+	ListTriageQuestions(ctx context.Context, params dto.ListTriageQuestionsParams) ([]refdomain.TriageQuestion, int64, error)
 }

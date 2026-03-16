@@ -17,3 +17,8 @@ type ListFacilitiesParams struct {
 	LevelID     *string               `json:"level_id,omitempty"`
 	Pagination  platformdb.Pagination `json:"pagination"`
 }
+
+type ListTriageQuestionsParams struct {
+	QuestionnaireCode *string               `json:"questionnaire_code,omitempty"`
+	Pagination        platformdb.Pagination `json:"pagination"`
+}

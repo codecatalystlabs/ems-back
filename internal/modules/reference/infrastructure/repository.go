@@ -399,3 +399,109 @@ func (r *Repository) ListCapabilities(ctx context.Context) ([]refdomain.Capabili
 	}
 	return items, rows.Err()
 }
+
+func (r *Repository) ListTriageQuestions(ctx context.Context, params dto.ListTriageQuestionsParams) ([]refdomain.TriageQuestion, int64, error) {
+	p := params.Pagination
+	allowedSorts := map[string]string{
+		"display_order": "tq.display_order",
+		"created_at":    "tq.created_at",
+		"code":          "tq.code",
+	}
+
+	where := []string{"1=1"}
+	args := make([]any, 0)
+	argPos := 1
+
+	if params.QuestionnaireCode != nil && *params.QuestionnaireCode != "" {
+		where = append(where, fmt.Sprintf(`tqq.code = $%d`, argPos))
+		args = append(args, strings.ToUpper(*params.QuestionnaireCode))
+		argPos++
+	}
+
+	if p.Search != "" {
+		where = append(where, fmt.Sprintf(`(
+			tq.code ILIKE $%d OR
+			tq.question_text ILIKE $%d OR
+			tq.response_type ILIKE $%d
+		)`, argPos, argPos, argPos))
+		args = append(args, "%"+p.Search+"%")
+		argPos++
+	}
+
+	if v, ok := p.Filters["is_active"]; ok {
+		where = append(where, fmt.Sprintf(`tq.is_active::text = $%d`, argPos))
+		args = append(args, strings.ToLower(v))
+		argPos++
+	}
+
+	if v, ok := p.Filters["is_required"]; ok {
+		where = append(where, fmt.Sprintf(`tq.is_required::text = $%d`, argPos))
+		args = append(args, strings.ToLower(v))
+		argPos++
+	}
+
+	if v, ok := p.Filters["response_type"]; ok {
+		where = append(where, fmt.Sprintf(`tq.response_type = $%d`, argPos))
+		args = append(args, strings.ToUpper(v))
+		argPos++
+	}
+
+	whereSQL := "WHERE " + strings.Join(where, " AND ")
+
+	var total int64
+	if err := r.db.QueryRow(ctx, `
+		SELECT COUNT(1)
+		FROM triage_questions tq
+		JOIN triage_questionnaires tqq ON tqq.id = tq.questionnaire_id
+		`+whereSQL, args...).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
+	orderBy := platformdb.BuildOrderBy(p, allowedSorts)
+	query := fmt.Sprintf(`
+		SELECT
+			tq.id,
+			tq.questionnaire_id,
+			tqq.code,
+			tq.code,
+			tq.question_text,
+			tq.response_type,
+			tq.display_order,
+			tq.is_required,
+			tq.is_active,
+			tq.created_at
+		FROM triage_questions tq
+		JOIN triage_questionnaires tqq ON tqq.id = tq.questionnaire_id
+		%s
+		%s
+		LIMIT $%d OFFSET $%d
+	`, whereSQL, orderBy, argPos, argPos+1)
+
+	rows, err := r.db.Query(ctx, query, append(args, p.PageSize, p.Offset)...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	items := make([]refdomain.TriageQuestion, 0)
+	for rows.Next() {
+		var item refdomain.TriageQuestion
+		if err := rows.Scan(
+			&item.ID,
+			&item.QuestionnaireID,
+			&item.QuestionnaireCode,
+			&item.Code,
+			&item.QuestionText,
+			&item.ResponseType,
+			&item.DisplayOrder,
+			&item.IsRequired,
+			&item.IsActive,
+			&item.CreatedAt,
+		); err != nil {
+			return nil, 0, err
+		}
+		items = append(items, item)
+	}
+
+	return items, total, rows.Err()
+}
