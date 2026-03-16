@@ -97,7 +97,7 @@ func LoadConfig() (Config, error) {
 			DefaultTTL: mustDuration("REDIS_DEFAULT_TTL", "5m"),
 		},
 		Kafka: KafkaConfig{
-			Brokers:               strings.Split(getenv("KAFKA_BROKERS", "localhost:9092"), ","),
+			Brokers:               splitNonEmpty(getenv("KAFKA_BROKERS", "localhost:9092"), ","),
 			ClientID:              getenv("KAFKA_CLIENT_ID", "dispatch-backend"),
 			GroupID:               getenv("KAFKA_GROUP_ID", "dispatch-backend-group"),
 			TopicUserCreated:      getenv("KAFKA_TOPIC_USER_CREATED", "user.created"),
@@ -130,6 +130,22 @@ func getenv(key, fallback string) string {
 		return fallback
 	}
 	return v
+}
+
+// splitNonEmpty splits s by sep, filtering empty and "disabled" values.
+// Use KAFKA_BROKERS=disabled to disable Kafka.
+func splitNonEmpty(s, sep string) []string {
+	if s == "" || strings.TrimSpace(s) == "disabled" {
+		return nil
+	}
+	parts := strings.Split(s, sep)
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if p = strings.TrimSpace(p); p != "" && p != "disabled" {
+			result = append(result, p)
+		}
+	}
+	return result
 }
 
 func mustDuration(key, fallback string) time.Duration {

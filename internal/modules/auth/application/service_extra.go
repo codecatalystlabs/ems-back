@@ -96,8 +96,10 @@ func (s *Service) Login(ctx context.Context, req dto.LoginRequest, deviceID, dev
 	if err := s.repo.CreateSession(ctx, session); err != nil {
 		return dto.AuthResponse{}, err
 	}
-	if err := s.cacheSession(ctx, session); err != nil {
-		s.log.Warn("cache session", zap.Error(err))
+	if s.redis != nil {
+		if err := s.cacheSession(ctx, session); err != nil {
+			s.log.Warn("cache session", zap.Error(err))
+		}
 	}
 
 	perms, err := s.rbacRepo.ListPermissionGrants(ctx, user.ID)
@@ -224,8 +226,10 @@ func (s *Service) Logout(ctx context.Context, refreshToken string) error {
 	if err := s.repo.RevokeSession(ctx, session.ID, "logout"); err != nil {
 		return err
 	}
-	_ = s.revokeRefreshToken(ctx, session.RefreshTokenID, time.Until(session.ExpiresAt))
-	_ = s.redis.Del(ctx, s.sessionCacheKey(session.RefreshTokenID)).Err()
+	if s.redis != nil {
+		_ = s.revokeRefreshToken(ctx, session.RefreshTokenID, time.Until(session.ExpiresAt))
+		_ = s.redis.Del(ctx, s.sessionCacheKey(session.RefreshTokenID)).Err()
+	}
 	return nil
 }
 
@@ -237,9 +241,11 @@ func (s *Service) LogoutAll(ctx context.Context, userID string) error {
 	if err := s.repo.RevokeAllUserSessions(ctx, userID, "logout_all"); err != nil {
 		return err
 	}
-	for _, session := range sessions {
-		_ = s.revokeRefreshToken(ctx, session.RefreshTokenID, time.Until(session.ExpiresAt))
-		_ = s.redis.Del(ctx, s.sessionCacheKey(session.RefreshTokenID)).Err()
+	if s.redis != nil {
+		for _, session := range sessions {
+			_ = s.revokeRefreshToken(ctx, session.RefreshTokenID, time.Until(session.ExpiresAt))
+			_ = s.redis.Del(ctx, s.sessionCacheKey(session.RefreshTokenID)).Err()
+		}
 	}
 	return nil
 }
@@ -249,6 +255,9 @@ func (s *Service) Sessions(ctx context.Context, userID string) ([]authdomain.Use
 }
 
 func (s *Service) cacheSession(ctx context.Context, session authdomain.UserSession) error {
+	if s.redis == nil {
+		return nil
+	}
 	key := s.sessionCacheKey(session.RefreshTokenID)
 	value := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", session.ID, session.UserID, session.AccessTokenID, session.DeviceID, session.DeviceName, session.IPAddress, session.ExpiresAt.Format(time.RFC3339))
 	return s.redis.Set(ctx, key, value, time.Until(session.ExpiresAt)).Err()
@@ -259,6 +268,9 @@ func (s *Service) sessionCacheKey(refreshJTI string) string {
 }
 
 func (s *Service) revokeRefreshToken(ctx context.Context, refreshJTI string, ttl time.Duration) error {
+	if s.redis == nil {
+		return nil
+	}
 	if ttl < time.Minute {
 		ttl = time.Minute
 	}
@@ -266,6 +278,9 @@ func (s *Service) revokeRefreshToken(ctx context.Context, refreshJTI string, ttl
 }
 
 func (s *Service) isRefreshTokenRevoked(ctx context.Context, refreshJTI string) bool {
+	if s.redis == nil {
+		return false
+	}
 	ok, err := s.redis.Exists(ctx, "auth:revoked:refresh:"+refreshJTI).Result()
 	if err != nil {
 		s.log.Warn("check revoked refresh token", zap.Error(err))

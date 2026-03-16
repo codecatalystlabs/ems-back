@@ -12,6 +12,7 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
 	"dispatch/internal/platform/config"
@@ -55,17 +56,27 @@ func NewApp(ctx context.Context) (*App, error) {
 		return nil, err
 	}
 
-	redisClient, err := NewRedis(ctx, cfg.Redis)
-	if err != nil {
-		return nil, err
+	var redisClient *redis.Client
+	if cfg.Redis.Addr != "" && cfg.Redis.Addr != "disabled" {
+		redisClient, err = NewRedis(ctx, cfg.Redis)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		log.Info("Redis disabled, running without cache")
 	}
 
-	producer, err := NewKafkaSyncProducer(cfg.Kafka)
-	if err != nil {
-		return nil, err
+	var bus events.KafkaBus
+	if len(cfg.Kafka.Brokers) > 0 && cfg.Kafka.Brokers[0] != "" && cfg.Kafka.Brokers[0] != "disabled" {
+		producer, err := NewKafkaSyncProducer(cfg.Kafka)
+		if err != nil {
+			return nil, err
+		}
+		bus = events.NewKafkaBus(producer, log)
+	} else {
+		log.Info("Kafka disabled, using noop event bus")
+		bus = &events.NoopBus{}
 	}
-
-	bus := events.NewKafkaBus(producer, log)
 
 	r := NewRouter()
 	api := r.Group("/api/v1")
