@@ -37,7 +37,6 @@ func (s *Service) Get(ctx context.Context, id string) (domain.Notification, erro
 }
 
 func (s *Service) Create(ctx context.Context,
-	// req CreateNotificationRequest,
 	typ, channel string,
 	recipientUserID, recipientPhone, recipientEmail, title, linkedEntityType *string,
 	body string,
@@ -46,17 +45,6 @@ func (s *Service) Create(ctx context.Context,
 ) (domain.Notification, error) {
 	now := time.Now().UTC()
 	n := domain.Notification{
-		// ID:               uuid.NewString(),
-		// Type:             req.Type,
-		// RecipientUserID:  req.RecipientUserID,
-		// RecipientPhone:   req.RecipientPhone,
-		// RecipientEmail:   req.RecipientEmail,
-		// Title:            req.Title,
-		// Body:             req.Body,
-		// Channel:          strings.ToUpper(strings.TrimSpace(req.Channel)),
-		// LinkedEntityType: req.LinkedEntityType,
-		// LinkedEntityID:   req.LinkedEntityID,
-		// Status:           "PENDING",
 		ID:               uuid.NewString(),
 		Type:             typ,
 		RecipientUserID:  recipientUserID,

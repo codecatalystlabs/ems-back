@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -36,6 +37,7 @@ func NewHandler(service *notifapp.Service) *Handler {
 //	@Router		/notifications [get]
 func (h *Handler) ListMy(c *gin.Context) {
 	userID := c.GetString("user_id")
+	fmt.Print(userID)
 	p := platformdb.ParsePagination(
 		c.Request.URL.Query(),
 		map[string]string{
