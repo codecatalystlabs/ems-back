@@ -104,11 +104,14 @@ jobs:
             set -e
             cd /opt/ems-back
 
+            # Stop and remove existing containers for this project only (keeps volumes)
+            docker compose -p ems-back down
+
             # Pull latest images (app from registry; infra from Docker Hub)
-            docker compose pull
+            docker compose -p ems-back pull
 
             # Bring up all services (--no-build: use pulled image, don't build)
-            docker compose up -d --no-build
+            docker compose -p ems-back up -d --no-build
 
             # Clean up unused images
             docker image prune -f
