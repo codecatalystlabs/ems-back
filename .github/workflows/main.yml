@@ -114,4 +114,4 @@ jobs:
             docker image prune -f
 
             echo "Deployment completed successfully!"
-            echo "Application is running on port 3002"
+            echo "Application is running on port 3005"

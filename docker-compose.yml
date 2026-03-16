@@ -91,7 +91,7 @@ services:
       # kafka:
       #   condition: service_healthy
     ports:
-      - "3002:8080"
+      - "3005:8080"
 
 volumes:
   ems_pgdata:
