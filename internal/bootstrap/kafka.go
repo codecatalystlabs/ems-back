@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"dispatch/internal/platform/config"
+	"fmt"
 
 	"github.com/IBM/sarama"
 )
@@ -20,5 +21,7 @@ func NewKafkaConsumerGroup(cfg config.KafkaConfig) (sarama.ConsumerGroup, error)
 	scfg.ClientID = cfg.ClientID
 	scfg.Version = sarama.V3_6_0_0
 	scfg.Consumer.Group.Rebalance.GroupStrategies = []sarama.BalanceStrategy{sarama.NewBalanceStrategyRoundRobin()}
+
+	fmt.Println("Kafka brokers:", cfg.Brokers)
 	return sarama.NewConsumerGroup(cfg.Brokers, cfg.GroupID, scfg)
 }

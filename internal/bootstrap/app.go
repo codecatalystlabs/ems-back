@@ -5,6 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
+	bloodinfra "dispatch/internal/modules/blood/infrastructure"
+	bloodworkers "dispatch/internal/modules/blood/workers"
+	notificationsapp "dispatch/internal/modules/notifications/application"
+	notificationsinfra "dispatch/internal/modules/notifications/infrastructure"
+
+	"github.com/IBM/sarama"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
@@ -21,9 +27,16 @@ type App struct {
 }
 
 type Worker struct {
-	cfg   config.Config
-	log   *zap.Logger
-	kafka events.KafkaBus
+	Config config.Config
+	Logger *zap.Logger
+	Bus    events.KafkaBus
+	Group  sarama.ConsumerGroup
+
+	NotificationRepo    notificationsapp.Repository
+	NotificationService *notificationsapp.Service
+	NotificationSender  *notificationsinfra.Sender
+
+	BloodRecipientFinder bloodworkers.BroadcastTargetFinder
 }
 
 func NewApp(ctx context.Context) (*App, error) {
@@ -101,22 +114,55 @@ func NewWorker(ctx context.Context) (*Worker, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	log, err := NewLogger(cfg.Log)
 	if err != nil {
 		return nil, err
 	}
+
+	db, err := NewPostgres(ctx, cfg.DB)
+	if err != nil {
+		return nil, err
+	}
+
 	producer, err := NewKafkaSyncProducer(cfg.Kafka)
 	if err != nil {
 		return nil, err
 	}
+
+	group, err := NewKafkaConsumerGroup(cfg.Kafka)
+	if err != nil {
+		return nil, err
+	}
+
 	bus := events.NewKafkaBus(producer, log)
-	return &Worker{cfg: cfg, log: log, kafka: bus}, nil
+
+	notificationRepo := notificationsinfra.NewRepository(db)
+	notificationService := notificationsapp.NewService(notificationRepo, bus, log)
+	notificationSender := notificationsinfra.NewSender()
+
+	bloodRecipientFinder := bloodinfra.NewBroadcastRecipientFinder(db)
+
+	return &Worker{
+		Config:               cfg,
+		Logger:               log,
+		Bus:                  bus,
+		Group:                group,
+		NotificationRepo:     notificationRepo,
+		NotificationService:  notificationService,
+		NotificationSender:   notificationSender,
+		BloodRecipientFinder: bloodRecipientFinder,
+	}, nil
 }
 
 func (w *Worker) Run(ctx context.Context) error {
-	w.log.Info("worker started")
+	w.Logger.Info("worker started")
 	<-ctx.Done()
-	return w.kafka.Close()
+
+	if w.Group != nil {
+		_ = w.Group.Close()
+	}
+	return w.Bus.Close()
 }
 
 var _ = gin.H{}

@@ -12,4 +12,8 @@ type Repository interface {
 	GetByID(ctx context.Context, id string) (domain.Notification, error)
 	Create(ctx context.Context, in domain.Notification) (domain.Notification, error)
 	UpdateStatus(ctx context.Context, id string, status string) error
+
+	MarkSent(ctx context.Context, id string) error
+	MarkFailed(ctx context.Context, id string) error
+	IncrementAttempts(ctx context.Context, id string) error
 }
