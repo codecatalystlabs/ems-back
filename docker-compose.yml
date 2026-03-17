@@ -7,17 +7,15 @@ services:
       POSTGRES_DB: ems_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5431:5432"
     volumes:
       - ems_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "psql -U postgres -d ems_db -c 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ems_db"]
       interval: 10s
       timeout: 5s
-      retries: 15
-      start_period: 30s
+      retries: 10
 
   app:
     image: joshmyles/ems-back:latest
@@ -33,7 +31,6 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: ems_db
-      DB_SSLMODE: disable
       REDIS_ADDR: disabled
       KAFKA_BROKERS: disabled
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
