@@ -25,7 +25,6 @@ func NewHandler(service *refapp.Service) *Handler {
 //	@Description	Returns paginated districts
 //	@Tags			Reference
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Param			page				query		int		false	"Page number"	default(1)
 //	@Param			page_size			query		int		false	"Page size"		default(20)
 //	@Param			search				query		string	false	"Search by district name, code, or region"
@@ -64,7 +63,6 @@ func (h *Handler) ListDistricts(c *gin.Context) {
 //	@Description	Returns paginated subcounties, optionally filtered by district
 //	@Tags			Reference
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Param			district_id			query		string	false	"District ID"
 //	@Param			page				query		int		false	"Page number"	default(1)
 //	@Param			page_size			query		int		false	"Page size"		default(20)
@@ -110,7 +108,6 @@ func (h *Handler) ListSubcounties(c *gin.Context) {
 //	@Description	Returns paginated facilities, optionally filtered by district, subcounty, or facility level
 //	@Tags			Reference
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Param			district_id					query		string	false	"District ID"
 //	@Param			subcounty_id				query		string	false	"Subcounty ID"
 //	@Param			level_id					query		string	false	"Facility level ID"
@@ -172,7 +169,6 @@ func (h *Handler) ListFacilities(c *gin.Context) {
 //	@Description	Returns active facility levels
 //	@Tags			Reference
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/reference/facility-levels [get]
@@ -191,7 +187,6 @@ func (h *Handler) ListFacilityLevels(c *gin.Context) {
 //	@Description	Returns active incident types
 //	@Tags			Reference
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/reference/incident-types [get]
@@ -210,7 +205,6 @@ func (h *Handler) ListIncidentTypes(c *gin.Context) {
 //	@Description	Returns active priority levels
 //	@Tags			Reference
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/reference/priority-levels [get]
@@ -229,7 +223,6 @@ func (h *Handler) ListPriorityLevels(c *gin.Context) {
 //	@Description	Returns active severity levels
 //	@Tags			Reference
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Success		200	{object}	map[string]interface{}
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/reference/severity-levels [get]
@@ -328,5 +321,44 @@ func (h *Handler) ListTriageQuestions(c *gin.Context) {
 		httpx.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	httpx.OK(c, out)
+}
+
+// ListRoles godoc
+// @Summary List roles
+// @Description Returns paginated roles (RBAC reference data)
+// @Tags Reference
+// @Produce json
+// @Security BearerAuth
+// @Param page query int false "Page number" default(1)
+// @Param page_size query int false "Page size" default(20)
+// @Param search query string false "Search by name/code"
+// @Param sort_by query string false "Sort field" Enums(name,code,created_at)
+// @Param sort_order query string false "Sort order" Enums(ASC,DESC)
+// @Param filter[is_system] query string false "Filter system roles"
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /reference/roles [get]
+func (h *Handler) ListRoles(c *gin.Context) {
+	params := dto.ListRolesParams{
+		Pagination: platformdb.ParsePagination(
+			c.Request.URL.Query(),
+			map[string]string{
+				"name":       "r.name",
+				"code":       "r.code",
+				"created_at": "r.created_at",
+			},
+			map[string]struct{}{
+				"is_system": {},
+			},
+		),
+	}
+
+	out, err := h.service.ListRoles(c.Request.Context(), params)
+	if err != nil {
+		httpx.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	httpx.OK(c, out)
 }

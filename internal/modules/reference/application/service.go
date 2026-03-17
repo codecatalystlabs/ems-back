@@ -21,4 +21,5 @@ type Repository interface {
 	ListCapabilities(ctx context.Context) ([]refdomain.Capability, error)
 
 	ListTriageQuestions(ctx context.Context, params dto.ListTriageQuestionsParams) ([]refdomain.TriageQuestion, int64, error)
+	ListRoles(ctx context.Context, params dto.ListRolesParams) ([]refdomain.Role, int64, error)
 }

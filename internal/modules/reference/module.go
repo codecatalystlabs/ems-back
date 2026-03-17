@@ -1,6 +1,7 @@
 package reference
 
 import (
+	middleware "dispatch/internal/modules/auth/middleware"
 	refapp "dispatch/internal/modules/reference/application"
 	"dispatch/internal/modules/reference/infrastructure"
 	"dispatch/internal/modules/reference/infrastructure/http"
@@ -13,5 +14,5 @@ func Register(deps types.ModuleDeps) {
 	handler := http.NewHandler(service)
 
 	group := deps.Router.Group("/reference")
-	http.RegisterRoutes(group, handler)
+	http.RegisterRoutes(group, handler, middleware.AuthMiddleware(deps.Config.JWT.Secret))
 }

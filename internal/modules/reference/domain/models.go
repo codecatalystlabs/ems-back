@@ -124,3 +124,13 @@ type TriageQuestion struct {
 	IsActive          bool      `json:"is_active"`
 	CreatedAt         time.Time `json:"created_at"`
 }
+
+type Role struct {
+	ID          string    `json:"id"`
+	Code        string    `json:"code"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description,omitempty"`
+	IsSystem    bool      `json:"is_system"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}

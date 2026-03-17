@@ -83,3 +83,14 @@ func (s *Service) ListTriageQuestions(ctx context.Context, params dto.ListTriage
 		Meta:  platformdb.NewPageMeta(params.Pagination, total),
 	}, nil
 }
+
+func (s *Service) ListRoles(ctx context.Context, params dto.ListRolesParams) (platformdb.PageResult[refdomain.Role], error) {
+	items, total, err := s.repo.ListRoles(ctx, params)
+	if err != nil {
+		return platformdb.PageResult[refdomain.Role]{}, err
+	}
+	return platformdb.PageResult[refdomain.Role]{
+		Items: items,
+		Meta:  platformdb.NewPageMeta(params.Pagination, total),
+	}, nil
+}

@@ -1397,6 +1397,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard/ems-overview": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the EMS dashboard metrics, charts, and ambulance status table based on date and location filters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "EMS dashboard overview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date YYYY-MM-DD",
+                        "name": "date_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date YYYY-MM-DD",
+                        "name": "date_to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "District ID",
+                        "name": "district_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Facility ID",
+                        "name": "facility_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/device-tokens": {
             "get": {
                 "security": [
@@ -3601,11 +3660,6 @@ const docTemplate = `{
         },
         "/reference/districts": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Returns paginated districts",
                 "produces": [
                     "application/json"
@@ -3683,11 +3737,6 @@ const docTemplate = `{
         },
         "/reference/facilities": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Returns paginated facilities, optionally filtered by district, subcounty, or facility level",
                 "produces": [
                     "application/json"
@@ -3789,11 +3838,6 @@ const docTemplate = `{
         },
         "/reference/facility-levels": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Returns active facility levels",
                 "produces": [
                     "application/json"
@@ -3822,11 +3866,6 @@ const docTemplate = `{
         },
         "/reference/incident-types": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Returns active incident types",
                 "produces": [
                     "application/json"
@@ -3855,11 +3894,6 @@ const docTemplate = `{
         },
         "/reference/priority-levels": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Returns active priority levels",
                 "produces": [
                     "application/json"
@@ -3886,13 +3920,90 @@ const docTemplate = `{
                 }
             }
         },
-        "/reference/severity-levels": {
+        "/reference/roles": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
+                "description": "Returns paginated roles (RBAC reference data)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reference"
+                ],
+                "summary": "List roles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name/code",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "name",
+                            "code",
+                            "created_at"
+                        ],
+                        "type": "string",
+                        "description": "Sort field",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "ASC",
+                            "DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort order",
+                        "name": "sort_order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter system roles",
+                        "name": "filter[is_system]",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/reference/severity-levels": {
+            "get": {
                 "description": "Returns active severity levels",
                 "produces": [
                     "application/json"
@@ -3921,11 +4032,6 @@ const docTemplate = `{
         },
         "/reference/subcounties": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Returns paginated subcounties, optionally filtered by district",
                 "produces": [
                     "application/json"

@@ -24,6 +24,8 @@ import (
 
 func RegisterModules(deps types.ModuleDeps) {
 	authmod.Register(deps)
+
+	refmod.Register(deps)
 	rbacSvc := rbacmod.BuildService(deps)
 
 	secured := deps.Router.Group("")
@@ -47,7 +49,6 @@ func RegisterModules(deps types.ModuleDeps) {
 	tripsmod.Register(securedDeps, rbacSvc)
 	notifmod.Register(securedDeps, rbacSvc)
 	fuelmod.Register(securedDeps, rbacSvc)
-	refmod.Register(securedDeps)
 	availabilitymod.Register(securedDeps)
 	dispatchmod.Register(securedDeps)
 	devicetokens.Register(securedDeps)
