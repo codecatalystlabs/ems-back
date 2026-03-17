@@ -12,7 +12,7 @@ services:
     volumes:
       - ems_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ems_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ems_db && psql -U postgres -d ems_db -c 'SELECT 1'"]
       interval: 10s
       timeout: 5s
       retries: 10
