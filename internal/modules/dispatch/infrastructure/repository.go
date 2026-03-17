@@ -150,24 +150,75 @@ func (r *Repository) ReplaceRecommendations(ctx context.Context, incidentID stri
 
 func (r *Repository) ListRecommendations(ctx context.Context, params dto.ListRecommendationsParams) ([]dispatchdomain.DispatchRecommendation, int64, error) {
 	p := params.Pagination
+
 	var total int64
-	if err := r.db.QueryRow(ctx, `SELECT COUNT(1) FROM dispatch_recommendations WHERE incident_id=$1`, params.IncidentID).Scan(&total); err != nil {
+	if err := r.db.QueryRow(
+		ctx,
+		`SELECT COUNT(1) FROM dispatch_recommendations WHERE incident_id = $1`,
+		params.IncidentID,
+	).Scan(&total); err != nil {
 		return nil, 0, err
 	}
-	q := fmt.Sprintf(`SELECT id, incident_id, ambulance_id, driver_user_id, score, eta_minutes, COALESCE(rule_summary,''), generated_at, selected FROM dispatch_recommendations WHERE incident_id=$1 %s LIMIT $2 OFFSET $3`, platformdb.BuildOrderBy(p, map[string]string{"generated_at": "generated_at", "score": "score"}))
+
+	sortBy := "generated_at"
+	sortOrder := "DESC"
+
+	if p.SortBy != "" {
+		switch p.SortBy {
+		case "generated_at", "score":
+			sortBy = p.SortBy
+		}
+	}
+
+	if p.SortOrder != "" {
+		switch strings.ToUpper(p.SortOrder) {
+		case "ASC", "DESC":
+			sortOrder = strings.ToUpper(p.SortOrder)
+		}
+	}
+
+	q := fmt.Sprintf(`
+		SELECT
+			id,
+			incident_id,
+			ambulance_id,
+			driver_user_id,
+			score,
+			eta_minutes,
+			COALESCE(rule_summary, ''),
+			generated_at,
+			selected
+		FROM dispatch_recommendations
+		WHERE incident_id = $1
+		ORDER BY %s %s
+		LIMIT $2 OFFSET $3
+	`, sortBy, sortOrder)
+
 	rows, err := r.db.Query(ctx, q, params.IncidentID, p.PageSize, p.Offset)
 	if err != nil {
 		return nil, 0, err
 	}
 	defer rows.Close()
+
 	items := []dispatchdomain.DispatchRecommendation{}
 	for rows.Next() {
 		var out dispatchdomain.DispatchRecommendation
-		if err := rows.Scan(&out.ID, &out.IncidentID, &out.AmbulanceID, &out.DriverUserID, &out.Score, &out.ETAMinutes, &out.RuleSummary, &out.GeneratedAt, &out.Selected); err != nil {
+		if err := rows.Scan(
+			&out.ID,
+			&out.IncidentID,
+			&out.AmbulanceID,
+			&out.DriverUserID,
+			&out.Score,
+			&out.ETAMinutes,
+			&out.RuleSummary,
+			&out.GeneratedAt,
+			&out.Selected,
+		); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, out)
 	}
+
 	return items, total, rows.Err()
 }
 

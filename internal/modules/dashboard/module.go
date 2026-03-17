@@ -1,0 +1,15 @@
+package dashboard
+
+import (
+	dashboardapp "dispatch/internal/modules/dashboard/application"
+	"dispatch/internal/modules/dashboard/infrastructure"
+	"dispatch/internal/shared/types"
+)
+
+func Register(deps types.ModuleDeps) {
+	repo := infrastructure.NewRepository(deps.DB)
+	service := dashboardapp.NewService(repo)
+	h := infrastructure.NewHandler(service)
+	group := deps.Router.Group("/dashboard")
+	infrastructure.RegisterRoutes(group, h)
+}
