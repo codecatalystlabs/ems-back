@@ -113,7 +113,7 @@ jobs:
             # Bring up all services (--no-build: use pulled image, don't build)
             docker compose -p ems-back up -d --no-build
 
-            # Run migrations (includes default admin user)
+            # Run migrations (includes default admin user from 000029)
             docker compose -p ems-back run --rm --entrypoint ./migrate -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/ems_db?sslmode=disable app -command up -dir migrations
 
             # Clean up unused images
