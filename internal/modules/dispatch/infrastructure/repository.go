@@ -234,80 +234,315 @@ func (r *Repository) CreateAssignment(ctx context.Context, in dispatchdomain.Dis
 	return in, err
 }
 
-func (r *Repository) GetAssignmentByID(ctx context.Context, id string) (dispatchdomain.DispatchAssignment, error) {
-	var out dispatchdomain.DispatchAssignment
+func (r *Repository) GetAssignmentByID(ctx context.Context, id string) (dispatchdomain.DispatchAssignmentResponse, error) {
+	var out dispatchdomain.DispatchAssignmentResponse
+
 	err := r.db.QueryRow(ctx, `
-		SELECT id, incident_id, ambulance_id, assigned_by_user_id, driver_user_id, lead_medic_user_id, team_snapshot_json,
-		assignment_mode, ranking_score, eta_minutes, status, assigned_at, accepted_at, departed_at, arrived_scene_at,
-		patient_loaded_at, arrived_destination_at, completed_at, cancelled_at, COALESCE(cancellation_reason,''), created_at, updated_at
-		FROM dispatch_assignments WHERE id=$1`, id,
-	).Scan(&out.ID, &out.IncidentID, &out.AmbulanceID, &out.AssignedByUserID, &out.DriverUserID, &out.LeadMedicUserID, &out.TeamSnapshotJSON,
-		&out.AssignmentMode, &out.RankingScore, &out.ETAMinutes, &out.Status, &out.AssignedAt, &out.AcceptedAt, &out.DepartedAt, &out.ArrivedSceneAt,
-		&out.PatientLoadedAt, &out.ArrivedDestinationAt, &out.CompletedAt, &out.CancelledAt, &out.CancellationReason, &out.CreatedAt, &out.UpdatedAt)
+		SELECT 
+			da.id,
+			da.incident_id,
+			COALESCE(i.incident_number, '') AS incident_number,
+
+			da.ambulance_id,
+			COALESCE(a.code, '') AS ambulance_code,
+			COALESCE(a.plate_number, '') AS plate_number,
+			COALESCE(rac.name, '') AS ambulance_category,
+
+			da.assigned_by_user_id,
+			COALESCE(
+				TRIM(CONCAT_WS(' ', abu.first_name, abu.last_name, abu.other_name)),
+				''
+			) AS assigned_by_name,
+
+			da.driver_user_id,
+			COALESCE(
+				TRIM(CONCAT_WS(' ', du.first_name, du.last_name, du.other_name)),
+				''
+			) AS driver_name,
+
+			da.lead_medic_user_id,
+			COALESCE(
+				TRIM(CONCAT_WS(' ', lmu.first_name, lmu.last_name, lmu.other_name)),
+				''
+			) AS lead_medic_name,
+
+			da.assignment_mode,
+			da.ranking_score,
+			da.eta_minutes,
+			da.status,
+
+			da.assigned_at,
+			da.accepted_at,
+			da.departed_at,
+			da.arrived_scene_at,
+			da.patient_loaded_at,
+			da.arrived_destination_at,
+			da.completed_at,
+			da.cancelled_at,
+
+			COALESCE(da.cancellation_reason, '') AS cancellation_reason,
+			da.created_at,
+			da.updated_at
+		FROM dispatch_assignments da
+		LEFT JOIN incidents i
+			ON i.id = da.incident_id
+		LEFT JOIN ambulances a
+			ON a.id = da.ambulance_id
+		LEFT JOIN ref_ambulance_categories rac
+			ON rac.id = a.category_id
+		LEFT JOIN users abu
+			ON abu.id = da.assigned_by_user_id
+		LEFT JOIN users du
+			ON du.id = da.driver_user_id
+		LEFT JOIN users lmu
+			ON lmu.id = da.lead_medic_user_id
+		WHERE da.id = $1
+	`, id).Scan(
+		&out.ID,
+		&out.IncidentID,
+		&out.IncidentNumber,
+
+		&out.AmbulanceID,
+		&out.AmbulanceCode,
+		&out.PlateNumber,
+		&out.AmbulanceCategory,
+
+		&out.AssignedByUserID,
+		&out.AssignedByName,
+		&out.DriverUserID,
+		&out.DriverName,
+		&out.LeadMedicUserID,
+		&out.LeadMedicName,
+
+		&out.AssignmentMode,
+		&out.RankingScore,
+		&out.ETAMinutes,
+		&out.Status,
+
+		&out.AssignedAt,
+		&out.AcceptedAt,
+		&out.DepartedAt,
+		&out.ArrivedSceneAt,
+		&out.PatientLoadedAt,
+		&out.ArrivedDestinationAt,
+		&out.CompletedAt,
+		&out.CancelledAt,
+
+		&out.CancellationReason,
+		&out.CreatedAt,
+		&out.UpdatedAt,
+	)
+
 	return out, err
 }
 
-func (r *Repository) UpdateAssignmentStatus(ctx context.Context, id, status, cancellationReason string) (dispatchdomain.DispatchAssignment, error) {
+func (r *Repository) UpdateAssignmentStatus(ctx context.Context, id, status, cancellationReason string) (dispatchdomain.DispatchAssignmentResponse, error) {
 	now := time.Now().UTC()
+
 	q := `
-	UPDATE dispatch_assignments
-	SET status=$2,
-		accepted_at=CASE WHEN $2='ACCEPTED' THEN $3 ELSE accepted_at END,
-		departed_at=CASE WHEN $2='DEPARTED' THEN $3 ELSE departed_at END,
-		arrived_scene_at=CASE WHEN $2='ARRIVED_SCENE' THEN $3 ELSE arrived_scene_at END,
-		patient_loaded_at=CASE WHEN $2='PATIENT_LOADED' THEN $3 ELSE patient_loaded_at END,
-		arrived_destination_at=CASE WHEN $2='ARRIVED_DESTINATION' THEN $3 ELSE arrived_destination_at END,
-		completed_at=CASE WHEN $2='COMPLETED' THEN $3 ELSE completed_at END,
-		cancelled_at=CASE WHEN $2='CANCELLED' THEN $3 ELSE cancelled_at END,
-		cancellation_reason=CASE WHEN $2='CANCELLED' THEN $4 ELSE cancellation_reason END,
-		updated_at=$3
-	WHERE id=$1`
-	_, err := r.db.Exec(ctx, q, id, status, now, cancellationReason)
+		UPDATE dispatch_assignments
+		SET status = $2,
+			accepted_at = CASE 
+				WHEN $2 = 'ACCEPTED' AND accepted_at IS NULL THEN $3 
+				ELSE accepted_at 
+			END,
+			departed_at = CASE 
+				WHEN $2 = 'DEPARTED' AND departed_at IS NULL THEN $3 
+				ELSE departed_at 
+			END,
+			arrived_scene_at = CASE 
+				WHEN $2 = 'ARRIVED_SCENE' AND arrived_scene_at IS NULL THEN $3 
+				ELSE arrived_scene_at 
+			END,
+			patient_loaded_at = CASE 
+				WHEN $2 = 'PATIENT_LOADED' AND patient_loaded_at IS NULL THEN $3 
+				ELSE patient_loaded_at 
+			END,
+			arrived_destination_at = CASE 
+				WHEN $2 = 'ARRIVED_DESTINATION' AND arrived_destination_at IS NULL THEN $3 
+				ELSE arrived_destination_at 
+			END,
+			completed_at = CASE 
+				WHEN $2 = 'COMPLETED' AND completed_at IS NULL THEN $3 
+				ELSE completed_at 
+			END,
+			cancelled_at = CASE 
+				WHEN $2 = 'CANCELLED' AND cancelled_at IS NULL THEN $3 
+				ELSE cancelled_at 
+			END,
+			cancellation_reason = CASE 
+				WHEN $2 = 'CANCELLED' THEN $4
+				ELSE cancellation_reason
+			END,
+			updated_at = $3
+		WHERE id = $1
+	`
+	ct, err := r.db.Exec(ctx, q, id, strings.ToUpper(status), now, cancellationReason)
 	if err != nil {
-		return dispatchdomain.DispatchAssignment{}, err
+		return dispatchdomain.DispatchAssignmentResponse{}, err
 	}
+	if ct.RowsAffected() == 0 {
+		return dispatchdomain.DispatchAssignmentResponse{}, pgx.ErrNoRows
+	}
+
 	return r.GetAssignmentByID(ctx, id)
 }
 
-func (r *Repository) ListAssignments(ctx context.Context, params dto.ListAssignmentsParams) ([]dispatchdomain.DispatchAssignment, int64, error) {
+func (r *Repository) ListAssignments(ctx context.Context, params dto.ListAssignmentsParams) ([]dispatchdomain.DispatchAssignmentResponse, int64, error) {
 	p := params.Pagination
 	where := []string{"1=1"}
 	args := []any{}
 	pos := 1
+
 	if params.IncidentID != nil && *params.IncidentID != "" {
-		where = append(where, fmt.Sprintf("incident_id=$%d", pos))
+		where = append(where, fmt.Sprintf("da.incident_id = $%d", pos))
 		args = append(args, *params.IncidentID)
 		pos++
 	}
+
 	if params.AmbulanceID != nil && *params.AmbulanceID != "" {
-		where = append(where, fmt.Sprintf("ambulance_id=$%d", pos))
+		where = append(where, fmt.Sprintf("da.ambulance_id = $%d", pos))
 		args = append(args, *params.AmbulanceID)
 		pos++
 	}
+
 	if params.Status != nil && *params.Status != "" {
-		where = append(where, fmt.Sprintf("status=$%d", pos))
+		where = append(where, fmt.Sprintf("da.status = $%d", pos))
 		args = append(args, strings.ToUpper(*params.Status))
 		pos++
 	}
+
 	whereSQL := "WHERE " + strings.Join(where, " AND ")
+
 	var total int64
-	if err := r.db.QueryRow(ctx, `SELECT COUNT(1) FROM dispatch_assignments `+whereSQL, args...).Scan(&total); err != nil {
+	countQuery := `
+		SELECT COUNT(1)
+		FROM dispatch_assignments da
+		` + whereSQL
+
+	if err := r.db.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
-	q := fmt.Sprintf(`SELECT id, incident_id, ambulance_id, assigned_by_user_id, driver_user_id, lead_medic_user_id, team_snapshot_json, assignment_mode, ranking_score, eta_minutes, status, assigned_at, accepted_at, departed_at, arrived_scene_at, patient_loaded_at, arrived_destination_at, completed_at, cancelled_at, COALESCE(cancellation_reason,''), created_at, updated_at FROM dispatch_assignments %s %s LIMIT $%d OFFSET $%d`, whereSQL, platformdb.BuildOrderBy(p, map[string]string{"created_at": "created_at", "status": "status", "assigned_at": "assigned_at"}), pos, pos+1)
+
+	orderBy := platformdb.BuildOrderBy(p, map[string]string{
+		"created_at":  "da.created_at",
+		"status":      "da.status",
+		"assigned_at": "da.assigned_at",
+	})
+
+	q := fmt.Sprintf(`
+		SELECT 
+			da.id,
+			da.incident_id,
+			COALESCE(i.incident_number, '') AS incident_number,
+
+			da.ambulance_id,
+			COALESCE(a.code, '') AS ambulance_code,
+			COALESCE(a.plate_number, '') AS plate_number,
+			COALESCE(rac.name, '') AS ambulance_category,
+
+			da.assigned_by_user_id,
+			COALESCE(
+				TRIM(CONCAT_WS(' ', abu.first_name, abu.last_name, abu.other_name)),
+				''
+			) AS assigned_by_name,
+
+			da.driver_user_id,
+			COALESCE(
+				TRIM(CONCAT_WS(' ', du.first_name, du.last_name, du.other_name)),
+				''
+			) AS driver_name,
+
+			da.lead_medic_user_id,
+			COALESCE(
+				TRIM(CONCAT_WS(' ', lmu.first_name, lmu.last_name, lmu.other_name)),
+				''
+			) AS lead_medic_name,
+
+			da.assignment_mode,
+			da.ranking_score,
+			da.eta_minutes,
+			da.status,
+
+			da.assigned_at,
+			da.accepted_at,
+			da.departed_at,
+			da.arrived_scene_at,
+			da.patient_loaded_at,
+			da.arrived_destination_at,
+			da.completed_at,
+			da.cancelled_at,
+
+			COALESCE(da.cancellation_reason, '') AS cancellation_reason,
+			da.created_at,
+			da.updated_at
+		FROM dispatch_assignments da
+		LEFT JOIN incidents i
+			ON i.id = da.incident_id
+		LEFT JOIN ambulances a
+			ON a.id = da.ambulance_id
+		LEFT JOIN ref_ambulance_categories rac
+			ON rac.id = a.category_id
+		LEFT JOIN users abu
+			ON abu.id = da.assigned_by_user_id
+		LEFT JOIN users du
+			ON du.id = da.driver_user_id
+		LEFT JOIN users lmu
+			ON lmu.id = da.lead_medic_user_id
+		%s
+		%s
+		LIMIT $%d OFFSET $%d
+	`, whereSQL, orderBy, pos, pos+1)
+
 	rows, err := r.db.Query(ctx, q, append(args, p.PageSize, p.Offset)...)
 	if err != nil {
 		return nil, 0, err
 	}
 	defer rows.Close()
-	items := []dispatchdomain.DispatchAssignment{}
+
+	items := []dispatchdomain.DispatchAssignmentResponse{}
 	for rows.Next() {
-		var out dispatchdomain.DispatchAssignment
-		if err := rows.Scan(&out.ID, &out.IncidentID, &out.AmbulanceID, &out.AssignedByUserID, &out.DriverUserID, &out.LeadMedicUserID, &out.TeamSnapshotJSON, &out.AssignmentMode, &out.RankingScore, &out.ETAMinutes, &out.Status, &out.AssignedAt, &out.AcceptedAt, &out.DepartedAt, &out.ArrivedSceneAt, &out.PatientLoadedAt, &out.ArrivedDestinationAt, &out.CompletedAt, &out.CancelledAt, &out.CancellationReason, &out.CreatedAt, &out.UpdatedAt); err != nil {
+		var out dispatchdomain.DispatchAssignmentResponse
+		if err := rows.Scan(
+			&out.ID,
+			&out.IncidentID,
+			&out.IncidentNumber,
+
+			&out.AmbulanceID,
+			&out.AmbulanceCode,
+			&out.PlateNumber,
+			&out.AmbulanceCategory,
+
+			&out.AssignedByUserID,
+			&out.AssignedByName,
+			&out.DriverUserID,
+			&out.DriverName,
+			&out.LeadMedicUserID,
+			&out.LeadMedicName,
+
+			&out.AssignmentMode,
+			&out.RankingScore,
+			&out.ETAMinutes,
+			&out.Status,
+
+			&out.AssignedAt,
+			&out.AcceptedAt,
+			&out.DepartedAt,
+			&out.ArrivedSceneAt,
+			&out.PatientLoadedAt,
+			&out.ArrivedDestinationAt,
+			&out.CompletedAt,
+			&out.CancelledAt,
+
+			&out.CancellationReason,
+			&out.CreatedAt,
+			&out.UpdatedAt,
+		); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, out)
 	}
+
 	return items, total, rows.Err()
 }
 

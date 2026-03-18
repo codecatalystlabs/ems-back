@@ -27,9 +27,9 @@ type Repository interface {
 	ListRecommendations(ctx context.Context, params dto.ListRecommendationsParams) ([]dispatchdomain.DispatchRecommendation, int64, error)
 
 	CreateAssignment(ctx context.Context, in dispatchdomain.DispatchAssignment) (dispatchdomain.DispatchAssignment, error)
-	GetAssignmentByID(ctx context.Context, id string) (dispatchdomain.DispatchAssignment, error)
-	UpdateAssignmentStatus(ctx context.Context, id, status, cancellationReason string) (dispatchdomain.DispatchAssignment, error)
-	ListAssignments(ctx context.Context, params dto.ListAssignmentsParams) ([]dispatchdomain.DispatchAssignment, int64, error)
+	GetAssignmentByID(ctx context.Context, id string) (dispatchdomain.DispatchAssignmentResponse, error)
+	UpdateAssignmentStatus(ctx context.Context, id, status, cancellationReason string) (dispatchdomain.DispatchAssignmentResponse, error)
+	ListAssignments(ctx context.Context, params dto.ListAssignmentsParams) ([]dispatchdomain.DispatchAssignmentResponse, int64, error)
 	MarkRecommendationSelected(ctx context.Context, incidentID, ambulanceID string) error
 	SetUserAvailabilityBusy(ctx context.Context, incidentID, assignmentID string, ambulanceID, driverUserID, medicUserID *string) error
 }

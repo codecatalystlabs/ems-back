@@ -76,11 +76,11 @@ func (s *Service) CreateAssignment(ctx context.Context, req dto.CreateDispatchAs
 	return created, nil
 }
 
-func (s *Service) UpdateAssignmentStatus(ctx context.Context, id string, req dto.UpdateDispatchStatusRequest, actorUserID *string) (dispatchdomain.DispatchAssignment, error) {
+func (s *Service) UpdateAssignmentStatus(ctx context.Context, id string, req dto.UpdateDispatchStatusRequest, actorUserID *string) (dispatchdomain.DispatchAssignmentResponse, error) {
 	status := strings.ToUpper(strings.TrimSpace(req.Status))
 	updated, err := s.repo.UpdateAssignmentStatus(ctx, id, status, req.CancellationReason)
 	if err != nil {
-		return dispatchdomain.DispatchAssignment{}, err
+		return dispatchdomain.DispatchAssignmentResponse{}, err
 	}
 	incidentStatus := map[string]string{
 		"ACCEPTED":            "ENROUTE",
@@ -98,16 +98,16 @@ func (s *Service) UpdateAssignmentStatus(ctx context.Context, id string, req dto
 	return updated, nil
 }
 
-func (s *Service) GetAssignmentByID(ctx context.Context, id string) (dispatchdomain.DispatchAssignment, error) {
+func (s *Service) GetAssignmentByID(ctx context.Context, id string) (dispatchdomain.DispatchAssignmentResponse, error) {
 	return s.repo.GetAssignmentByID(ctx, id)
 }
 
-func (s *Service) ListAssignments(ctx context.Context, params dto.ListAssignmentsParams) (platformdb.PageResult[dispatchdomain.DispatchAssignment], error) {
+func (s *Service) ListAssignments(ctx context.Context, params dto.ListAssignmentsParams) (platformdb.PageResult[dispatchdomain.DispatchAssignmentResponse], error) {
 	items, total, err := s.repo.ListAssignments(ctx, params)
 	if err != nil {
-		return platformdb.PageResult[dispatchdomain.DispatchAssignment]{}, err
+		return platformdb.PageResult[dispatchdomain.DispatchAssignmentResponse]{}, err
 	}
-	return platformdb.PageResult[dispatchdomain.DispatchAssignment]{Items: items, Meta: platformdb.NewPageMeta(params.Pagination, total)}, nil
+	return platformdb.PageResult[dispatchdomain.DispatchAssignmentResponse]{Items: items, Meta: platformdb.NewPageMeta(params.Pagination, total)}, nil
 }
 
 func (s *Service) ListRecommendations(ctx context.Context, params dto.ListRecommendationsParams) (platformdb.PageResult[dispatchdomain.DispatchRecommendation], error) {
