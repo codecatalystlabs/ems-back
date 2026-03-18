@@ -110,6 +110,15 @@ jobs:
             # Recreate containers with new images; volumes are preserved (no down -v)
             docker compose -p ems-back up -d --no-build --force-recreate
 
+            # Wait for postgres to accept connections before migrate
+            for i in $(seq 1 30); do
+              if docker compose -p ems-back exec -T postgres pg_isready -U postgres -d ems_db 2>/dev/null; then
+                break
+              fi
+              echo "Waiting for postgres... ($i/30)"
+              sleep 2
+            done
+
             # Run migrations (includes default admin user from 000029)
             docker compose -p ems-back run --rm --entrypoint ./migrate -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/ems_db?sslmode=disable app -command up -dir migrations
 
