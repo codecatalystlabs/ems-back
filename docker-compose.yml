@@ -40,3 +40,4 @@ services:
 
 volumes:
   ems_pgdata:
+    name: ems-back-pgdata  # Fixed name so volume persists across deploys
