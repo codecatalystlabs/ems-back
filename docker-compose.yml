@@ -62,9 +62,10 @@ services:
 
   migrate:
     image: joshmyles/ems-back:latest
+    network_mode: "service:postgres"
     entrypoint: ['./migrate', '-command', 'up', '-dir', 'migrations']
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/ems_db?sslmode=disable
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/ems_db?sslmode=disable
     depends_on:
       postgres:
         condition: service_healthy
