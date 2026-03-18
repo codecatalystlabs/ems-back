@@ -3011,8 +3011,6 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      security:
-      - BearerAuth: []
       summary: Create incident with triage
       tags:
       - Incidents

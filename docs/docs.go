@@ -3010,11 +3010,6 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "Creates an incident and optionally persists triage responses on creation",
                 "consumes": [
                     "application/json"

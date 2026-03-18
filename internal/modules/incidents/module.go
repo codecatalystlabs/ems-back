@@ -6,6 +6,7 @@ import (
 	"dispatch/internal/modules/incidents/infrastructure/http"
 	"dispatch/internal/shared/types"
 
+	middleware "dispatch/internal/modules/auth/middleware"
 	rbacapp "dispatch/internal/modules/rbac/application"
 )
 
@@ -14,5 +15,5 @@ func Register(deps types.ModuleDeps, rbacSvc *rbacapp.Service) {
 	service := incapp.NewService(repo, deps.Bus, deps.Logger)
 	handler := http.NewHandler(service)
 	group := deps.Router.Group("/incidents")
-	http.RegisterRoutes(group, handler, rbacSvc)
+	http.RegisterRoutes(group, handler, rbacSvc, middleware.AuthMiddleware(deps.Config.JWT.Secret))
 }

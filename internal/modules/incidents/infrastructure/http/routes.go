@@ -8,9 +8,13 @@ import (
 	rbacapp "dispatch/internal/modules/rbac/application"
 )
 
-func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service) {
-	rg.GET("", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.List)
-	rg.POST("", rbacmiddleware.RequirePermission(rbacSvc, "incidents.create"), h.Create)
-	rg.GET("/:id", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.GetByID)
-	rg.PATCH("/:id/status", rbacmiddleware.RequirePermission(rbacSvc, "incidents.triage"), h.UpdateStatus)
+func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service, authMiddleware gin.HandlerFunc) {
+
+	rg.POST("", h.Create)
+	secured := rg.Group("")
+	secured.Use(authMiddleware)
+
+	secured.GET("", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.List)
+	secured.GET("/:id", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.GetByID)
+	secured.PATCH("/:id/status", rbacmiddleware.RequirePermission(rbacSvc, "incidents.triage"), h.UpdateStatus)
 }

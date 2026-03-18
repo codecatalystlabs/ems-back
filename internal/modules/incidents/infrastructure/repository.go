@@ -26,7 +26,25 @@ func (r *Repository) NextIncidentNumber(ctx context.Context) (string, error) {
 	return fmt.Sprintf("INC-%s-%06d", time.Now().UTC().Format("20060102"), count+1), nil
 }
 
+func nilIfBlank(s *string) *string {
+	if s == nil {
+		return nil
+	}
+	v := strings.TrimSpace(*s)
+	if v == "" {
+		return nil
+	}
+	return &v
+}
+
 func (r *Repository) CreateIncident(ctx context.Context, in incidentdomain.Incident) (incidentdomain.Incident, error) {
+	// normalize optional UUID fields
+	in.FacilityID = nilIfBlank(in.FacilityID)
+	in.DistrictID = nilIfBlank(in.DistrictID)
+	in.SeverityLevelID = nilIfBlank(in.SeverityLevelID)
+	in.PriorityLevelID = nilIfBlank(in.PriorityLevelID)
+	in.CreatedByUserID = nilIfBlank(in.CreatedByUserID)
+
 	q := `
 	INSERT INTO incidents (
 		id, incident_number, source_channel, caller_name, caller_phone, patient_name, patient_phone,
@@ -40,15 +58,46 @@ func (r *Repository) CreateIncident(ctx context.Context, in incidentdomain.Incid
 		$21,$22,$23,$24,$25,$26,now(),now()
 	)
 	RETURNING triaged_by_user_id, triaged_at, assigned_at, closed_at, created_at, updated_at`
+
 	err := r.db.QueryRow(ctx, q,
-		in.ID, in.IncidentNumber, in.SourceChannel, in.CallerName, in.CallerPhone, in.PatientName, in.PatientPhone,
-		in.PatientAgeGroup, in.PatientSex, in.IncidentTypeID, in.SeverityLevelID, in.PriorityLevelID,
-		in.Summary, in.Description, in.DistrictID, in.FacilityID, in.Village, in.Parish, in.Subcounty, in.Landmark,
-		in.Latitude, in.Longitude, in.VerificationStatus, in.Status, in.ReportedAt, in.CreatedByUserID,
-	).Scan(&in.TriagedByUserID, &in.TriagedAt, &in.AssignedAt, &in.ClosedAt, &in.CreatedAt, &in.UpdatedAt)
+		in.ID,
+		in.IncidentNumber,
+		in.SourceChannel,
+		in.CallerName,
+		in.CallerPhone,
+		in.PatientName,
+		in.PatientPhone,
+		in.PatientAgeGroup,
+		in.PatientSex,
+		in.IncidentTypeID,
+		in.SeverityLevelID,
+		in.PriorityLevelID,
+		in.Summary,
+		in.Description,
+		in.DistrictID,
+		in.FacilityID,
+		in.Village,
+		in.Parish,
+		in.Subcounty,
+		in.Landmark,
+		in.Latitude,
+		in.Longitude,
+		in.VerificationStatus,
+		in.Status,
+		in.ReportedAt,
+		in.CreatedByUserID,
+	).Scan(
+		&in.TriagedByUserID,
+		&in.TriagedAt,
+		&in.AssignedAt,
+		&in.ClosedAt,
+		&in.CreatedAt,
+		&in.UpdatedAt,
+	)
 	if err != nil {
 		return incidentdomain.Incident{}, err
 	}
+
 	return r.GetIncidentByID(ctx, in.ID)
 }
 
