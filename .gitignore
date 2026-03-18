@@ -20,6 +20,7 @@ coverage.html
 # IDE and editors
 .idea/
 .vscode/
+secrets/*
 *.swp
 *.swo
 *~
@@ -35,4 +36,3 @@ Thumbs.db
 # Docker (local overrides)
 docker-compose.override.yml
 docker-compose.override.yaml
-secrets/firebase-service-account.json

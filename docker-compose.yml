@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: kartoza/postgis:16-3.4
+    container_name: ems-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ems_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5431:5432"
+    volumes:
+      - ems_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ems_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: joshmyles/ems-back:latest
+    container_name: ems-back
+    restart: unless-stopped
+    ports:
+      - "3005:8080"
+    environment:
+      APP_ENV: production
+      APP_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: ems_db
+      REDIS_ADDR: disabled
+      KAFKA_BROKERS: disabled
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  ems_pgdata:

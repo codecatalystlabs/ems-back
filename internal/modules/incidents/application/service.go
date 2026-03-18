@@ -34,6 +34,11 @@ func (s *Service) CreateIncident(ctx context.Context, req CreateIncidentRequest)
 	verificationStatus := "PENDING"
 	now := time.Now()
 
+	var facilityID *string
+	if req.FacilityID != nil && strings.TrimSpace(*req.FacilityID) != "" {
+		facilityID = req.FacilityID
+	}
+
 	inc := incidentdomain.Incident{
 		ID:                 uuid.NewString(),
 		IncidentNumber:     incidentNumber,
@@ -50,7 +55,7 @@ func (s *Service) CreateIncident(ctx context.Context, req CreateIncidentRequest)
 		Summary:            req.Summary,
 		Description:        req.Description,
 		DistrictID:         req.DistrictID,
-		FacilityID:         req.FacilityID,
+		FacilityID:         facilityID,
 		Village:            req.Village,
 		Parish:             req.Parish,
 		Subcounty:          req.Subcounty,

@@ -505,3 +505,83 @@ func (r *Repository) ListTriageQuestions(ctx context.Context, params dto.ListTri
 
 	return items, total, rows.Err()
 }
+
+func (r *Repository) ListRoles(ctx context.Context, params dto.ListRolesParams) ([]refdomain.Role, int64, error) {
+	p := params.Pagination
+
+	allowedSorts := map[string]string{
+		"name":       "r.name",
+		"code":       "r.code",
+		"created_at": "r.created_at",
+	}
+
+	where := []string{"1=1"}
+	args := make([]any, 0)
+	argPos := 1
+
+	if p.Search != "" {
+		where = append(where, fmt.Sprintf(`(
+			r.name ILIKE $%d OR
+			r.code ILIKE $%d OR
+			COALESCE(r.description,'') ILIKE $%d
+		)`, argPos, argPos, argPos))
+		args = append(args, "%"+p.Search+"%")
+		argPos++
+	}
+
+	if v, ok := p.Filters["is_system"]; ok {
+		where = append(where, fmt.Sprintf(`r.is_system::text = $%d`, argPos))
+		args = append(args, strings.ToLower(v))
+		argPos++
+	}
+
+	whereSQL := "WHERE " + strings.Join(where, " AND ")
+
+	// total
+	var total int64
+	if err := r.db.QueryRow(ctx,
+		`SELECT COUNT(1) FROM roles r `+whereSQL,
+		args...,
+	).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
+	// query
+	query := fmt.Sprintf(`
+		SELECT id, code, name, description, is_system, created_at, updated_at
+		FROM roles r
+		%s
+		%s
+		LIMIT $%d OFFSET $%d
+	`,
+		whereSQL,
+		platformdb.BuildOrderBy(p, allowedSorts),
+		argPos,
+		argPos+1,
+	)
+
+	rows, err := r.db.Query(ctx, query, append(args, p.PageSize, p.Offset)...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	items := []refdomain.Role{}
+	for rows.Next() {
+		var item refdomain.Role
+		if err := rows.Scan(
+			&item.ID,
+			&item.Code,
+			&item.Name,
+			&item.Description,
+			&item.IsSystem,
+			&item.CreatedAt,
+			&item.UpdatedAt,
+		); err != nil {
+			return nil, 0, err
+		}
+		items = append(items, item)
+	}
+
+	return items, total, rows.Err()
+}

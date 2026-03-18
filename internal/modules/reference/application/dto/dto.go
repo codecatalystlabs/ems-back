@@ -22,3 +22,7 @@ type ListTriageQuestionsParams struct {
 	QuestionnaireCode *string               `json:"questionnaire_code,omitempty"`
 	Pagination        platformdb.Pagination `json:"pagination"`
 }
+
+type ListRolesParams struct {
+	Pagination platformdb.Pagination `json:"pagination"`
+}

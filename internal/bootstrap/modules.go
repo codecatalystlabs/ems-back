@@ -4,6 +4,7 @@ import (
 	authmod "dispatch/internal/modules/auth"
 	availabilitymod "dispatch/internal/modules/availability"
 	bloodmod "dispatch/internal/modules/blood"
+	dashboard "dispatch/internal/modules/dashboard"
 	devicetokens "dispatch/internal/modules/device_tokens"
 	dispatchmod "dispatch/internal/modules/dispatch"
 	facilitiesmod "dispatch/internal/modules/facilities"
@@ -23,6 +24,8 @@ import (
 
 func RegisterModules(deps types.ModuleDeps) {
 	authmod.Register(deps)
+
+	refmod.Register(deps)
 	rbacSvc := rbacmod.BuildService(deps)
 
 	secured := deps.Router.Group("")
@@ -46,8 +49,8 @@ func RegisterModules(deps types.ModuleDeps) {
 	tripsmod.Register(securedDeps, rbacSvc)
 	notifmod.Register(securedDeps, rbacSvc)
 	fuelmod.Register(securedDeps, rbacSvc)
-	refmod.Register(securedDeps)
 	availabilitymod.Register(securedDeps)
 	dispatchmod.Register(securedDeps)
 	devicetokens.Register(securedDeps)
+	dashboard.Register(securedDeps)
 }
