@@ -111,7 +111,7 @@ jobs:
             docker compose -p ems-back up -d --no-build --force-recreate
 
             # Run migrations (migrate service waits for postgres healthy via depends_on)
-            docker compose -p ems-back run --rm --profile migrate migrate
+            docker compose -p ems-back run --rm migrate
 
             # Clean up unused images
             docker image prune -f

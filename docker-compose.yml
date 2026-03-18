@@ -68,8 +68,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    profiles:
-      - migrate
 
   app:
     image: joshmyles/ems-back:latest
