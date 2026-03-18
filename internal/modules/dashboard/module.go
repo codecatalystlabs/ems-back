@@ -8,8 +8,11 @@ import (
 
 func Register(deps types.ModuleDeps) {
 	repo := infrastructure.NewRepository(deps.DB)
-	service := dashboardapp.NewService(repo)
-	h := infrastructure.NewHandler(service)
+	cache := dashboardapp.NewCacheService(deps.Redis)
+	refresh := dashboardapp.NewRefreshService(deps.DB)
+	service := dashboardapp.NewService(repo, cache, refresh)
+	handler := infrastructure.NewHandler(service)
+
 	group := deps.Router.Group("/dashboard")
-	infrastructure.RegisterRoutes(group, h)
+	infrastructure.RegisterRoutes(group, handler)
 }

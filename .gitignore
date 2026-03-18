@@ -20,6 +20,7 @@ coverage.html
 # IDE and editors
 .idea/
 .vscode/
+secrets/*
 *.swp
 *.swo
 *~

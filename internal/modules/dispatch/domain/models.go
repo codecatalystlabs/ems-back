@@ -27,6 +27,42 @@ type DispatchAssignment struct {
 	UpdatedAt            time.Time  `json:"updated_at"`
 }
 
+type DispatchAssignmentResponse struct {
+	ID             string `json:"id"`
+	IncidentID     string `json:"incident_id"`
+	IncidentNumber string `json:"incident_number"`
+
+	AmbulanceID       *string `json:"ambulance_id,omitempty"`
+	AmbulanceCode     string  `json:"ambulance_code,omitempty"`
+	PlateNumber       string  `json:"plate_number,omitempty"`
+	AmbulanceCategory string  `json:"ambulance_category,omitempty"`
+
+	AssignedByUserID *string `json:"assigned_by_user_id,omitempty"`
+	AssignedByName   string  `json:"assigned_by_name,omitempty"`
+	DriverUserID     *string `json:"driver_user_id,omitempty"`
+	DriverName       string  `json:"driver_name,omitempty"`
+	LeadMedicUserID  *string `json:"lead_medic_user_id,omitempty"`
+	LeadMedicName    string  `json:"lead_medic_name,omitempty"`
+
+	AssignmentMode string   `json:"assignment_mode"`
+	RankingScore   *float64 `json:"ranking_score,omitempty"`
+	ETAMinutes     *int     `json:"eta_minutes,omitempty"`
+	Status         string   `json:"status"`
+
+	AssignedAt           *time.Time `json:"assigned_at,omitempty"`
+	AcceptedAt           *time.Time `json:"accepted_at,omitempty"`
+	DepartedAt           *time.Time `json:"departed_at,omitempty"`
+	ArrivedSceneAt       *time.Time `json:"arrived_scene_at,omitempty"`
+	PatientLoadedAt      *time.Time `json:"patient_loaded_at,omitempty"`
+	ArrivedDestinationAt *time.Time `json:"arrived_destination_at,omitempty"`
+	CompletedAt          *time.Time `json:"completed_at,omitempty"`
+	CancelledAt          *time.Time `json:"cancelled_at,omitempty"`
+
+	CancellationReason string    `json:"cancellation_reason,omitempty"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
+}
+
 type DispatchRecommendation struct {
 	ID           string    `json:"id"`
 	IncidentID   string    `json:"incident_id"`

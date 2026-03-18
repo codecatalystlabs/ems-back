@@ -21,7 +21,6 @@ func NewHandler(service *incidentapp.Service) *Handler { return &Handler{service
 //	@Tags			Incidents
 //	@Accept			json
 //	@Produce		json
-//	@Security		BearerAuth
 //	@Param			payload	body		incidentapp.CreateIncidentRequest	true	"Incident payload"
 //	@Success		201		{object}	map[string]interface{}
 //	@Failure		400		{object}	map[string]interface{}

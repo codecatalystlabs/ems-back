@@ -20,7 +20,11 @@ type Sender struct {
 }
 
 func NewSender(credentialsFile string, resolver DeviceTokenResolver) (*Sender, error) {
-	app, err := firebase.NewApp(context.Background(), nil, option.WithCredentialsFile(credentialsFile))
+	app, err := firebase.NewApp(
+		context.Background(),
+		nil,
+		option.WithAuthCredentialsFile(option.ServiceAccount, credentialsFile),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("init firebase app: %w", err)
 	}

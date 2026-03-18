@@ -3,11 +3,10 @@ package domain
 import "time"
 
 type DashboardFilters struct {
-	DateFrom    *time.Time `json:"date_from,omitempty"`
-	DateTo      *time.Time `json:"date_to,omitempty"`
-	DistrictID  *string    `json:"district_id,omitempty"`
-	SubcountyID *string    `json:"subcounty_id,omitempty"`
-	FacilityID  *string    `json:"facility_id,omitempty"`
+	DateFrom   *time.Time `json:"date_from,omitempty"`
+	DateTo     *time.Time `json:"date_to,omitempty"`
+	DistrictID *string    `json:"district_id,omitempty"`
+	FacilityID *string    `json:"facility_id,omitempty"`
 }
 
 type KPIStat struct {
@@ -19,11 +18,13 @@ type KPIStat struct {
 type AmbulanceStatusRow struct {
 	District            string `json:"district"`
 	AmbulanceStation    string `json:"ambulance_station"`
-	RegistrationNumber  string `json:"registration_number"`
+	PlateNumber         string `json:"plate_number"`
 	Category            string `json:"category"`
-	FunctionalityStatus string `json:"functionality_status"`
-	FuelCardAvailable   string `json:"fuel_card_available"`
+	MechanicalStatus    string `json:"mechanical_status"`
+	DispatchReadiness   string `json:"dispatch_readiness"`
 	FuelStatus          string `json:"fuel_status"`
+	OxygenStatus        string `json:"oxygen_status"`
+	CommunicationStatus string `json:"communication_status"`
 }
 
 type TrendPoint struct {

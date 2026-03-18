@@ -1,0 +1,3 @@
+REFRESH MATERIALIZED VIEW CONCURRENTLY mv_ambulance_latest_readiness;
+REFRESH MATERIALIZED VIEW CONCURRENTLY mv_incident_daily_stats;
+REFRESH MATERIALIZED VIEW CONCURRENTLY mv_dashboard_daily_summary;
