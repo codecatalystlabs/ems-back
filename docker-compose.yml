@@ -60,6 +60,17 @@ services:
       timeout: 10s
       retries: 10
 
+  migrate:
+    image: joshmyles/ems-back:latest
+    entrypoint: ['./migrate', '-command', 'up', '-dir', 'migrations']
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/ems_db?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - migrate
+
   app:
     image: joshmyles/ems-back:latest
     container_name: ems-back
