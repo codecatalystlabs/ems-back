@@ -46,7 +46,8 @@ func trimmedValue(s *string) string {
 
 func (r *Repository) CreateIncident(ctx context.Context, in incidentdomain.Incident) (incidentdomain.Incident, error) {
 	// normalize optional UUID fields
-	in.FacilityID = nilIfBlank(in.FacilityID)
+	in.ReceivingFacilityID = nilIfBlank(in.ReceivingFacilityID)
+	in.ReferringFacilityID = nilIfBlank(in.ReferringFacilityID)
 	in.DistrictID = nilIfBlank(in.DistrictID)
 	in.SeverityLevelID = nilIfBlank(in.SeverityLevelID)
 	in.PriorityLevelID = nilIfBlank(in.PriorityLevelID)
@@ -55,14 +56,16 @@ func (r *Repository) CreateIncident(ctx context.Context, in incidentdomain.Incid
 	q := `
 	INSERT INTO incidents (
 		id, incident_number, source_channel, caller_name, caller_phone, patient_name, patient_phone,
-		patient_age_group, patient_sex, incident_type_id, severity_level_id, priority_level_id,
-		summary, description, district_id, facility_id, village, parish, subcounty, landmark,
+		patient_age_group, patient_sex, patient_details_diagnosis, incident_type_id, severity_level_id, priority_level_id,
+		summary, description, district_id, pickup_location, receiving_facility_id, referring_facility_id,
+		village, parish, subcounty, landmark,
 		latitude, longitude, verification_status, status, reported_at, created_by_user_id, created_at, updated_at
 	) VALUES (
 		$1,$2,$3,$4,$5,$6,$7,
-		$8,$9,$10,$11,$12,
-		$13,$14,$15,$16,$17,$18,$19,$20,
-		$21,$22,$23,$24,$25,$26,now(),now()
+		$8,$9,$10,$11,$12,$13,
+		$14,$15,$16,$17,$18,$19,
+		$20,$21,$22,$23,
+		$24,$25,$26,$27,$28,$29,now(),now()
 	)
 	RETURNING triaged_by_user_id, triaged_at, assigned_at, closed_at, created_at, updated_at`
 
@@ -76,13 +79,16 @@ func (r *Repository) CreateIncident(ctx context.Context, in incidentdomain.Incid
 		in.PatientPhone,
 		in.PatientAgeGroup,
 		in.PatientSex,
+		in.PatientDetailsDiagnosis,
 		in.IncidentTypeID,
 		in.SeverityLevelID,
 		in.PriorityLevelID,
 		in.Summary,
 		in.Description,
 		in.DistrictID,
-		in.FacilityID,
+		nilIfBlank(&in.PickupLocation),
+		in.ReceivingFacilityID,
+		in.ReferringFacilityID,
 		in.Village,
 		in.Parish,
 		in.Subcounty,
@@ -113,8 +119,10 @@ func (r *Repository) GetIncidentByID(ctx context.Context, id string) (incidentdo
 	err := r.db.QueryRow(ctx, `
 		SELECT i.id, i.incident_number, i.source_channel, COALESCE(i.caller_name,''), COALESCE(i.caller_phone,''),
 		COALESCE(i.patient_name,''), COALESCE(i.patient_phone,''), COALESCE(i.patient_age_group,''), COALESCE(i.patient_sex,''),
+		COALESCE(i.patient_details_diagnosis,''),
 		i.incident_type_id, i.severity_level_id, i.priority_level_id, COALESCE(rpl.code,''), COALESCE(i.summary,''), COALESCE(i.description,''),
-		i.district_id, i.facility_id, COALESCE(i.village,''), COALESCE(i.parish,''), COALESCE(i.subcounty,''), COALESCE(i.landmark,''),
+		i.district_id, COALESCE(i.pickup_location,''), i.receiving_facility_id, i.referring_facility_id,
+		COALESCE(i.village,''), COALESCE(i.parish,''), COALESCE(i.subcounty,''), COALESCE(i.landmark,''),
 		i.latitude, i.longitude, i.verification_status, i.status, i.reported_at, i.created_by_user_id, i.triaged_by_user_id,
 		i.triaged_at, i.assigned_at, i.closed_at, i.created_at, i.updated_at
 		FROM incidents i
@@ -122,8 +130,10 @@ func (r *Repository) GetIncidentByID(ctx context.Context, id string) (incidentdo
 		WHERE i.id=$1`, id,
 	).Scan(&out.ID, &out.IncidentNumber, &out.SourceChannel, &out.CallerName, &out.CallerPhone,
 		&out.PatientName, &out.PatientPhone, &out.PatientAgeGroup, &out.PatientSex,
+		&out.PatientDetailsDiagnosis,
 		&out.IncidentTypeID, &out.SeverityLevelID, &out.PriorityLevelID, &out.PriorityCode, &out.Summary, &out.Description,
-		&out.DistrictID, &out.FacilityID, &out.Village, &out.Parish, &out.Subcounty, &out.Landmark,
+		&out.DistrictID, &out.PickupLocation, &out.ReceivingFacilityID, &out.ReferringFacilityID,
+		&out.Village, &out.Parish, &out.Subcounty, &out.Landmark,
 		&out.Latitude, &out.Longitude, &out.VerificationStatus, &out.Status, &out.ReportedAt, &out.CreatedByUserID, &out.TriagedByUserID,
 		&out.TriagedAt, &out.AssignedAt, &out.ClosedAt, &out.CreatedAt, &out.UpdatedAt)
 	return out, err
@@ -156,9 +166,14 @@ func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListI
 		args = append(args, *params.DistrictID)
 		pos++
 	}
-	if params.FacilityID != nil && *params.FacilityID != "" {
-		where = append(where, fmt.Sprintf("i.facility_id=$%d", pos))
-		args = append(args, *params.FacilityID)
+	if params.ReceivingFacilityID != nil && *params.ReceivingFacilityID != "" {
+		where = append(where, fmt.Sprintf("i.receiving_facility_id=$%d", pos))
+		args = append(args, *params.ReceivingFacilityID)
+		pos++
+	}
+	if params.ReferringFacilityID != nil && *params.ReferringFacilityID != "" {
+		where = append(where, fmt.Sprintf("i.referring_facility_id=$%d", pos))
+		args = append(args, *params.ReferringFacilityID)
 		pos++
 	}
 	if params.PriorityID != nil && *params.PriorityID != "" {
@@ -181,7 +196,7 @@ func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListI
 	if err := r.db.QueryRow(ctx, `SELECT COUNT(1) FROM incidents i `+whereSQL, args...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
-	q := fmt.Sprintf(`SELECT i.id, i.incident_number, i.source_channel, COALESCE(i.caller_name,''), COALESCE(i.caller_phone,''), COALESCE(i.patient_name,''), COALESCE(i.patient_phone,''), COALESCE(i.patient_age_group,''), COALESCE(i.patient_sex,''), i.incident_type_id, i.severity_level_id, i.priority_level_id, COALESCE(rpl.code,''), COALESCE(i.summary,''), COALESCE(i.description,''), i.district_id, i.facility_id, COALESCE(i.village,''), COALESCE(i.parish,''), COALESCE(i.subcounty,''), COALESCE(i.landmark,''), i.latitude, i.longitude, i.verification_status, i.status, i.reported_at, i.created_by_user_id, i.triaged_by_user_id, i.triaged_at, i.assigned_at, i.closed_at, i.created_at, i.updated_at FROM incidents i LEFT JOIN ref_priority_levels rpl ON rpl.id=i.priority_level_id %s %s LIMIT $%d OFFSET $%d`, whereSQL, platformdb.BuildOrderBy(p, map[string]string{"reported_at": "i.reported_at", "created_at": "i.created_at", "status": "i.status"}), pos, pos+1)
+	q := fmt.Sprintf(`SELECT i.id, i.incident_number, i.source_channel, COALESCE(i.caller_name,''), COALESCE(i.caller_phone,''), COALESCE(i.patient_name,''), COALESCE(i.patient_phone,''), COALESCE(i.patient_age_group,''), COALESCE(i.patient_sex,''), COALESCE(i.patient_details_diagnosis,''), i.incident_type_id, i.severity_level_id, i.priority_level_id, COALESCE(rpl.code,''), COALESCE(i.summary,''), COALESCE(i.description,''), i.district_id, COALESCE(i.pickup_location,''), i.receiving_facility_id, i.referring_facility_id, COALESCE(i.village,''), COALESCE(i.parish,''), COALESCE(i.subcounty,''), COALESCE(i.landmark,''), i.latitude, i.longitude, i.verification_status, i.status, i.reported_at, i.created_by_user_id, i.triaged_by_user_id, i.triaged_at, i.assigned_at, i.closed_at, i.created_at, i.updated_at FROM incidents i LEFT JOIN ref_priority_levels rpl ON rpl.id=i.priority_level_id %s %s LIMIT $%d OFFSET $%d`, whereSQL, platformdb.BuildOrderBy(p, map[string]string{"reported_at": "i.reported_at", "created_at": "i.created_at", "status": "i.status"}), pos, pos+1)
 	rows, err := r.db.Query(ctx, q, append(args, p.PageSize, p.Offset)...)
 	if err != nil {
 		return nil, 0, err
@@ -190,7 +205,7 @@ func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListI
 	items := []incidentdomain.Incident{}
 	for rows.Next() {
 		var out incidentdomain.Incident
-		if err := rows.Scan(&out.ID, &out.IncidentNumber, &out.SourceChannel, &out.CallerName, &out.CallerPhone, &out.PatientName, &out.PatientPhone, &out.PatientAgeGroup, &out.PatientSex, &out.IncidentTypeID, &out.SeverityLevelID, &out.PriorityLevelID, &out.PriorityCode, &out.Summary, &out.Description, &out.DistrictID, &out.FacilityID, &out.Village, &out.Parish, &out.Subcounty, &out.Landmark, &out.Latitude, &out.Longitude, &out.VerificationStatus, &out.Status, &out.ReportedAt, &out.CreatedByUserID, &out.TriagedByUserID, &out.TriagedAt, &out.AssignedAt, &out.ClosedAt, &out.CreatedAt, &out.UpdatedAt); err != nil {
+		if err := rows.Scan(&out.ID, &out.IncidentNumber, &out.SourceChannel, &out.CallerName, &out.CallerPhone, &out.PatientName, &out.PatientPhone, &out.PatientAgeGroup, &out.PatientSex, &out.PatientDetailsDiagnosis, &out.IncidentTypeID, &out.SeverityLevelID, &out.PriorityLevelID, &out.PriorityCode, &out.Summary, &out.Description, &out.DistrictID, &out.PickupLocation, &out.ReceivingFacilityID, &out.ReferringFacilityID, &out.Village, &out.Parish, &out.Subcounty, &out.Landmark, &out.Latitude, &out.Longitude, &out.VerificationStatus, &out.Status, &out.ReportedAt, &out.CreatedByUserID, &out.TriagedByUserID, &out.TriagedAt, &out.AssignedAt, &out.ClosedAt, &out.CreatedAt, &out.UpdatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, out)
@@ -250,6 +265,11 @@ func (r *Repository) UpdateIncident(ctx context.Context, id string, req incident
 		args = append(args, strings.ToUpper(trimmedValue(req.PatientSex)))
 		pos++
 	}
+	if req.PatientDetailsDiagnosis != nil {
+		sets = append(sets, fmt.Sprintf("patient_details_diagnosis = $%d", pos))
+		args = append(args, trimmedValue(req.PatientDetailsDiagnosis))
+		pos++
+	}
 	if req.IncidentTypeID != nil {
 		sets = append(sets, fmt.Sprintf("incident_type_id = $%d", pos))
 		args = append(args, trimmedValue(req.IncidentTypeID))
@@ -280,9 +300,19 @@ func (r *Repository) UpdateIncident(ctx context.Context, id string, req incident
 		args = append(args, nilIfBlank(req.DistrictID))
 		pos++
 	}
-	if req.FacilityID != nil {
-		sets = append(sets, fmt.Sprintf("facility_id = $%d", pos))
-		args = append(args, nilIfBlank(req.FacilityID))
+	if req.PickupLocation != nil {
+		sets = append(sets, fmt.Sprintf("pickup_location = $%d", pos))
+		args = append(args, nilIfBlank(req.PickupLocation))
+		pos++
+	}
+	if req.ReceivingFacilityID != nil {
+		sets = append(sets, fmt.Sprintf("receiving_facility_id = $%d", pos))
+		args = append(args, nilIfBlank(req.ReceivingFacilityID))
+		pos++
+	}
+	if req.ReferringFacilityID != nil {
+		sets = append(sets, fmt.Sprintf("referring_facility_id = $%d", pos))
+		args = append(args, nilIfBlank(req.ReferringFacilityID))
 		pos++
 	}
 	if req.Village != nil {

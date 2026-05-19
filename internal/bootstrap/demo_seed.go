@@ -150,7 +150,7 @@ func SeedDemoData(ctx context.Context, db *pgxpool.Pool) error {
 		`INSERT INTO incidents (
 			incident_number, source_channel, caller_name, caller_phone,
 			patient_name, patient_sex, incident_type_id, severity_level_id,
-			priority_level_id, summary, description, district_id, facility_id,
+			priority_level_id, summary, description, district_id, referring_facility_id,
 			status, verification_status, reported_at, created_by_user_id, created_at, updated_at
 		) VALUES (
 			$1,'CALL',$2,$3,

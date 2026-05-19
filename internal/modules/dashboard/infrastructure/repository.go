@@ -79,7 +79,7 @@ func buildFilters(filters dashboarddomain.DashboardFilters) filterParts {
 	}
 
 	if filters.FacilityID != nil {
-		incidentClauses = append(incidentClauses, fmt.Sprintf("i.facility_id = $%d", argPos))
+		incidentClauses = append(incidentClauses, fmt.Sprintf("i.referring_facility_id = $%d", argPos))
 		facilityClauses = append(facilityClauses, fmt.Sprintf("f.id = $%d", argPos))
 		ambulanceClauses = append(ambulanceClauses, fmt.Sprintf("m.station_facility_id = $%d", argPos))
 		p.args = append(p.args, *filters.FacilityID)
@@ -281,7 +281,7 @@ func (r *Repository) loadFacilityCaseTrend(ctx context.Context, resp *dashboardd
 			COALESCE(f.name, 'Unknown') AS bucket,
 			COUNT(*) AS total_cases
 		FROM incidents i
-		LEFT JOIN ref_facilities f ON f.id = i.facility_id
+		LEFT JOIN ref_facilities f ON f.id = i.referring_facility_id
 		WHERE %s
 		GROUP BY f.name
 		ORDER BY total_cases DESC

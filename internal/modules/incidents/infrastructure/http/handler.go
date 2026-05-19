@@ -87,33 +87,38 @@ func (h *Handler) Create(c *gin.Context) {
 //	@Tags			Incidents
 //	@Produce		json
 //	@Security		BearerAuth
-//	@Param			status		query		string	false	"Incident status"
-//	@Param			district_id	query		string	false	"District ID"
-//	@Param			facility_id	query		string	false	"Facility ID"
-//	@Param			priority_id	query		string	false	"Priority level ID"
-//	@Param			page		query		int		false	"Page number"	default(1)
-//	@Param			page_size	query		int		false	"Page size"		default(20)
-//	@Param			search		query		string	false	"Search by incident number, summary, or patient name"
-//	@Param			sort_by		query		string	false	"Sort field"	Enums(reported_at,created_at,status)
-//	@Param			sort_order	query		string	false	"Sort order"	Enums(ASC,DESC)
-//	@Success		200			{object}	map[string]interface{}
-//	@Failure		500			{object}	map[string]interface{}
+//	@Param			status					query		string	false	"Incident status"
+//	@Param			district_id				query		string	false	"District ID"
+//	@Param			receiving_facility_id	query		string	false	"Receiving (destination) facility ID"
+//	@Param			referring_facility_id	query		string	false	"Referring (origin) facility ID"
+//	@Param			priority_id				query		string	false	"Priority level ID"
+//	@Param			page					query		int		false	"Page number"	default(1)
+//	@Param			page_size				query		int		false	"Page size"		default(20)
+//	@Param			search					query		string	false	"Search by incident number, summary, or patient name"
+//	@Param			sort_by					query		string	false	"Sort field"	Enums(reported_at,created_at,status)
+//	@Param			sort_order				query		string	false	"Sort order"	Enums(ASC,DESC)
+//	@Success		200						{object}	map[string]interface{}
+//	@Failure		500						{object}	map[string]interface{}
 //	@Router			/incidents [get]
 func (h *Handler) List(c *gin.Context) {
-	var status, districtID, facilityID, priorityID *string
+	var status, districtID, receivingFacilityID, referringFacilityID, priorityID *string
 	if v := c.Query("status"); v != "" {
 		status = &v
 	}
 	if v := c.Query("district_id"); v != "" {
 		districtID = &v
 	}
-	if v := c.Query("facility_id"); v != "" {
-		facilityID = &v
+	if v := c.Query("receiving_facility_id"); v != "" {
+		receivingFacilityID = &v
+	}
+	if v := c.Query("referring_facility_id"); v != "" {
+		referringFacilityID = &v
 	}
 	if v := c.Query("priority_id"); v != "" {
 		priorityID = &v
 	}
-	params := incidentapp.ListIncidentsParams{Status: status, DistrictID: districtID, FacilityID: facilityID, PriorityID: priorityID,
+	params := incidentapp.ListIncidentsParams{Status: status, DistrictID: districtID,
+		ReceivingFacilityID: receivingFacilityID, ReferringFacilityID: referringFacilityID, PriorityID: priorityID,
 		AssignedToUserID: assignedScopeUserID(c),
 		Pagination:       platformdb.ParsePagination(c.Request.URL.Query(), map[string]string{"reported_at": "i.reported_at", "created_at": "i.created_at", "status": "i.status"}, map[string]struct{}{}),
 	}
