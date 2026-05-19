@@ -78,7 +78,11 @@ type ListIncidentsParams struct {
 	DistrictID *string               `json:"district_id,omitempty"`
 	FacilityID *string               `json:"facility_id,omitempty"`
 	PriorityID *string               `json:"priority_id,omitempty"`
-	Pagination platformdb.Pagination `json:"pagination"`
+	// AssignedToUserID, when set, restricts results to incidents that have a
+	// dispatch assignment where the user is the driver or lead medic. It is
+	// derived server-side from the caller's roles and is not client-supplied.
+	AssignedToUserID *string               `json:"assigned_to_user_id,omitempty"`
+	Pagination       platformdb.Pagination `json:"pagination"`
 }
 
 type CreateIncidentResponse struct {

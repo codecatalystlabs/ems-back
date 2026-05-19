@@ -16,6 +16,7 @@ type QuestionDefinition struct {
 type Repository interface {
 	CreateIncident(ctx context.Context, in incidentdomain.Incident) (incidentdomain.Incident, error)
 	GetIncidentByID(ctx context.Context, id string) (incidentdomain.Incident, error)
+	IsUserAssignedToIncident(ctx context.Context, incidentID, userID string) (bool, error)
 	ListIncidents(ctx context.Context, params ListIncidentsParams) ([]incidentdomain.Incident, int64, error)
 	UpdateIncident(ctx context.Context, id string, req UpdateIncidentRequest) (incidentdomain.Incident, error)
 	UpdateIncidentStatus(ctx context.Context, id, status string) (incidentdomain.Incident, error)
