@@ -129,6 +129,18 @@ func (r *Repository) GetIncidentByID(ctx context.Context, id string) (incidentdo
 	return out, err
 }
 
+// IsUserAssignedToIncident reports whether the user is the driver or lead
+// medic on any dispatch assignment for the given incident.
+func (r *Repository) IsUserAssignedToIncident(ctx context.Context, incidentID, userID string) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow(ctx, `
+		SELECT EXISTS (
+			SELECT 1 FROM dispatch_assignments da
+			WHERE da.incident_id=$1 AND (da.driver_user_id=$2 OR da.lead_medic_user_id=$2)
+		)`, incidentID, userID).Scan(&exists)
+	return exists, err
+}
+
 func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListIncidentsParams) ([]incidentdomain.Incident, int64, error) {
 	p := params.Pagination
 	where := []string{"1=1"}
@@ -152,6 +164,11 @@ func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListI
 	if params.PriorityID != nil && *params.PriorityID != "" {
 		where = append(where, fmt.Sprintf("i.priority_level_id=$%d", pos))
 		args = append(args, *params.PriorityID)
+		pos++
+	}
+	if params.AssignedToUserID != nil && *params.AssignedToUserID != "" {
+		where = append(where, fmt.Sprintf("EXISTS (SELECT 1 FROM dispatch_assignments da WHERE da.incident_id=i.id AND (da.driver_user_id=$%d OR da.lead_medic_user_id=$%d))", pos, pos))
+		args = append(args, *params.AssignedToUserID)
 		pos++
 	}
 	if p.Search != "" {

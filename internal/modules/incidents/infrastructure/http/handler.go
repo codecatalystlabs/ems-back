@@ -1,7 +1,9 @@
 package http
 
 import (
+	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -9,6 +11,39 @@ import (
 	platformdb "dispatch/internal/platform/db"
 	"dispatch/internal/platform/httpx"
 )
+
+// responderRoles are roles whose members may only see incidents assigned to
+// them. seeAllRoles take precedence: a user holding any seeAll role sees every
+// incident regardless of also being a responder.
+var responderRoles = map[string]struct{}{
+	"DRIVER": {},
+	"MEDIC":  {},
+}
+
+// assignedScopeUserID returns the user ID to scope the incident list to when
+// the caller is a pure responder (driver/medic) with no broader role. It
+// returns nil when the caller should see all incidents.
+func assignedScopeUserID(c *gin.Context) *string {
+	rawRoles, _ := c.Get("roles")
+	roles, _ := rawRoles.([]string)
+	hasResponderRole := false
+	for _, r := range roles {
+		code := strings.ToUpper(strings.TrimSpace(r))
+		if _, ok := responderRoles[code]; ok {
+			hasResponderRole = true
+			continue
+		}
+		// Any non-responder role grants the broader incidents view.
+		return nil
+	}
+	if !hasResponderRole {
+		return nil
+	}
+	if uid := c.GetString("user_id"); uid != "" {
+		return &uid
+	}
+	return nil
+}
 
 type Handler struct{ service *incidentapp.Service }
 
@@ -79,7 +114,8 @@ func (h *Handler) List(c *gin.Context) {
 		priorityID = &v
 	}
 	params := incidentapp.ListIncidentsParams{Status: status, DistrictID: districtID, FacilityID: facilityID, PriorityID: priorityID,
-		Pagination: platformdb.ParsePagination(c.Request.URL.Query(), map[string]string{"reported_at": "i.reported_at", "created_at": "i.created_at", "status": "i.status"}, map[string]struct{}{}),
+		AssignedToUserID: assignedScopeUserID(c),
+		Pagination:       platformdb.ParsePagination(c.Request.URL.Query(), map[string]string{"reported_at": "i.reported_at", "created_at": "i.created_at", "status": "i.status"}, map[string]struct{}{}),
 	}
 	out, err := h.service.ListIncidents(c.Request.Context(), params)
 	if err != nil {
@@ -165,7 +201,22 @@ func (h *Handler) UpdateStatus(c *gin.Context) {
 //	@Failure		500	{object}	map[string]interface{}
 //	@Router			/incidents/{id} [get]
 func (h *Handler) GetByID(c *gin.Context) {
-	out, err := h.service.GetIncidentByID(c.Request.Context(), c.Param("id"))
+	id := c.Param("id")
+	// Pure responders (driver/medic) may only view incidents assigned to them.
+	if scopeUserID := assignedScopeUserID(c); scopeUserID != nil {
+		out, err := h.service.GetIncidentByIDForAssignee(c.Request.Context(), id, *scopeUserID)
+		if err != nil {
+			if errors.Is(err, incidentapp.ErrIncidentNotAssigned) {
+				httpx.Error(c, http.StatusForbidden, "incident not assigned to you")
+				return
+			}
+			httpx.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		httpx.OK(c, out)
+		return
+	}
+	out, err := h.service.GetIncidentByID(c.Request.Context(), id)
 	if err != nil {
 		httpx.Error(c, http.StatusInternalServerError, err.Error())
 		return

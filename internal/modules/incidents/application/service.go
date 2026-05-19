@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -229,6 +230,23 @@ func (s *Service) persistTriage(ctx context.Context, incidentID, questionnaireCo
 }
 
 func (s *Service) GetIncidentByID(ctx context.Context, id string) (incidentdomain.Incident, error) {
+	return s.repo.GetIncidentByID(ctx, id)
+}
+
+// ErrIncidentNotAssigned is returned when a responder requests an incident
+// that is not assigned to them.
+var ErrIncidentNotAssigned = errors.New("incident not assigned to user")
+
+// GetIncidentByIDForAssignee returns the incident only if the user is the
+// driver or lead medic on one of its dispatch assignments.
+func (s *Service) GetIncidentByIDForAssignee(ctx context.Context, id, userID string) (incidentdomain.Incident, error) {
+	assigned, err := s.repo.IsUserAssignedToIncident(ctx, id, userID)
+	if err != nil {
+		return incidentdomain.Incident{}, err
+	}
+	if !assigned {
+		return incidentdomain.Incident{}, ErrIncidentNotAssigned
+	}
 	return s.repo.GetIncidentByID(ctx, id)
 }
 
