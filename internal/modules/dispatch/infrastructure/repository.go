@@ -29,7 +29,7 @@ func NewRepository(db *pgxpool.Pool) *Repository { return &Repository{db: db} }
 func (r *Repository) GetIncidentDispatchContext(ctx context.Context, incidentID string) (dispatchdomain.IncidentDispatchContext, error) {
 	var out dispatchdomain.IncidentDispatchContext
 	err := r.db.QueryRow(ctx, `
-		SELECT i.id, i.priority_level_id, COALESCE(rpl.code,''), i.district_id, i.facility_id, i.latitude, i.longitude, i.verification_status, i.status
+		SELECT i.id, i.priority_level_id, COALESCE(rpl.code,''), i.district_id, i.receiving_facility_id, i.latitude, i.longitude, i.verification_status, i.status
 		FROM incidents i
 		LEFT JOIN ref_priority_levels rpl ON rpl.id = i.priority_level_id
 		WHERE i.id=$1`, incidentID,
