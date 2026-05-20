@@ -15,6 +15,10 @@ type CreateAmbulanceRequest struct {
 	DispatchReadiness *string `json:"dispatch_readiness,omitempty" enums:"DISPATCHABLE,RESTRICTED,NOT_DISPATCHABLE"`
 }
 
+type AssignDriverRequest struct {
+	DriverUserID string `json:"driver_user_id" binding:"required,uuid"`
+}
+
 type UpdateAmbulanceRequest struct {
 	Code              *string `json:"code,omitempty"`
 	VIN               *string `json:"vin,omitempty"`

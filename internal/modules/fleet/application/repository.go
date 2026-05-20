@@ -13,4 +13,6 @@ type Repository interface {
 	Create(ctx context.Context, in domain.Ambulance) (domain.Ambulance, error)
 	Update(ctx context.Context, id string, req UpdateAmbulanceRequest) (domain.Ambulance, error)
 	Delete(ctx context.Context, id string) error
+	AssignDriver(ctx context.Context, ambulanceID, driverUserID string) error
+	UnassignDriver(ctx context.Context, ambulanceID string) error
 }

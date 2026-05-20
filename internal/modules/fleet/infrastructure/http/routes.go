@@ -14,4 +14,6 @@ func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service) {
 	rg.POST("", rbacmiddleware.RequirePermission(rbacSvc, "fleet.manage"), h.Create)
 	rg.PUT("/:id", rbacmiddleware.RequirePermission(rbacSvc, "fleet.manage"), h.Update)
 	rg.DELETE("/:id", rbacmiddleware.RequirePermission(rbacSvc, "fleet.manage"), h.Delete)
+	rg.POST("/:id/driver", rbacmiddleware.RequirePermission(rbacSvc, "fleet.manage"), h.AssignDriver)
+	rg.DELETE("/:id/driver", rbacmiddleware.RequirePermission(rbacSvc, "fleet.manage"), h.UnassignDriver)
 }

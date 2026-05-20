@@ -142,6 +142,58 @@ func (h *Handler) Update(c *gin.Context) {
 	httpx.OK(c, out)
 }
 
+// AssignDriver godoc
+//
+//	@Summary		Assign driver to ambulance
+//	@Description	Sets the active driver on an ambulance's crew assignment
+//	@Tags			Fleet
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id		path		string						true	"Ambulance ID"
+//	@Param			payload	body		fleetapp.AssignDriverRequest	true	"Driver assignment payload"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]interface{}
+//	@Failure		404		{object}	map[string]interface{}
+//	@Failure		500		{object}	map[string]interface{}
+//	@Router			/ambulances/{id}/driver [post]
+func (h *Handler) AssignDriver(c *gin.Context) {
+	id := c.Param("id")
+	var req fleetapp.AssignDriverRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		httpx.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	out, err := h.service.AssignDriverToAmbulance(c.Request.Context(), id, req)
+	if err != nil {
+		httpx.DBError(c, err)
+		return
+	}
+	httpx.OK(c, out)
+}
+
+// UnassignDriver godoc
+//
+//	@Summary		Unassign driver from ambulance
+//	@Description	Clears the driver from the ambulance's active crew assignment
+//	@Tags			Fleet
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			id	path		string	true	"Ambulance ID"
+//	@Success		200	{object}	map[string]interface{}
+//	@Failure		404	{object}	map[string]interface{}
+//	@Failure		500	{object}	map[string]interface{}
+//	@Router			/ambulances/{id}/driver [delete]
+func (h *Handler) UnassignDriver(c *gin.Context) {
+	id := c.Param("id")
+	out, err := h.service.UnassignDriverFromAmbulance(c.Request.Context(), id)
+	if err != nil {
+		httpx.DBError(c, err)
+		return
+	}
+	httpx.OK(c, out)
+}
+
 // Delete godoc
 //
 //	@Summary		Delete ambulance

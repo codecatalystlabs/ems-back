@@ -65,3 +65,23 @@ func (s *Service) UpdateAmbulance(ctx context.Context, id string, req UpdateAmbu
 func (s *Service) DeleteAmbulance(ctx context.Context, id string) error {
 	return s.repo.Delete(ctx, id)
 }
+
+func (s *Service) AssignDriverToAmbulance(ctx context.Context, ambulanceID string, req AssignDriverRequest) (domain.Ambulance, error) {
+	if _, err := s.repo.GetByID(ctx, ambulanceID); err != nil {
+		return domain.Ambulance{}, err
+	}
+	if err := s.repo.AssignDriver(ctx, ambulanceID, req.DriverUserID); err != nil {
+		return domain.Ambulance{}, err
+	}
+	return s.repo.GetByID(ctx, ambulanceID)
+}
+
+func (s *Service) UnassignDriverFromAmbulance(ctx context.Context, ambulanceID string) (domain.Ambulance, error) {
+	if _, err := s.repo.GetByID(ctx, ambulanceID); err != nil {
+		return domain.Ambulance{}, err
+	}
+	if err := s.repo.UnassignDriver(ctx, ambulanceID); err != nil {
+		return domain.Ambulance{}, err
+	}
+	return s.repo.GetByID(ctx, ambulanceID)
+}
