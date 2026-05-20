@@ -106,8 +106,16 @@ func (r *Repository) ListAmbulances(ctx context.Context, p platformdb.Pagination
 			a.last_seen_at,
 			a.is_active,
 			a.created_at,
-			a.updated_at
+			a.updated_at,
+			ca.driver_user_id,
+			du.first_name,
+			du.last_name,
+			du.phone
 		FROM ambulances a
+		LEFT JOIN ambulance_crew_assignments ca
+			ON ca.ambulance_id = a.id AND ca.active = TRUE
+		LEFT JOIN users du
+			ON du.id = ca.driver_user_id
 		%s
 		%s
 		LIMIT $%d OFFSET $%d
@@ -123,6 +131,7 @@ func (r *Repository) ListAmbulances(ctx context.Context, p platformdb.Pagination
 	for rows.Next() {
 		var a domain.Ambulance
 		var code, vin, makeVal, model, ownershipType *string
+		var driverID, driverFirst, driverLast, driverPhone *string
 		if err := rows.Scan(
 			&a.ID,
 			&code,
@@ -143,6 +152,10 @@ func (r *Repository) ListAmbulances(ctx context.Context, p platformdb.Pagination
 			&a.IsActive,
 			&a.CreatedAt,
 			&a.UpdatedAt,
+			&driverID,
+			&driverFirst,
+			&driverLast,
+			&driverPhone,
 		); err != nil {
 			return nil, 0, err
 		}
@@ -151,6 +164,10 @@ func (r *Repository) ListAmbulances(ctx context.Context, p platformdb.Pagination
 		a.Make = makeVal
 		a.Model = model
 		a.OwnershipType = ownershipType
+		a.CurrentDriverUserID = driverID
+		a.CurrentDriverFirstName = driverFirst
+		a.CurrentDriverLastName = driverLast
+		a.CurrentDriverPhone = driverPhone
 		items = append(items, a)
 	}
 
@@ -178,8 +195,16 @@ SELECT
 	a.last_seen_at,
 	a.is_active,
 	a.created_at,
-	a.updated_at
+	a.updated_at,
+	ca.driver_user_id,
+	du.first_name,
+	du.last_name,
+	du.phone
 FROM ambulances a
+LEFT JOIN ambulance_crew_assignments ca
+	ON ca.ambulance_id = a.id AND ca.active = TRUE
+LEFT JOIN users du
+	ON du.id = ca.driver_user_id
 WHERE a.id = $1`
 	var a domain.Ambulance
 	if err := r.db.QueryRow(ctx, q, id).Scan(
@@ -202,6 +227,10 @@ WHERE a.id = $1`
 		&a.IsActive,
 		&a.CreatedAt,
 		&a.UpdatedAt,
+		&a.CurrentDriverUserID,
+		&a.CurrentDriverFirstName,
+		&a.CurrentDriverLastName,
+		&a.CurrentDriverPhone,
 	); err != nil {
 		return domain.Ambulance{}, err
 	}
@@ -319,5 +348,39 @@ func (r *Repository) Update(ctx context.Context, id string, req fleetapp.UpdateA
 
 func (r *Repository) Delete(ctx context.Context, id string) error {
 	_, err := r.db.Exec(ctx, `DELETE FROM ambulances WHERE id = $1`, id)
+	return err
+}
+
+// AssignDriver sets driver_user_id on the active crew assignment for the
+// ambulance. If no active row exists one is created; otherwise the existing
+// active row is updated in place so other crew slots (medic/nurse/doctor) are
+// preserved.
+func (r *Repository) AssignDriver(ctx context.Context, ambulanceID, driverUserID string) error {
+	tag, err := r.db.Exec(ctx, `
+		UPDATE ambulance_crew_assignments
+		SET driver_user_id = $2
+		WHERE ambulance_id = $1 AND active = TRUE
+	`, ambulanceID, driverUserID)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() > 0 {
+		return nil
+	}
+	_, err = r.db.Exec(ctx, `
+		INSERT INTO ambulance_crew_assignments (ambulance_id, driver_user_id, active)
+		VALUES ($1, $2, TRUE)
+	`, ambulanceID, driverUserID)
+	return err
+}
+
+// UnassignDriver clears the driver_user_id from the active crew assignment.
+// The row is left active so other crew members (if any) are not affected.
+func (r *Repository) UnassignDriver(ctx context.Context, ambulanceID string) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE ambulance_crew_assignments
+		SET driver_user_id = NULL
+		WHERE ambulance_id = $1 AND active = TRUE
+	`, ambulanceID)
 	return err
 }
