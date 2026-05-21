@@ -23,7 +23,7 @@ type CreateIncidentRequest struct {
 	IncidentTypeID          string                `json:"incident_type_id" binding:"required,uuid"`
 	SeverityLevelID         *string               `json:"severity_level_id"`
 	PriorityLevelID         *string               `json:"priority_level_id"`
-	Summary                 string                `json:"summary" binding:"required"`
+	Summary                 string                `json:"summary"`
 	Description             string                `json:"description"`
 	DistrictID              *string               `json:"district_id"`
 	PickupLocation          string                `json:"pickup_location" binding:"omitempty,oneof=COMMUNITY FACILITY"`

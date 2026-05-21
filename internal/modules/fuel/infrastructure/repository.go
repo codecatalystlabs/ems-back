@@ -136,6 +136,20 @@ func (r *Repository) List(ctx context.Context, p platformdb.Pagination, driverUs
 			where = append(where, fmt.Sprintf("fl.ambulance_id = $%d", pos))
 			args = append(args, v)
 			pos++
+		case "user_id":
+			// Return fuel logs for any ambulance the user is the active driver
+			// on, OR fuel logs they personally filled in. This lets a manager
+			// look up a specific user's fuel activity.
+			where = append(where, fmt.Sprintf(`(
+				fl.filled_by = $%d OR EXISTS (
+					SELECT 1 FROM ambulance_crew_assignments ca_uid
+					WHERE ca_uid.ambulance_id = fl.ambulance_id
+					  AND ca_uid.driver_user_id = $%d
+					  AND ca_uid.active = TRUE
+				)
+			)`, pos, pos))
+			args = append(args, v)
+			pos++
 		case "date_from":
 			where = append(where, fmt.Sprintf("fl.filled_at >= $%d", pos))
 			args = append(args, v)
