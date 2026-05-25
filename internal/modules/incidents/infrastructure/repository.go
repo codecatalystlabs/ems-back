@@ -181,6 +181,16 @@ func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListI
 		args = append(args, *params.PriorityID)
 		pos++
 	}
+	if params.DateFrom != nil {
+		where = append(where, fmt.Sprintf("i.reported_at >= $%d", pos))
+		args = append(args, *params.DateFrom)
+		pos++
+	}
+	if params.DateTo != nil {
+		where = append(where, fmt.Sprintf("i.reported_at < $%d", pos))
+		args = append(args, *params.DateTo)
+		pos++
+	}
 	if params.AssignedToUserID != nil && *params.AssignedToUserID != "" {
 		where = append(where, fmt.Sprintf("EXISTS (SELECT 1 FROM dispatch_assignments da WHERE da.incident_id=i.id AND (da.driver_user_id=$%d OR da.lead_medic_user_id=$%d))", pos, pos))
 		args = append(args, *params.AssignedToUserID)

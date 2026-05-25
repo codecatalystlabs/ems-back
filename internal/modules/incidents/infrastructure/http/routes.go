@@ -17,5 +17,5 @@ func RegisterRoutes(rg *gin.RouterGroup, h *Handler, rbacSvc *rbacapp.Service, a
 	secured.GET("", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.List)
 	secured.GET("/:id", rbacmiddleware.RequirePermission(rbacSvc, "incidents.read"), h.GetByID)
 	secured.PUT("/:id", rbacmiddleware.RequirePermission(rbacSvc, "incidents.triage"), h.Update)
-	secured.PATCH("/:id/status", rbacmiddleware.RequirePermission(rbacSvc, "incidents.triage"), h.UpdateStatus)
+	secured.PATCH("/:id/status", rbacmiddleware.RequirePermissionOrRole(rbacSvc, "incidents.triage", "DRIVER", "MEDIC"), h.UpdateStatus)
 }
