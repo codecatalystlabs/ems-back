@@ -258,6 +258,57 @@ func (s *Service) GetIncidentByID(ctx context.Context, id string) (incidentdomai
 	return s.repo.GetIncidentByID(ctx, id)
 }
 
+// CreateIncidentFeedback records a receiving-facility outcome report against an
+// incident. It returns ErrIncidentNotFound when the incident does not exist.
+func (s *Service) CreateIncidentFeedback(ctx context.Context, incidentID string, req CreateIncidentFeedbackRequest, actorUserID *string) (incidentdomain.IncidentFeedback, error) {
+	if _, err := s.repo.GetIncidentByID(ctx, incidentID); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return incidentdomain.IncidentFeedback{}, ErrIncidentNotFound
+		}
+		return incidentdomain.IncidentFeedback{}, err
+	}
+
+	fb := incidentdomain.IncidentFeedback{
+		IncidentID:      incidentID,
+		OutcomeStatus:   strings.ToUpper(strings.TrimSpace(req.OutcomeStatus)),
+		Summary:         strings.TrimSpace(req.Summary),
+		ReportedBy:      strings.TrimSpace(req.ReportedBy),
+		OtherDetails:    strings.TrimSpace(req.OtherDetails),
+		CreatedByUserID: actorUserID,
+	}
+	created, err := s.repo.CreateIncidentFeedback(ctx, fb)
+	if err != nil {
+		return incidentdomain.IncidentFeedback{}, err
+	}
+
+	note := "receiving facility feedback: " + created.OutcomeStatus
+	if created.Summary != "" {
+		note += " — " + created.Summary
+	}
+	_ = s.repo.CreateIncidentUpdate(ctx, incidentID, "COMMENT", "", created.OutcomeStatus, note, actorUserID)
+
+	_ = s.bus.Publish(ctx, "incident.feedback.created", events.Event{
+		ID:          uuid.NewString(),
+		Topic:       "incident.feedback.created",
+		AggregateID: incidentID,
+		Type:        "incident.feedback.created",
+		OccurredAt:  time.Now(),
+		Payload: map[string]any{
+			"incident_id":    incidentID,
+			"feedback_id":    created.ID,
+			"outcome_status": created.OutcomeStatus,
+			"reported_by":    created.ReportedBy,
+		},
+	})
+
+	return created, nil
+}
+
+// ListIncidentFeedback returns all feedback entries for an incident, newest first.
+func (s *Service) ListIncidentFeedback(ctx context.Context, incidentID string) ([]incidentdomain.IncidentFeedback, error) {
+	return s.repo.ListIncidentFeedback(ctx, incidentID)
+}
+
 // ErrIncidentNotAssigned is returned when a responder requests an incident
 // that is not assigned to them.
 var ErrIncidentNotAssigned = errors.New("incident not assigned to user")

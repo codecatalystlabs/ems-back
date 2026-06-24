@@ -19,15 +19,21 @@ type Incident struct {
 	BP                      string     `json:"bp"`
 	Temperature             string     `json:"temperature"`
 	IncidentTypeID          string     `json:"incident_type_id"`
+	IncidentTypeName        string     `json:"incident_type_name,omitempty"`
 	SeverityLevelID         *string    `json:"severity_level_id,omitempty"`
+	SeverityName            string     `json:"severity_name,omitempty"`
 	PriorityLevelID         *string    `json:"priority_level_id,omitempty"`
 	PriorityCode            string     `json:"priority_code,omitempty"`
+	PriorityName            string     `json:"priority_name,omitempty"`
 	Summary                 string     `json:"summary"`
 	Description             string     `json:"description"`
 	DistrictID              *string    `json:"district_id,omitempty"`
+	DistrictName            string     `json:"district_name,omitempty"`
 	PickupLocation          string     `json:"pickup_location"`
 	ReceivingFacilityID     *string    `json:"receiving_facility_id,omitempty"`
+	ReceivingFacilityName   string     `json:"receiving_facility_name,omitempty"`
 	ReferringFacilityID     *string    `json:"referring_facility_id,omitempty"`
+	ReferringFacilityName   string     `json:"referring_facility_name,omitempty"`
 	Village                 string     `json:"village"`
 	Parish                  string     `json:"parish"`
 	Subcounty               string     `json:"subcounty"`
@@ -44,6 +50,20 @@ type Incident struct {
 	ClosedAt                *time.Time `json:"closed_at,omitempty"`
 	CreatedAt               time.Time  `json:"created_at"`
 	UpdatedAt               time.Time  `json:"updated_at"`
+}
+
+// IncidentFeedback is a receiving-facility outcome report recorded against an
+// incident (e.g. the patient was admitted, discharged, referred onward, etc.).
+type IncidentFeedback struct {
+	ID              string    `json:"id"`
+	IncidentID      string    `json:"incident_id"`
+	OutcomeStatus   string    `json:"outcome_status"`
+	Summary         string    `json:"summary"`
+	ReportedBy      string    `json:"reported_by,omitempty"`
+	OtherDetails    string    `json:"other_details,omitempty"`
+	CreatedByUserID *string   `json:"created_by_user_id,omitempty"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }
 
 type IncidentUpdate struct {
