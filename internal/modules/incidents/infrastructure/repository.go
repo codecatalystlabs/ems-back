@@ -72,13 +72,15 @@ func (r *Repository) CreateIncident(ctx context.Context, in incidentdomain.Incid
 		patient_age_group, patient_sex, patient_details_diagnosis, incident_type_id, severity_level_id, priority_level_id,
 		summary, description, district_id, pickup_location, receiving_facility_id, referring_facility_id,
 		village, parish, subcounty, landmark,
-		latitude, longitude, verification_status, status, reported_at, created_by_user_id, created_at, updated_at
+		latitude, longitude, verification_status, status, reported_at, created_by_user_id,
+		respiratory_rate, spo2, pulse, bp, temperature, created_at, updated_at
 	) VALUES (
 		$1,$2,$3,$4,$5,$6,$7,
 		$8,$9,$10,$11,$12,$13,
 		$14,$15,$16,$17,$18,$19,
 		$20,$21,$22,$23,
-		$24,$25,$26,$27,$28,$29,now(),now()
+		$24,$25,$26,$27,$28,$29,
+		$30,$31,$32,$33,$34,now(),now()
 	)
 	RETURNING triaged_by_user_id, triaged_at, assigned_at, closed_at, created_at, updated_at`
 
@@ -112,6 +114,11 @@ func (r *Repository) CreateIncident(ctx context.Context, in incidentdomain.Incid
 		in.Status,
 		in.ReportedAt,
 		in.CreatedByUserID,
+		in.RespiratoryRate,
+		in.Spo2,
+		in.Pulse,
+		in.BP,
+		in.Temperature,
 	).Scan(
 		&in.TriagedByUserID,
 		&in.TriagedAt,
@@ -133,23 +140,73 @@ func (r *Repository) GetIncidentByID(ctx context.Context, id string) (incidentdo
 		SELECT i.id, i.incident_number, i.source_channel, COALESCE(i.caller_name,''), COALESCE(i.caller_phone,''),
 		COALESCE(i.patient_name,''), COALESCE(i.patient_phone,''), COALESCE(i.patient_age_group,''), COALESCE(i.patient_sex,''),
 		COALESCE(i.patient_details_diagnosis,''),
-		i.incident_type_id, i.severity_level_id, i.priority_level_id, COALESCE(rpl.code,''), COALESCE(i.summary,''), COALESCE(i.description,''),
-		i.district_id, COALESCE(i.pickup_location,''), i.receiving_facility_id, i.referring_facility_id,
+		COALESCE(i.respiratory_rate,''), COALESCE(i.spo2,''), COALESCE(i.pulse,''), COALESCE(i.bp,''), COALESCE(i.temperature,''),
+		i.incident_type_id, COALESCE(rit.name,''), i.severity_level_id, COALESCE(rsl.name,''),
+		i.priority_level_id, COALESCE(rpl.code,''), COALESCE(rpl.name,''), COALESCE(i.summary,''), COALESCE(i.description,''),
+		i.district_id, COALESCE(rd.name,''), COALESCE(i.pickup_location,''),
+		i.receiving_facility_id, COALESCE(rfrec.name,''), i.referring_facility_id, COALESCE(rfref.name,''),
 		COALESCE(i.village,''), COALESCE(i.parish,''), COALESCE(i.subcounty,''), COALESCE(i.landmark,''),
 		i.latitude, i.longitude, i.verification_status, i.status, i.reported_at, i.created_by_user_id, i.triaged_by_user_id,
 		i.triaged_at, i.assigned_at, i.closed_at, i.created_at, i.updated_at
 		FROM incidents i
 		LEFT JOIN ref_priority_levels rpl ON rpl.id = i.priority_level_id
+		LEFT JOIN ref_incident_types rit ON rit.id = i.incident_type_id
+		LEFT JOIN ref_severity_levels rsl ON rsl.id = i.severity_level_id
+		LEFT JOIN ref_districts rd ON rd.id = i.district_id
+		LEFT JOIN ref_facilities rfrec ON rfrec.id = i.receiving_facility_id
+		LEFT JOIN ref_facilities rfref ON rfref.id = i.referring_facility_id
 		WHERE i.id=$1`, id,
 	).Scan(&out.ID, &out.IncidentNumber, &out.SourceChannel, &out.CallerName, &out.CallerPhone,
 		&out.PatientName, &out.PatientPhone, &out.PatientAgeGroup, &out.PatientSex,
 		&out.PatientDetailsDiagnosis,
-		&out.IncidentTypeID, &out.SeverityLevelID, &out.PriorityLevelID, &out.PriorityCode, &out.Summary, &out.Description,
-		&out.DistrictID, &out.PickupLocation, &out.ReceivingFacilityID, &out.ReferringFacilityID,
+		&out.RespiratoryRate, &out.Spo2, &out.Pulse, &out.BP, &out.Temperature,
+		&out.IncidentTypeID, &out.IncidentTypeName, &out.SeverityLevelID, &out.SeverityName,
+		&out.PriorityLevelID, &out.PriorityCode, &out.PriorityName, &out.Summary, &out.Description,
+		&out.DistrictID, &out.DistrictName, &out.PickupLocation,
+		&out.ReceivingFacilityID, &out.ReceivingFacilityName, &out.ReferringFacilityID, &out.ReferringFacilityName,
 		&out.Village, &out.Parish, &out.Subcounty, &out.Landmark,
 		&out.Latitude, &out.Longitude, &out.VerificationStatus, &out.Status, &out.ReportedAt, &out.CreatedByUserID, &out.TriagedByUserID,
 		&out.TriagedAt, &out.AssignedAt, &out.ClosedAt, &out.CreatedAt, &out.UpdatedAt)
 	return out, err
+}
+
+func (r *Repository) CreateIncidentFeedback(ctx context.Context, fb incidentdomain.IncidentFeedback) (incidentdomain.IncidentFeedback, error) {
+	err := r.db.QueryRow(ctx, `
+		INSERT INTO incident_feedback (incident_id, outcome_status, summary, reported_by, other_details, created_by_user_id)
+		VALUES ($1,$2,$3,$4,$5,$6)
+		RETURNING id, created_at, updated_at`,
+		fb.IncidentID,
+		fb.OutcomeStatus,
+		fb.Summary,
+		nilIfBlank(&fb.ReportedBy),
+		nilIfBlank(&fb.OtherDetails),
+		fb.CreatedByUserID,
+	).Scan(&fb.ID, &fb.CreatedAt, &fb.UpdatedAt)
+	return fb, err
+}
+
+func (r *Repository) ListIncidentFeedback(ctx context.Context, incidentID string) ([]incidentdomain.IncidentFeedback, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, incident_id, outcome_status, summary, COALESCE(reported_by,''), COALESCE(other_details,''),
+		created_by_user_id, created_at, updated_at
+		FROM incident_feedback
+		WHERE incident_id=$1
+		ORDER BY created_at DESC`, incidentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	out := make([]incidentdomain.IncidentFeedback, 0)
+	for rows.Next() {
+		var fb incidentdomain.IncidentFeedback
+		if err := rows.Scan(&fb.ID, &fb.IncidentID, &fb.OutcomeStatus, &fb.Summary, &fb.ReportedBy, &fb.OtherDetails,
+			&fb.CreatedByUserID, &fb.CreatedAt, &fb.UpdatedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, fb)
+	}
+	return out, rows.Err()
 }
 
 // IsUserAssignedToIncident reports whether the user is the driver or lead
@@ -219,7 +276,7 @@ func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListI
 	if err := r.db.QueryRow(ctx, `SELECT COUNT(1) FROM incidents i `+whereSQL, args...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
-	q := fmt.Sprintf(`SELECT i.id, i.incident_number, i.source_channel, COALESCE(i.caller_name,''), COALESCE(i.caller_phone,''), COALESCE(i.patient_name,''), COALESCE(i.patient_phone,''), COALESCE(i.patient_age_group,''), COALESCE(i.patient_sex,''), COALESCE(i.patient_details_diagnosis,''), i.incident_type_id, i.severity_level_id, i.priority_level_id, COALESCE(rpl.code,''), COALESCE(i.summary,''), COALESCE(i.description,''), i.district_id, COALESCE(i.pickup_location,''), i.receiving_facility_id, i.referring_facility_id, COALESCE(i.village,''), COALESCE(i.parish,''), COALESCE(i.subcounty,''), COALESCE(i.landmark,''), i.latitude, i.longitude, i.verification_status, i.status, i.reported_at, i.created_by_user_id, i.triaged_by_user_id, i.triaged_at, i.assigned_at, i.closed_at, i.created_at, i.updated_at FROM incidents i LEFT JOIN ref_priority_levels rpl ON rpl.id=i.priority_level_id %s %s LIMIT $%d OFFSET $%d`, whereSQL, platformdb.BuildOrderBy(p, map[string]string{"reported_at": "i.reported_at", "created_at": "i.created_at", "status": "i.status"}), pos, pos+1)
+	q := fmt.Sprintf(`SELECT i.id, i.incident_number, i.source_channel, COALESCE(i.caller_name,''), COALESCE(i.caller_phone,''), COALESCE(i.patient_name,''), COALESCE(i.patient_phone,''), COALESCE(i.patient_age_group,''), COALESCE(i.patient_sex,''), COALESCE(i.patient_details_diagnosis,''), COALESCE(i.respiratory_rate,''), COALESCE(i.spo2,''), COALESCE(i.pulse,''), COALESCE(i.bp,''), COALESCE(i.temperature,''), i.incident_type_id, COALESCE(rit.name,''), i.severity_level_id, COALESCE(rsl.name,''), i.priority_level_id, COALESCE(rpl.code,''), COALESCE(rpl.name,''), COALESCE(i.summary,''), COALESCE(i.description,''), i.district_id, COALESCE(rd.name,''), COALESCE(i.pickup_location,''), i.receiving_facility_id, COALESCE(rfrec.name,''), i.referring_facility_id, COALESCE(rfref.name,''), COALESCE(i.village,''), COALESCE(i.parish,''), COALESCE(i.subcounty,''), COALESCE(i.landmark,''), i.latitude, i.longitude, i.verification_status, i.status, i.reported_at, i.created_by_user_id, i.triaged_by_user_id, i.triaged_at, i.assigned_at, i.closed_at, i.created_at, i.updated_at FROM incidents i LEFT JOIN ref_priority_levels rpl ON rpl.id=i.priority_level_id LEFT JOIN ref_incident_types rit ON rit.id=i.incident_type_id LEFT JOIN ref_severity_levels rsl ON rsl.id=i.severity_level_id LEFT JOIN ref_districts rd ON rd.id=i.district_id LEFT JOIN ref_facilities rfrec ON rfrec.id=i.receiving_facility_id LEFT JOIN ref_facilities rfref ON rfref.id=i.referring_facility_id %s %s LIMIT $%d OFFSET $%d`, whereSQL, platformdb.BuildOrderBy(p, map[string]string{"reported_at": "i.reported_at", "created_at": "i.created_at", "status": "i.status"}), pos, pos+1)
 	rows, err := r.db.Query(ctx, q, append(args, p.PageSize, p.Offset)...)
 	if err != nil {
 		return nil, 0, err
@@ -228,7 +285,7 @@ func (r *Repository) ListIncidents(ctx context.Context, params incidentapp.ListI
 	items := []incidentdomain.Incident{}
 	for rows.Next() {
 		var out incidentdomain.Incident
-		if err := rows.Scan(&out.ID, &out.IncidentNumber, &out.SourceChannel, &out.CallerName, &out.CallerPhone, &out.PatientName, &out.PatientPhone, &out.PatientAgeGroup, &out.PatientSex, &out.PatientDetailsDiagnosis, &out.IncidentTypeID, &out.SeverityLevelID, &out.PriorityLevelID, &out.PriorityCode, &out.Summary, &out.Description, &out.DistrictID, &out.PickupLocation, &out.ReceivingFacilityID, &out.ReferringFacilityID, &out.Village, &out.Parish, &out.Subcounty, &out.Landmark, &out.Latitude, &out.Longitude, &out.VerificationStatus, &out.Status, &out.ReportedAt, &out.CreatedByUserID, &out.TriagedByUserID, &out.TriagedAt, &out.AssignedAt, &out.ClosedAt, &out.CreatedAt, &out.UpdatedAt); err != nil {
+		if err := rows.Scan(&out.ID, &out.IncidentNumber, &out.SourceChannel, &out.CallerName, &out.CallerPhone, &out.PatientName, &out.PatientPhone, &out.PatientAgeGroup, &out.PatientSex, &out.PatientDetailsDiagnosis, &out.RespiratoryRate, &out.Spo2, &out.Pulse, &out.BP, &out.Temperature, &out.IncidentTypeID, &out.IncidentTypeName, &out.SeverityLevelID, &out.SeverityName, &out.PriorityLevelID, &out.PriorityCode, &out.PriorityName, &out.Summary, &out.Description, &out.DistrictID, &out.DistrictName, &out.PickupLocation, &out.ReceivingFacilityID, &out.ReceivingFacilityName, &out.ReferringFacilityID, &out.ReferringFacilityName, &out.Village, &out.Parish, &out.Subcounty, &out.Landmark, &out.Latitude, &out.Longitude, &out.VerificationStatus, &out.Status, &out.ReportedAt, &out.CreatedByUserID, &out.TriagedByUserID, &out.TriagedAt, &out.AssignedAt, &out.ClosedAt, &out.CreatedAt, &out.UpdatedAt); err != nil {
 			return nil, 0, err
 		}
 		items = append(items, out)
@@ -291,6 +348,31 @@ func (r *Repository) UpdateIncident(ctx context.Context, id string, req incident
 	if req.PatientDetailsDiagnosis != nil {
 		sets = append(sets, fmt.Sprintf("patient_details_diagnosis = $%d", pos))
 		args = append(args, trimmedValue(req.PatientDetailsDiagnosis))
+		pos++
+	}
+	if req.RespiratoryRate != nil {
+		sets = append(sets, fmt.Sprintf("respiratory_rate = $%d", pos))
+		args = append(args, trimmedValue(req.RespiratoryRate))
+		pos++
+	}
+	if req.Spo2 != nil {
+		sets = append(sets, fmt.Sprintf("spo2 = $%d", pos))
+		args = append(args, trimmedValue(req.Spo2))
+		pos++
+	}
+	if req.Pulse != nil {
+		sets = append(sets, fmt.Sprintf("pulse = $%d", pos))
+		args = append(args, trimmedValue(req.Pulse))
+		pos++
+	}
+	if req.BP != nil {
+		sets = append(sets, fmt.Sprintf("bp = $%d", pos))
+		args = append(args, trimmedValue(req.BP))
+		pos++
+	}
+	if req.Temperature != nil {
+		sets = append(sets, fmt.Sprintf("temperature = $%d", pos))
+		args = append(args, trimmedValue(req.Temperature))
 		pos++
 	}
 	if req.IncidentTypeID != nil {
@@ -412,6 +494,37 @@ func (r *Repository) UpdateIncident(ctx context.Context, id string, req incident
 		return incidentdomain.Incident{}, err
 	}
 	return r.GetIncidentByID(ctx, id)
+}
+
+// DeleteIncident hard-deletes an incident. Most child rows (dispatch
+// assignments/recommendations, triage sessions/responses, trips, incident
+// updates) reference the incident with ON DELETE CASCADE, but a few references
+// are nullable with no cascade and would otherwise block the delete, so they
+// are cleared first inside the same transaction. Returns pgx.ErrNoRows when no
+// incident with the given id exists.
+func (r *Repository) DeleteIncident(ctx context.Context, id string) error {
+	return platformdb.WithTx(ctx, r.db, func(tx pgx.Tx) error {
+		clears := []string{
+			`UPDATE user_availability SET current_incident_id = NULL WHERE current_incident_id = $1`,
+			`UPDATE inbound_sms SET linked_incident_id = NULL WHERE linked_incident_id = $1`,
+			`UPDATE outbound_sms SET linked_incident_id = NULL WHERE linked_incident_id = $1`,
+			`UPDATE ussd_sessions SET linked_incident_id = NULL WHERE linked_incident_id = $1`,
+			`UPDATE call_logs SET linked_incident_id = NULL WHERE linked_incident_id = $1`,
+		}
+		for _, q := range clears {
+			if _, err := tx.Exec(ctx, q, id); err != nil {
+				return err
+			}
+		}
+		ct, err := tx.Exec(ctx, `DELETE FROM incidents WHERE id = $1`, id)
+		if err != nil {
+			return err
+		}
+		if ct.RowsAffected() == 0 {
+			return pgx.ErrNoRows
+		}
+		return nil
+	})
 }
 
 func (r *Repository) UpdateIncidentStatus(ctx context.Context, id, status string) (incidentdomain.Incident, error) {
