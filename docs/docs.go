@@ -3455,6 +3455,114 @@ const docTemplate = `{
                 }
             }
         },
+        "/incidents/{id}/feedback": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns receiving-facility feedback entries for an incident, newest first.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incidents"
+                ],
+                "summary": "List incident feedback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Records receiving-facility outcome feedback for a transferred/received patient. Requires the incidents.feedback permission.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Incidents"
+                ],
+                "summary": "Submit incident feedback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Incident ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Feedback payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dispatch_internal_modules_incidents_application.CreateIncidentFeedbackRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/incidents/{id}/status": {
             "patch": {
                 "security": [
@@ -6886,6 +6994,10 @@ const docTemplate = `{
                 },
                 "station_name": {
                     "type": "string"
+                },
+                "unit_cost": {
+                    "type": "number",
+                    "minimum": 0
                 }
             }
         },
@@ -6912,6 +7024,10 @@ const docTemplate = `{
                 },
                 "station_name": {
                     "type": "string"
+                },
+                "unit_cost": {
+                    "type": "number",
+                    "minimum": 0
                 }
             }
         },
@@ -6987,6 +7103,9 @@ const docTemplate = `{
                 "station_name": {
                     "type": "string"
                 },
+                "unit_cost": {
+                    "type": "number"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -7017,6 +7136,35 @@ const docTemplate = `{
                     "$ref": "#/definitions/dispatch_internal_modules_fuel_domain.FuelLog"
                 },
                 "logged_by_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dispatch_internal_modules_incidents_application.CreateIncidentFeedbackRequest": {
+            "type": "object",
+            "required": [
+                "outcome_status",
+                "summary"
+            ],
+            "properties": {
+                "other_details": {
+                    "type": "string"
+                },
+                "outcome_status": {
+                    "type": "string",
+                    "enum": [
+                        "ADMITTED",
+                        "DISCHARGED",
+                        "STABILIZED",
+                        "REFERRED",
+                        "DECEASED",
+                        "OTHER"
+                    ]
+                },
+                "reported_by": {
+                    "type": "string"
+                },
+                "summary": {
                     "type": "string"
                 }
             }

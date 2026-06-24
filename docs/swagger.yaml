@@ -579,6 +579,9 @@ definitions:
         type: integer
       station_name:
         type: string
+      unit_cost:
+        minimum: 0
+        type: number
     required:
     - ambulance_id
     - liters
@@ -599,6 +602,9 @@ definitions:
         type: integer
       station_name:
         type: string
+      unit_cost:
+        minimum: 0
+        type: number
     type: object
   dispatch_internal_modules_fuel_domain.CrewMember:
     properties:
@@ -648,6 +654,8 @@ definitions:
         type: string
       station_name:
         type: string
+      unit_cost:
+        type: number
       updated_at:
         type: string
     type: object
@@ -669,6 +677,27 @@ definitions:
         $ref: '#/definitions/dispatch_internal_modules_fuel_domain.FuelLog'
       logged_by_name:
         type: string
+    type: object
+  dispatch_internal_modules_incidents_application.CreateIncidentFeedbackRequest:
+    properties:
+      other_details:
+        type: string
+      outcome_status:
+        enum:
+        - ADMITTED
+        - DISCHARGED
+        - STABILIZED
+        - REFERRED
+        - DECEASED
+        - OTHER
+        type: string
+      reported_by:
+        type: string
+      summary:
+        type: string
+    required:
+    - outcome_status
+    - summary
     type: object
   dispatch_internal_modules_incidents_application.CreateIncidentRequest:
     properties:
@@ -3487,6 +3516,79 @@ paths:
       security:
       - BearerAuth: []
       summary: Update incident
+      tags:
+      - Incidents
+  /incidents/{id}/feedback:
+    get:
+      description: Returns receiving-facility feedback entries for an incident, newest
+        first.
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List incident feedback
+      tags:
+      - Incidents
+    post:
+      consumes:
+      - application/json
+      description: Records receiving-facility outcome feedback for a transferred/received
+        patient. Requires the incidents.feedback permission.
+      parameters:
+      - description: Incident ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Feedback payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dispatch_internal_modules_incidents_application.CreateIncidentFeedbackRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Submit incident feedback
       tags:
       - Incidents
   /incidents/{id}/status:
