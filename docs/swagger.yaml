@@ -1528,6 +1528,42 @@ paths:
       summary: Assign driver to ambulance
       tags:
       - Fleet
+  /analytics/summary:
+    get:
+      description: 'Returns system-wide reporting: incident totals, assignments, referrals,
+        patient transfers, outcome distribution and district-level breakdowns. Optionally
+        filtered by date range and district.'
+      parameters:
+      - description: Start date YYYY-MM-DD
+        in: query
+        name: date_from
+        type: string
+      - description: End date YYYY-MM-DD
+        in: query
+        name: date_to
+        type: string
+      - description: District ID
+        in: query
+        name: district_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Consolidated analytics summary
+      tags:
+      - Analytics
   /auth/login:
     post:
       consumes:

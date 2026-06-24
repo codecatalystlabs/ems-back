@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	analyticsmod "dispatch/internal/modules/analytics"
 	authmod "dispatch/internal/modules/auth"
 	availabilitymod "dispatch/internal/modules/availability"
 	bloodmod "dispatch/internal/modules/blood"
@@ -58,4 +59,5 @@ func RegisterModules(deps types.ModuleDeps) {
 	dispatchmod.Register(securedDeps)
 	devicetokens.Register(securedDeps)
 	dashboard.Register(securedDeps)
+	analyticsmod.Register(securedDeps)
 }
