@@ -18,8 +18,10 @@ import (
 	"dispatch/internal/platform/events"
 )
 
-// dispatcherNotifyRoles are the roles alerted whenever a new incident is reported.
-var dispatcherNotifyRoles = []string{"DISPATCHER", "DISPATCH_SUPERVISOR"}
+// dispatcherNotifyRoles are the roles alerted whenever a new incident is
+// reported: dispatch staff plus system-wide and national administrators.
+// DISTRICT_ADMIN is left out because recipients are not filtered by district.
+var dispatcherNotifyRoles = []string{"DISPATCHER", "DISPATCH_SUPERVISOR", "SUPER_ADMIN", "NATIONAL_ADMIN"}
 
 type NotificationCreator interface {
 	Create(ctx context.Context,
@@ -156,7 +158,7 @@ func (s *Service) CreateIncident(ctx context.Context, req CreateIncidentRequest)
 	return resp, nil
 }
 
-// notifyIncidentReported alerts dispatch staff that a new incident needs
+// notifyIncidentReported alerts dispatch staff and admins that a new incident needs
 // attention. Failures are logged, never propagated: notification delivery
 // must not fail incident creation.
 func (s *Service) notifyIncidentReported(ctx context.Context, inc incidentdomain.Incident) {
